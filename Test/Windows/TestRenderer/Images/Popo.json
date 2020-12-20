@@ -1,0 +1,51 @@
+{
+    "AnimationList": [
+        {
+            "Name": "Default",
+            "TimePerFrame": 1,
+            "Texture": "Images/Popo.png",
+            "FrameList": [
+                {
+                    "Color": "0xffffffff",
+                    "UV": "0,0,44,41"
+                },
+                {
+                    "Color": "0xffffffff",
+                    "UV": "45,0,88,41"
+                },
+                {
+                    "Color": "0xffffffff",
+                    "UV": "89,0,132,41"
+                },
+                {
+                    "Color": "0xffffffff",
+                    "UV": "45,0,88,41"
+                }
+            ]
+        },
+
+        {
+            "Name": "Haha",
+            "TimePerFrame": 0.13,
+            "Texture": "Images/Popo.png",
+            "FrameList": [
+                {
+                    "Color": "0xffffffff",
+                    "UV": "0,0,44,41"
+                },
+                {
+                    "Color": "0xffffffff",
+                    "UV": "44,0,88,41"
+                },
+                {
+                    "Color": "0xffffffff",
+                    "UV": "88,0,132,41"
+                },
+                {
+                    "Color": "0xffffffff",
+                    "UV": "44,0,88,41"
+                }
+            ]
+        }
+    ]
+}

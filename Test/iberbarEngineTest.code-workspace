@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "Test.Lua\\Scripts"
+		},
+		{
+			"path": "Test.Lua\\Scripts2"
+		},
+		{
+			"path": "Windows\\TestRenderer\\Scripts"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Scripts"
+	}
+}
