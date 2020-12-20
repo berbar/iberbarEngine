@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="D3D9">
+      <UniqueIdentifier>{42f84b03-976f-4b72-962d-72fbf2f10921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D11">
+      <UniqueIdentifier>{ee5adc5a-fb3d-437d-b31d-5a3232fcc219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DCommon">
+      <UniqueIdentifier>{45ba44c6-6295-4df3-b369-6dfd382e0691}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\Device.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\Headers.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\Texture.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3DCommon\Macros.h">
+      <Filter>D3DCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\Buffer.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\Shader.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\CommandContext.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\Types.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\ShaderState.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\VertexDeclaration.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D9\ShaderVariables.h">
+      <Filter>D3D9</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Device.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Headers.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\Device.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\Texture.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\Buffer.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\Shader.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\CommandContext.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\ShaderState.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\VertexDeclaration.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D9\ShaderVariables.cpp">
+      <Filter>D3D9</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Element\ElemColorRect.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Element\ElemStateTexture.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\Button.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\Container.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\CheckBox.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\RadioBox.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Element\ElemStateLabel.cpp">
+      <Filter>Element</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Xml\XmlState.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Xml\XmlProc.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Engine.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Object.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\RenderElement.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widget.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Dialog.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Commands.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\ListBox.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\ScrollBar.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\EditBox.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Xml\XmlProcHelper.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\BaseTypes.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Element\BlendColor.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Element\ElemColorRect.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Element\ElemStateTexture.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\Button.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\Container.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\CheckBox.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\RadioBox.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Element\ElemStateLabel.h">
+      <Filter>Element</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Xml\XmlState.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Xml\XmlProc.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Engine.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\RenderElement.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Object.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widget.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Dialog.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Commands.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\ListBox.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\ScrollBar.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\EditBox.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Xml\XmlProcHelper.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Element">
+      <UniqueIdentifier>{957c2246-56c8-4315-b9db-8cf13d895b98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Widget">
+      <UniqueIdentifier>{3bda1c99-cb27-45b5-90f8-892a41820b35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Xml">
+      <UniqueIdentifier>{941f32a6-aad7-470d-b87a-e88a9b5241d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lua">
+      <UniqueIdentifier>{33ae0287-1ca8-4092-830c-550277ad19e5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Xsd Include="..\..\..\Src\iberbar\Gui\Xml\Gui.xsd">
+      <Filter>Xml</Filter>
+    </Xsd>
+  </ItemGroup>
+</Project>

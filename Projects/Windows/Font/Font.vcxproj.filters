@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Font\FontBase.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\FontDeviceFreeType.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\FontDrawText.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\TextAdjust.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\Types.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\CharMapper.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\FreeType.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Font\CalculateTextRect.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Font\FontDeviceFreeType.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Font\TextAdjust.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Font\CharMapper.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Font\FreeType.cpp" />
+  </ItemGroup>
+</Project>

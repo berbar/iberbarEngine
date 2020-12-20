@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\IO.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Logger.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\Private\MsgQueue.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Device.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Socket.h">
+      <Filter>Private</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Network\IO.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Logger.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Network\Private\MsgQueue.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Device.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Socket.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Private">
+      <UniqueIdentifier>{89caba25-427f-4a63-97f9-41c6fe4f9717}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

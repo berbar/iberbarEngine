@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<iberbar>
+    <Preload>
+        <Font Family="Fonts/msyh.ttc" Size="21" Weight="Bold" Italic="" Vocabular="">
+        </Font>
+
+        <Font Family="Fonts/consola.ttf" Size="21" Weight="Bold" Italic="" Vocabular="">
+            <Charaters>abcdefghijklmnopqrstuvwxyzAB</Charaters>
+        </Font>
+
+        <Font Family="Fonts/arial.ttf" Size="40" Weight="Bold" Italic="" Vocabular="">
+        </Font>
+
+        <Font Family="Fonts/STHUPO.TTF" Size="21" Weight="Bold" Italic="" Vocabular="">
+        </Font>
+    </Preload>
+</iberbar>

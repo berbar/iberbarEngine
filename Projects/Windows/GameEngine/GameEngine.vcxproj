@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{721c957b-1c66-47e4-b169-254f0c0e5cc1}</ProjectGuid>
+    <RootNamespace>GameEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\Properties\Common-Windows.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\Properties\Common-Windows.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\Properties\Common-Windows.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\Properties\Common-Windows.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opengl_include);$(DXSDK_DIR)Include;$(sdk_lua_include);$(sdk_directxmath_include);$(sdk_nlohmann_json);$(sdk_msgpack_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opengl_lib);$(DXSDK_DIR)Lib\$(PlatformTarget);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opengl_include);$(DXSDK_DIR)Include;$(sdk_lua_include);$(sdk_directxmath_include);$(sdk_nlohmann_json);$(sdk_msgpack_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opengl_lib);$(DXSDK_DIR)Lib\$(PlatformTarget);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opengl_include);$(DXSDK_DIR)Include;$(sdk_lua_include);$(sdk_directxmath_include);$(sdk_nlohmann_json);$(sdk_msgpack_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opengl_lib);$(DXSDK_DIR)Lib\$(PlatformTarget);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opengl_include);$(DXSDK_DIR)Include;$(sdk_lua_include);$(sdk_directxmath_include);$(sdk_nlohmann_json);$(sdk_msgpack_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opengl_lib);$(DXSDK_DIR)Lib\$(PlatformTarget);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__iberbarGameEngineApiExport__;__iberbarLuaApisExport__;WIN32;_DEBUG;GAMEENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>glew32.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__iberbarGameEngineApiExport__;__iberbarLuaApisExport__;WIN32;NDEBUG;GAMEENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>glew32.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__iberbarGameEngineApiExport__;__iberbarLuaApisExport__;_DEBUG;GAMEENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>glew32.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>__iberbarGameEngineApiExport__;__iberbarLuaApisExport__;NDEBUG;GAMEENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>glew32.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Application.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\BaseResourceManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\FontManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\LoadingThread.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\OutputDeviceFileAsync.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\TextureManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Timer.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Game.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Game_Names.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Gui.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Gui_Names.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Json.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\MsgPack.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Network.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Network_Names.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d_Names.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\FontManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\LoadingThread.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\TextureManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Timer.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Game.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Gui.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Json.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\MsgPack.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Network.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Font\Font.vcxproj">
+      <Project>{49d3fa7d-bc14-4987-af1d-92af0a2c7ff3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Gui\Gui.vcxproj">
+      <Project>{a980a403-b3e9-41c2-8d23-fe1109c7d0b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Lua\Lua.vcxproj">
+      <Project>{19354e10-e280-4145-896a-7eab42b9cec2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Network\Network.vcxproj">
+      <Project>{46b138c1-1e14-412f-8200-9a0686b915b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Paper2d\Paper2d.vcxproj">
+      <Project>{d190599f-e831-45e6-8062-0dc24e4f0960}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Renderer\Renderer.vcxproj">
+      <Project>{72a811b7-083c-43b3-9dac-e161fc97d8c8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI.D3D\RHI.D3D.vcxproj">
+      <Project>{78f105b7-d338-42f2-845c-c8899265ff45}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI.OpenGL\RHI.OpenGL.vcxproj">
+      <Project>{99d7e711-e3be-4705-9459-462c46366add}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI\RHI.vcxproj">
+      <Project>{46598424-3772-4387-ba03-3e3ed3aeca79}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{295545fc-44b3-43cd-b1a5-6871e9be9217}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

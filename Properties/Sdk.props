@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <__common_include>$(CppSdkEnv)\__common</__common_include>
+    <sdk_lua>$(CppSdkEnv)\lua\5.3.5\$(OSTarget)\$(PlatformTarget)</sdk_lua>
+    <sdk_lua_include>$(sdk_lua)\include</sdk_lua_include>
+    <sdk_lua_lib>$(sdk_lua)\lib</sdk_lua_lib>
+    <sdk_lua_bin>$(sdk_lua)\bin</sdk_lua_bin>
+    <sdk_opencv>$(CppSdkEnv)\opencv-4.1.2\windows</sdk_opencv>
+    <sdk_opencv_include>$(sdk_opencv)\include</sdk_opencv_include>
+    <sdk_opencv_lib>$(sdk_opencv)\$(PlatformTarget)\vc16\lib</sdk_opencv_lib>
+    <sdk_opencv_bin>$(sdk_opencv)\$(PlatformTarget)\vc16\bin</sdk_opencv_bin>
+    <sdk_nlohmann_json>$(CppSdkEnv)\nlohmann\3.7.3</sdk_nlohmann_json>
+    <sdk_rapidxml>$(CppSdkEnv)\rapidxml\1.13</sdk_rapidxml>
+    <sdk_rapidxml_include>$(sdk_rapidxml)</sdk_rapidxml_include>
+    <sdk_directx9>$(CppSdkEnv)\DirectX9.0c</sdk_directx9>
+    <sdk_directx9_include>$(sdk_directx9)\Include</sdk_directx9_include>
+    <sdk_directx9_lib>$(sdk_directx9)\Lib\$(PlatformTarget)</sdk_directx9_lib>
+    <sdk_directx9_bin>$(sdk_directx9)\Developer Runtime\$(PlatformTarget)</sdk_directx9_bin>
+    <sdk_freetype2>$(CppSdkEnv)\freetype\2.10.2\$(OSTarget)\$(PlatformTarget)</sdk_freetype2>
+    <sdk_freetype2_include>$(sdk_freetype2)\include\freetype2</sdk_freetype2_include>
+    <sdk_freetype2_lib>$(sdk_freetype2)\lib</sdk_freetype2_lib>
+    <sdk_curl>$(CppSdkEnv)\curl\windows\$(PlatformTarget)</sdk_curl>
+    <sdk_curl_include>$(sdk_curl)\include</sdk_curl_include>
+    <sdk_curl_lib>$(sdk_curl)\lib</sdk_curl_lib>
+    <sdk_curl_bin>$(sdk_curl)\bin</sdk_curl_bin>
+    <sdk_gles>$(CppSdkEnv)\GL\windows</sdk_gles>
+    <sdk_gles_include>$(sdk_gles)\include</sdk_gles_include>
+    <sdk_gles_lib>$(sdk_gles)\bin</sdk_gles_lib>
+    <sdk_gles_bin>$(sdk_gles)\bin</sdk_gles_bin>
+    <sdk_libpng>$(CppSdkEnv)\libpng\1.6.37\$(OSTarget)\$(PlatformTarget)</sdk_libpng>
+    <sdk_libpng_include>$(sdk_libpng)\include</sdk_libpng_include>
+    <sdk_libpng_lib>$(sdk_libpng)\lib</sdk_libpng_lib>
+    <sdk_libpng_bin>$(sdk_libpng)\bin</sdk_libpng_bin>
+    <sdk_opengl>$(CppSdkEnv)\OpenGL\glew-2.1.0</sdk_opengl>
+    <sdk_opengl_include>$(sdk_opengl)\include\GL</sdk_opengl_include>
+    <sdk_opengl_lib>$(sdk_opengl)\lib\Release\$(Platform)</sdk_opengl_lib>
+    <sdk_opengl_bin>$(sdk_opengl)\bin\Release\$(Platform)</sdk_opengl_bin>
+    <sdk_zlib>$(CppSdkEnv)\zlib\1.2.11\$(OSTarget)\$(PlatformTarget)</sdk_zlib>
+    <sdk_zlib_include>$(sdk_zlib)\include</sdk_zlib_include>
+    <sdk_zlib_lib>$(sdk_zlib)\lib</sdk_zlib_lib>
+    <sdk_zlib_bin>$(sdk_zlib)\bin</sdk_zlib_bin>
+    <sdk_directxmath>$(CppSdkEnv)\DirectXMath\3.15</sdk_directxmath>
+    <sdk_directxmath_include>$(sdk_directxmath)\Inc</sdk_directxmath_include>
+    <sdk_libevent>$(CppSdkEnv)\libevent\2.1.12\$(sdk_platform_path)</sdk_libevent>
+    <sdk_libevent_include>$(sdk_libevent)\include</sdk_libevent_include>
+    <sdk_libevent_lib>$(sdk_libevent)\lib</sdk_libevent_lib>
+    <sdk_libevent_bin>$(sdk_libevent)\lib</sdk_libevent_bin>
+    <sdk_openssl>$(CppSdkEnv)\OpenSSL\v1.1.1g\$(OSTarget)</sdk_openssl>
+    <sdk_msgpack>$(CppSdkEnv)\msgpack\3.3.0\$(sdk_platform_path)</sdk_msgpack>
+    <sdk_msgpack_include>$(sdk_msgpack)\include</sdk_msgpack_include>
+    <sdk_sproto>$(CppSdkEnv)\sproto\$(sdk_platform_path)</sdk_sproto>
+    <sdk_sproto_bin>$(sdk_sproto)\bin</sdk_sproto_bin>
+    <sdk_spdlog>$(CppSdkEnv)\spdlog\1.7.0\$(sdk_platform_path)</sdk_spdlog>
+    <sdk_spdlog_include>$(sdk_spdlog)\include</sdk_spdlog_include>
+    <sdk_spdlog_lib>$(sdk_spdlog)\lib</sdk_spdlog_lib>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="__common_include">
+      <Value>$(__common_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_lua">
+      <Value>$(sdk_lua)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_lua_include">
+      <Value>$(sdk_lua_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_lua_lib">
+      <Value>$(sdk_lua_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_lua_bin">
+      <Value>$(sdk_lua_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opencv">
+      <Value>$(sdk_opencv)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opencv_include">
+      <Value>$(sdk_opencv_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opencv_lib">
+      <Value>$(sdk_opencv_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opencv_bin">
+      <Value>$(sdk_opencv_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_nlohmann_json">
+      <Value>$(sdk_nlohmann_json)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_rapidxml">
+      <Value>$(sdk_rapidxml)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_rapidxml_include">
+      <Value>$(sdk_rapidxml_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directx9">
+      <Value>$(sdk_directx9)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directx9_include">
+      <Value>$(sdk_directx9_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directx9_lib">
+      <Value>$(sdk_directx9_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directx9_bin">
+      <Value>$(sdk_directx9_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_freetype2">
+      <Value>$(sdk_freetype2)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_freetype2_include">
+      <Value>$(sdk_freetype2_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_freetype2_lib">
+      <Value>$(sdk_freetype2_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_curl">
+      <Value>$(sdk_curl)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_curl_include">
+      <Value>$(sdk_curl_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_curl_lib">
+      <Value>$(sdk_curl_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_curl_bin">
+      <Value>$(sdk_curl_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_gles">
+      <Value>$(sdk_gles)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_gles_include">
+      <Value>$(sdk_gles_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_gles_lib">
+      <Value>$(sdk_gles_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_gles_bin">
+      <Value>$(sdk_gles_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libpng">
+      <Value>$(sdk_libpng)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libpng_include">
+      <Value>$(sdk_libpng_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libpng_lib">
+      <Value>$(sdk_libpng_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libpng_bin">
+      <Value>$(sdk_libpng_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opengl">
+      <Value>$(sdk_opengl)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opengl_include">
+      <Value>$(sdk_opengl_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opengl_lib">
+      <Value>$(sdk_opengl_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_opengl_bin">
+      <Value>$(sdk_opengl_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_zlib">
+      <Value>$(sdk_zlib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_zlib_include">
+      <Value>$(sdk_zlib_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_zlib_lib">
+      <Value>$(sdk_zlib_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_zlib_bin">
+      <Value>$(sdk_zlib_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directxmath">
+      <Value>$(sdk_directxmath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directxmath_include">
+      <Value>$(sdk_directxmath_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libevent">
+      <Value>$(sdk_libevent)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libevent_include">
+      <Value>$(sdk_libevent_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libevent_lib">
+      <Value>$(sdk_libevent_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_libevent_bin">
+      <Value>$(sdk_libevent_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_openssl">
+      <Value>$(sdk_openssl)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_msgpack">
+      <Value>$(sdk_msgpack)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_msgpack_include">
+      <Value>$(sdk_msgpack_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_sproto">
+      <Value>$(sdk_sproto)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_sproto_bin">
+      <Value>$(sdk_sproto_bin)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_spdlog">
+      <Value>$(sdk_spdlog)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_spdlog_include">
+      <Value>$(sdk_spdlog_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_spdlog_lib">
+      <Value>$(sdk_spdlog_lib)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

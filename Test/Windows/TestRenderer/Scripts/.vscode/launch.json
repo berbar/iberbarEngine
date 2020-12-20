@@ -1,0 +1,23 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "attach",
+            "type": "lua",
+            "request": "attach",
+            "stopOnEntry": true,
+            "processName": "TestRenderer.exe"
+        },
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "Debug",
+            "program": "${workspaceFolder}/main.lua",
+            "runtimeExecutable": "G:/Environment/lua/5.3.5/Windows/x86/bin/lua53.dll"
+        }
+    ]
+}

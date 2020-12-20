@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Node.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Image.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Animation.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Scene.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\DrawContext.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Camera.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Director.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Component.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\ComponentSystem.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\ComponentContainer.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Terrain.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Transform.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\PhysicsWorld.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\TimeController.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Node.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Image.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Animation.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Scene.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Director.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\DrawContext.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Camera.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\ComponentSystem.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\ComponentContainer.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Terrain.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Transform.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\PhysicsWorld.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component_Bounding.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component_Updatable.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component_HandleMouseInput.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component_HandleKeyboardInput.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component_CustomAttributes.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Component_Transform.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\TimeController.h" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<iberbarGui version="0.1">
+
+    <Widget Type="Default" Id="Background"
+        X="0" Y="0"
+        Width="100%" Height="100%"
+        AlignHorizental="Center"
+        AlignVertical="Center">
+        <Styles>
+            <Element Type="StateTexture" X="0" Y="0" Width="100%" Height="100%">
+                <Texture State="All" Src="Images/Background.png" UV="0,0,1,1" Color="0xffffffff" />
+            </Element>
+        </Styles>
+    </Widget>
+
+    <Widget Type="Button" Id="Btn-StartGame"
+        X="100" Y="-100"
+        Width="200" Height="50"
+        AlignHorizental="Center" AlignVertical="Center" >
+        <Styles>
+            <Element Type="StateLabel" X="0" Y="0" Width="100%" Height="100%" >
+                <Font Family="Fonts/STHUPO.TTF" Size="21" Weight="Bold" />
+                <Text>开始游戏</Text>
+                <Color State="Normal" Value="0xff000000" />
+                <Color State="MouseOver" Value="0xff0000ff" />
+                <Color State="Pressed" Value="0xffff0000" />
+                <Color State="Focus" Value="0xff00ff00" />
+                <Color State="Disabled" Value="0xff8c8c8c" />
+                <Color State="Hidden" Value="0x00000000" />
+            </Element>
+        </Styles>
+    </Widget>
+
+    <Widget Type="Button" Id="Btn-Settings"
+        X="100" Y="0"
+        Width="200" Height="50"
+        AlignHorizental="Center" AlignVertical="Center">
+        <Styles>
+            <Element Type="StateLabel" X="0" Y="0" Width="100%" Height="100%">
+                <Font Family="Fonts/STHUPO.TTF" Size="21" Weight="Bold" />
+                <Text>设置</Text>
+                <Color State="Normal" Value="0xff000000" />
+                <Color State="MouseOver" Value="0xffff0000" />
+                <Color State="Pressed" Value="0xffff0000" />
+                <Color State="Focus" Value="0xffff0000" />
+                <Color State="Disabled" Value="0xff8c8c8c" />
+                <Color State="Hidden" Value="0x00000000" />
+            </Element>
+        </Styles>
+    </Widget>
+
+    <Widget Type="Button" Id="Btn-Quit"
+        X="100" Y="100"
+        Width="200" Height="50"
+        AlignHorizental="Center" AlignVertical="Center" >
+        <Styles>
+            <Element Type="StateLabel" X="0" Y="0" Width="100%" Height="100%">
+                <Font Family="Fonts/STHUPO.TTF" Size="21" Weight="Bold" />
+                <Text>退出</Text>
+                <Color State="Normal" Value="0xff000000" />
+                <Color State="MouseOver" Value="0xffff0000" />
+                <Color State="Pressed" Value="0xffff0000" />
+                <Color State="Focus" Value="0xffff0000" />
+                <Color State="Disabled" Value="0xff8c8c8c" />
+                <Color State="Hidden" Value="0x00000000" />
+            </Element>
+        </Styles>
+    </Widget>
+
+
+</iberbarGui>
