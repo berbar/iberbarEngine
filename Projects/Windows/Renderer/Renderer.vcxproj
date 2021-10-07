@@ -190,9 +190,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\CallbackCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\CustomCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Font.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\FontDrawState.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\GroupCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RenderCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Renderer.h" />
@@ -200,8 +202,10 @@
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\CallbackCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Font.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\FontDrawState.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\GroupCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RenderCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RendererSprite.cpp" />

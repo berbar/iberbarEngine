@@ -56,8 +56,8 @@ TCharNode* iberbar::TFontCharMapper< TCharNode >::Get( wchar_t nChar )
 	if ( nChar >= 31 && nChar <= 126 )
 	{
 		TCharNode* pTemp = &m_LatinBitmaps[nChar - 30];
-		if ( pTemp->nTextureIndex == -1 )
-			return nullptr;
+		//if ( pTemp->nTextureIndex == -1 )
+		//	return nullptr;
 		return pTemp;
 	}
 

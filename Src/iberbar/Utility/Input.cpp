@@ -60,6 +60,24 @@ void iberbar::CInput::HandleWndProc( HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM
 			break;
 		}
 
+		case WM_RBUTTONDOWN:
+		{
+			UMouseEventData EventData;
+			EventData.nMouseEvent = UMouseEvent::RDown;
+			EventData.MousePoint = m_MousePoint;
+			DoMouseEvent( &EventData );
+			break;
+		}
+
+		case WM_RBUTTONUP:
+		{
+			UMouseEventData EventData;
+			EventData.nMouseEvent = UMouseEvent::RUp;
+			EventData.MousePoint = m_MousePoint;
+			DoMouseEvent( &EventData );
+			break;
+		}
+
 		case WM_MOUSEWHEEL:
 		{
 			int nScrollAmount = int( (short)HIWORD( wParam ) ) / WHEEL_DELTA;

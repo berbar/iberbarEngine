@@ -3,6 +3,8 @@
 #include <iberbar/Renderer/Renderer.h>
 #include <iberbar/Renderer/RenderCommand.h>
 #include <iberbar/Renderer/TrianglesCommand.h>
+#include <iberbar/Renderer/CallbackCommand.h>
+#include <iberbar/Renderer/GroupCommand.h>
 #include <iberbar/RHI/Device.h>
 #include <iberbar/RHI/CommandContext.h>
 #include <iberbar/RHI/Buffer.h>
@@ -35,12 +37,12 @@ namespace iberbar
 			FORCEINLINE uint32 GetIndexSizeTotal() const { return m_nIndexSizeTotal; }
 			FORCEINLINE uint32 GetTriangleCount() const { return m_nTriangleCount; }
 			FORCEINLINE RHI::IShaderState* GetUsingShaderState() const { return m_pUsingShaderState; }
-			FORCEINLINE RHI::IShaderVariableTable* GetUsingShaderVarTable() const { return m_pUsingShaderVarTable; }
+			FORCEINLINE RHI::IShaderVariableTable* GetUsingShaderVarTable( RHI::EShaderType eShaderType ) const { return m_pUsingShaderVarTables[ (int)eShaderType ]; }
 
 		private:
 			std::vector<CTrianglesCommand*> m_CommandList_Render;
 			RHI::IShaderState* m_pUsingShaderState;
-			RHI::IShaderVariableTable* m_pUsingShaderVarTable;
+			RHI::IShaderVariableTable* m_pUsingShaderVarTables[ (int)RHI::EShaderType::__Count ];
 			uint32 m_nVertexSize;
 			uint32 m_nVertexCount;
 			uint32 m_nVertexSizeTotal;
@@ -103,19 +105,23 @@ void iberbar::Renderer::CRenderQueue::Clear()
 
 iberbar::Renderer::CRenderer2d::CRenderer2d()
 	: m_RenderQueue()
+	, m_CommandGroupStack()
 	, m_bIsRendering( false )
 	, m_pDevice( nullptr )
 	, m_pCommandContext( nullptr )
 	, m_pVertexBuffer( nullptr )
 	, m_pIndexBuffer( nullptr )
 	, m_pState( new CRenderer2dState() )
+	, m_pRenderGroupCommandManager( new CRenderGroupCommandManager( this ) )
 {
 	m_RenderQueue.push_back( CRenderQueue() );
+	m_CommandGroupStack.push( 0 );
 }
 
 iberbar::Renderer::CRenderer2d::~CRenderer2d()
 {
 	m_RenderQueue.clear();
+	SAFE_DELETE( m_pRenderGroupCommandManager );
 	SAFE_DELETE( m_pState );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pCommandContext );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pVertexBuffer );
@@ -134,9 +140,19 @@ void iberbar::Renderer::CRenderer2d::Init( RHI::IDevice* pDevice )
 	m_pDevice->CreateIndexBuffer( 0, UINT16_MAX * 6 / 4, RHI::UBufferUsageFlags::AnyDynamic, &m_pIndexBuffer );
 }
 
+
+void iberbar::Renderer::CRenderer2d::AddCommand( CRenderCommand* pCommand )
+{
+	int nQueueId = m_CommandGroupStack.top();
+	AddCommand( pCommand, nQueueId );
+}
+
+
 void iberbar::Renderer::CRenderer2d::AddCommand( CRenderCommand* pCommand, int nQueueId )
 {
 	assert( pCommand );
+	assert( nQueueId >= 0 );
+	assert( m_bIsRendering == false );
 
 	m_RenderQueue[ nQueueId ].PushBack( pCommand );
 }
@@ -146,12 +162,28 @@ void iberbar::Renderer::CRenderer2d::CleanupCommands()
 
 }
 
+
 int iberbar::Renderer::CRenderer2d::CreateRenderQueue()
 {
 	CRenderQueue queue;
 	m_RenderQueue.push_back( queue );
 	return (int)m_RenderQueue.size() - 1;
 }
+
+
+void iberbar::Renderer::CRenderer2d::PushRenderQueue( int nQueueId )
+{
+	assert( m_bIsRendering == false );
+	m_CommandGroupStack.push( nQueueId );
+}
+
+
+void iberbar::Renderer::CRenderer2d::PopRenderQueue()
+{
+	assert( m_bIsRendering == false );
+	m_CommandGroupStack.pop();
+}
+
 
 void iberbar::Renderer::CRenderer2d::Clear()
 {
@@ -177,6 +209,49 @@ void iberbar::Renderer::CRenderer2d::Render()
 
 	m_bIsRendering = false;
 }
+
+
+void iberbar::Renderer::CRenderer2d::OnRhiLost()
+{
+	m_pCommandContext->SetVertexBuffer( nullptr );
+	m_pCommandContext->SetIndexBuffer( nullptr );
+	m_pCommandContext->SetShaderState( nullptr );
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i ++ )
+		m_pCommandContext->SetShaderVariableTable( (RHI::EShaderType)i, nullptr );
+
+	if ( m_pVertexBuffer )
+	{
+		m_pVertexBuffer->OnLost();
+	}
+
+	if ( m_pIndexBuffer )
+	{
+		m_pIndexBuffer->OnLost();
+	}
+}
+
+
+iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
+{
+	CResult Ret;
+
+	if ( m_pVertexBuffer )
+	{
+		Ret = m_pVertexBuffer->OnReset();
+		if ( Ret.IsOK() == false )
+			return Ret;
+	}
+
+	if ( m_pIndexBuffer )
+	{
+		Ret = m_pIndexBuffer->OnReset();
+		if ( Ret.IsOK() == false )
+			return Ret;
+	}
+
+	return Ret;
+}
+
 
 void iberbar::Renderer::CRenderer2d::VisitQueue( CRenderQueue& queue )
 {
@@ -217,8 +292,21 @@ void iberbar::Renderer::CRenderer2d::VisitCommand( CRenderCommand* pCommand )
 				DrawBatchTriangles();
 				m_pState->AddCommand( pTrianglesCommand );
 			}
+			break;
 		}
-		break;
+		
+		case URenderCommandType::Callback:
+		{
+			Flush();
+			((CRenderCallbackCommand*)pCommand)->Execute();
+			break;
+		}
+
+		case  URenderCommandType::Group:
+		{
+			ProcessGroupCommand( (CRenderGroupCommand*)pCommand );
+			break;
+		}
 
 		default:
 			break;
@@ -272,7 +360,10 @@ void iberbar::Renderer::CRenderer2d::DrawBatchTriangles()
 	m_pCommandContext->SetVertexBuffer( m_pVertexBuffer );
 	m_pCommandContext->SetIndexBuffer( m_pIndexBuffer );
 	m_pCommandContext->SetShaderState( m_pState->GetUsingShaderState() );
-	m_pCommandContext->SetShaderVariableTable( m_pState->GetUsingShaderVarTable() );
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	{
+		m_pCommandContext->SetShaderVariableTable( (RHI::EShaderType)i, m_pState->GetUsingShaderVarTable( (RHI::EShaderType)i ) );
+	}
 	m_pCommandContext->DrawElements( RHI::UPrimitiveType::Triangle, RHI::UIndexFormat::U_Short, nTriangleCount, 0 );
 
 	m_pState->FlushRenderList();
@@ -281,8 +372,12 @@ void iberbar::Renderer::CRenderer2d::DrawBatchTriangles()
 
 void iberbar::Renderer::CRenderer2d::DrawOneTriangles( CTrianglesCommand* pCommand )
 {
-	if ( pCommand->GetShaderState() == nullptr ||
-		pCommand->GetShaderVariableTable() == nullptr )
+	RHI::IShaderState* pShaderState = pCommand->GetShaderState();
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex = pCommand->GetShaderVariableTable( RHI::EShaderType::VertexShader );
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel = pCommand->GetShaderVariableTable( RHI::EShaderType::PixelShader );
+	if ( pShaderState == nullptr ||
+		pShaderVarTable_Vertex == nullptr ||
+		pShaderVarTable_Pixel == nullptr )
 		return;
 
 	auto pTriangles = pCommand->GetTriangles();
@@ -307,8 +402,8 @@ void iberbar::Renderer::CRenderer2d::DrawOneTriangles( CTrianglesCommand* pComma
 
 	m_pCommandContext->SetVertexBuffer( m_pVertexBuffer );
 	m_pCommandContext->SetIndexBuffer( m_pIndexBuffer );
-	m_pCommandContext->SetShaderState( pCommand->GetShaderState() );
-	m_pCommandContext->SetShaderVariableTable( pCommand->GetShaderVariableTable() );
+	m_pCommandContext->SetShaderState( pShaderState );
+	m_pCommandContext->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
 
 	m_pCommandContext->DrawElements( RHI::UPrimitiveType::Triangle, RHI::UIndexFormat::U_Short, pTriangles->nTrianglesCount, 0 );
 }
@@ -317,6 +412,16 @@ void iberbar::Renderer::CRenderer2d::DrawOneTriangles( CTrianglesCommand* pComma
 void iberbar::Renderer::CRenderer2d::Flush()
 {
 	DrawBatchTriangles();
+}
+
+
+void iberbar::Renderer::CRenderer2d::ProcessGroupCommand( CRenderGroupCommand* pCommand )
+{
+	Flush();
+
+	int nQueueId = pCommand->GetQueueId();
+
+	VisitQueue( m_RenderQueue[ nQueueId ] );
 }
 
 
@@ -329,7 +434,7 @@ void iberbar::Renderer::CRenderer2d::Flush()
 iberbar::Renderer::CRenderer2dState::CRenderer2dState()
 	: m_CommandList_Render()
 	, m_pUsingShaderState( nullptr )
-	, m_pUsingShaderVarTable( nullptr )
+	, m_pUsingShaderVarTables()
 	, m_nVertexSize(0)
 	, m_nVertexCount( 0 )
 	, m_nVertexSizeTotal( 0 )
@@ -337,6 +442,7 @@ iberbar::Renderer::CRenderer2dState::CRenderer2dState()
 	, m_nIndexSizeTotal( 0 )
 	, m_nTriangleCount( 0 )
 {
+	memset( m_pUsingShaderVarTables, 0, sizeof( m_pUsingShaderVarTables ) );
 }
 
 
@@ -347,8 +453,7 @@ iberbar::Renderer::CRenderer2dState::~CRenderer2dState()
 
 bool iberbar::Renderer::CRenderer2dState::AddCommand( CTrianglesCommand* pCommand )
 {
-	if ( pCommand->GetShaderState() == nullptr ||
-		pCommand->GetShaderVariableTable() == nullptr )
+	if ( pCommand->GetShaderState() == nullptr )
 		return true;
 
 	auto pTriangles = pCommand->GetTriangles();
@@ -357,7 +462,10 @@ bool iberbar::Renderer::CRenderer2dState::AddCommand( CTrianglesCommand* pComman
 	{
 		m_CommandList_Render.push_back( pCommand );
 		m_pUsingShaderState = pCommand->GetShaderState();
-		m_pUsingShaderVarTable = pCommand->GetShaderVariableTable();
+		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+		{
+			m_pUsingShaderVarTables[ i ] = pCommand->GetShaderVariableTable( (RHI::EShaderType)i );
+		}
 
 		m_nVertexSize = pTriangles->vertexSize;
 		m_nVertexCount = pTriangles->vertexCount;
@@ -369,28 +477,37 @@ bool iberbar::Renderer::CRenderer2dState::AddCommand( CTrianglesCommand* pComman
 		return true;
 	}
 
-	if ( pCommand->GetShaderState() == m_pUsingShaderState &&
-		pCommand->GetShaderVariableTable()->Compare( m_pUsingShaderVarTable ) == true )
+	if ( pCommand->GetShaderState() != m_pUsingShaderState )
+		return false;
+
+	RHI::IShaderVariableTable* pTableUsing = nullptr;
+	RHI::IShaderVariableTable* pTableOther = nullptr;
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		m_CommandList_Render.push_back( pCommand );
-
-		m_nVertexCount += pTriangles->vertexCount;
-		m_nVertexSizeTotal += pTriangles->vertexSizeTotal;
-		m_nIndexCount += pTriangles->indexCount;
-		m_nIndexSizeTotal += pTriangles->indexSizeTotal;
-		m_nTriangleCount += pTriangles->nTrianglesCount;
-
-		return true;
+		pTableUsing = m_pUsingShaderVarTables[ i ];
+		pTableOther = pCommand->GetShaderVariableTable( (RHI::EShaderType)i );
+		if ( pTableUsing == nullptr && pTableOther == nullptr )
+			continue;
+		if ( pTableUsing != nullptr && pTableOther != nullptr && pTableUsing->Compare( pTableOther ) == false )
+			return false;
 	}
 
-	return false;
+	m_CommandList_Render.push_back( pCommand );
+	m_nVertexCount += pTriangles->vertexCount;
+	m_nVertexSizeTotal += pTriangles->vertexSizeTotal;
+	m_nIndexCount += pTriangles->indexCount;
+	m_nIndexSizeTotal += pTriangles->indexSizeTotal;
+	m_nTriangleCount += pTriangles->nTrianglesCount;
+
+	return true;
+
 }
 
 
 void iberbar::Renderer::CRenderer2dState::FlushRenderList()
 {
 	m_pUsingShaderState = nullptr;
-	m_pUsingShaderVarTable = nullptr;
+	memset( m_pUsingShaderVarTables, 0, sizeof( m_pUsingShaderVarTables ) );
 	m_CommandList_Render.clear();
 	m_nVertexSize = 0;
 	m_nVertexCount = 0;

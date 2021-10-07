@@ -331,9 +331,9 @@ int iberbar::MsgPack::LuaCFunction_Decode( lua_State* pLuaState )
 
 void iberbar::MsgPack::RegisterLuaCpp( lua_State* pLuaState )
 {
-	LuaCpp::CBuilder builder( pLuaState );
+	Lua::CBuilder builder( pLuaState );
 	builder.ResolveScope(
-		[]( LuaCpp::CScopeBuilder* scope )
+		[]( Lua::CScopeBuilder* scope )
 		{
 			scope->AddFunctionOne( "Encode", LuaCFunction_Encode );
 			scope->AddFunctionOne( "Decode", LuaCFunction_Decode );

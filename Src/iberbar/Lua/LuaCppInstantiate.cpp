@@ -8,7 +8,7 @@
 
 namespace iberbar
 {
-	namespace LuaCpp
+	namespace Lua
 	{
 		void Class_XXX_PushObject(
 			lua_State* pLuaState,
@@ -23,7 +23,7 @@ namespace iberbar
 
 
 
-FORCEINLINE void iberbar::LuaCpp::Class_XXX_PushObject(
+FORCEINLINE void iberbar::Lua::Class_XXX_PushObject(
 	lua_State* pLuaState,
 	int nMetatable,
 	void* pInstanceVoid,
@@ -88,7 +88,7 @@ FORCEINLINE void iberbar::LuaCpp::Class_XXX_PushObject(
 
 
 
-void iberbar::LuaCpp::Class_Default_PushObjectWithName( lua_State* pLuaState, const char* strClassFullName, void* pInstance )
+void iberbar::Lua::Class_Default_PushObjectWithName( lua_State* pLuaState, const char* strClassFullName, void* pInstance )
 {
 	// 获取 metatable
 	luaL_getmetatable( pLuaState, strClassFullName );
@@ -102,13 +102,13 @@ void iberbar::LuaCpp::Class_Default_PushObjectWithName( lua_State* pLuaState, co
 }
 
 
-void iberbar::LuaCpp::Class_Default_PushObject( lua_State* pLuaState, int nMetatable, void* pInstance, const char* strClassFullName )
+void iberbar::Lua::Class_Default_PushObject( lua_State* pLuaState, int nMetatable, void* pInstance, const char* strClassFullName )
 {
 	Class_XXX_PushObject( pLuaState, nMetatable, pInstance, strClassFullName, nullptr );
 }
 
 
-void iberbar::LuaCpp::Class_Ref_PushObjectWithName( lua_State* pLuaState, const char* strClassFullName, CRef* pInstance )
+void iberbar::Lua::Class_Ref_PushObjectWithName( lua_State* pLuaState, const char* strClassFullName, CRef* pInstance )
 {
 	// 获取 metatable
 	luaL_getmetatable( pLuaState, strClassFullName );
@@ -122,13 +122,13 @@ void iberbar::LuaCpp::Class_Ref_PushObjectWithName( lua_State* pLuaState, const 
 }
 
 
-void iberbar::LuaCpp::Class_Ref_PushObject( lua_State* pLuaState, int nMetatable, CRef* pInstance, const char* strClassFullName )
+void iberbar::Lua::Class_Ref_PushObject( lua_State* pLuaState, int nMetatable, CRef* pInstance, const char* strClassFullName )
 {
 	Class_XXX_PushObject( pLuaState, nMetatable, pInstance, strClassFullName, pInstance );
 }
 
 
-int iberbar::LuaCpp::Class_Default_Constructor_New_GetMetatable( lua_State* L, const char* (*ppClassFullName), int* pOutMetatable )
+int iberbar::Lua::Class_Default_Constructor_New_GetMetatable( lua_State* L, const char* (*ppClassFullName), int* pOutMetatable )
 {
 	*ppClassFullName = nullptr;
 	*pOutMetatable = 0;

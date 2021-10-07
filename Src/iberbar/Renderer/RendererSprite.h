@@ -15,6 +15,7 @@ namespace iberbar
 		class IDevice;
 		class IShaderState;
 		class IShaderVariableTable;
+		class CShaderVariableTableUnion;
 	}
 
 	namespace Renderer
@@ -28,6 +29,7 @@ namespace iberbar
 		static const char s_strShaderVarName_RHW[] = "g_rhw";
 		static const char s_strShaderVarName_UseTexture[] = "g_useTexture";
 		static const char s_strShaderVarName_MatViewProjection[] = "g_matViewProjection";
+		static const char s_strShaderVarName_Texture[] = "g_texture";
 		static const char s_strShaderVarName_TextureSampler[] = "g_textureSampler";
 		static const char s_strShaderVarName_OutlineSize[] = "g_outlineSize";
 		static const char s_strShaderVarName_OutlineColor[] = "g_outlineColor";
@@ -162,7 +164,8 @@ namespace iberbar
 				const CColor4B& color,
 				const CRect2f& rcTextureCoord,
 				RHI::IShaderState* pShaderState,
-				RHI::IShaderVariableTable* pShaderVariableTable );
+				RHI::IShaderVariableTable* pShaderVarTable_Vertex,
+				RHI::IShaderVariableTable* pShaderVarTable_Pixel);
 
 			int DrawRectEx(
 				int nZOrder,
@@ -170,7 +173,8 @@ namespace iberbar
 				const CColor4B& color,
 				const CRect2f& rcTextureCoord,
 				RHI::IShaderState* pShaderState,
-				RHI::IShaderVariableTable* pShaderVariableTable );
+				RHI::IShaderVariableTable* pShaderVarTable_Vertex,
+				RHI::IShaderVariableTable* pShaderVarTable_Pixel );
 
 
 			FORCEINLINE void SetTextureFilterType( RHI::UTextureFilterType nFilterType, RHI::UTextureFilterType nMipmapFilterType )
@@ -185,7 +189,8 @@ namespace iberbar
 			FORCEINLINE CRenderer2d* GetRenderer() const { return m_pRenderer; }
 
 			void GetDefaultShaderState( RHI::IShaderState** ppOutShaderState );
-			void CreateDefaultShaderVariableTable( RHI::IShaderVariableTable** ppOutShaderVariableTable );
+			void CreateDefaultShaderVariableTable( RHI::IShaderVariableTable** ppOutShaderVariableTable, RHI::EShaderType eShaderType );
+			void CreateDefaultShaderVariableTableUnion( RHI::CShaderVariableTableUnion* pShaderVariableTableUnion );
 
 		protected:
 			CRenderer2d* m_pRenderer;

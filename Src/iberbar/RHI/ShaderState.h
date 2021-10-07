@@ -11,6 +11,8 @@ namespace iberbar
 		class __iberbarRHIApi__ IShaderState
 			: public CRef
 		{
+		public:
+			virtual IShader* GetShader( EShaderType eShaderType ) = 0;
 		};
 	}
 }

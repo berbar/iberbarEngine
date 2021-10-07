@@ -290,12 +290,14 @@ void iberbar::RHI::OpenGL::CDevice::CreateCommandContext( ICommandContext** ppOu
 }
 
 
-void iberbar::RHI::OpenGL::CDevice::Begin()
+iberbar::CResult iberbar::RHI::OpenGL::CDevice::Begin()
 {
 	if ( m_bHasLostDevice )
 	{
 		LostDevice();
-		ResetDevice( m_ContextSize.w, m_ContextSize.h, m_bIsWindow );
+		CResult RetReset = ResetDevice( m_ContextSize.w, m_ContextSize.h, m_bIsWindow );
+		if ( RetReset.IsOK() == false )
+			return RetReset;
 		m_bHasLostDevice = false;
 	}
 
@@ -308,6 +310,8 @@ void iberbar::RHI::OpenGL::CDevice::Begin()
 	glEnable( GL_DEPTH );
 	glEnable( GL_MULTISAMPLE );
 #endif
+
+	return CResult();
 }
 
 

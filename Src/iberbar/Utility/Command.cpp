@@ -19,7 +19,9 @@ namespace iberbar
 
 	private:
 		//std::queue<CBaseCommand*> m_Commands;
+		bool m_bExecuteCommands;
 		std::pmr::vector<CBaseCommand*> m_Commands;
+		std::pmr::vector<CBaseCommand*> m_CommandsBackup;
 	};
 }
 
@@ -52,7 +54,9 @@ void iberbar::DestroyCommandQueue( CCommandQueue* pQueue )
 
 
 iberbar::CCommandQueueUnSync::CCommandQueueUnSync( std::pmr::memory_resource* pMemoryRes )
-	: m_Commands( pMemoryRes )
+	: m_bExecuteCommands( false )
+	, m_Commands( pMemoryRes )
+	, m_CommandsBackup( pMemoryRes )
 {
 
 }
@@ -70,18 +74,28 @@ iberbar::CCommandQueueUnSync::~CCommandQueueUnSync()
 
 void iberbar::CCommandQueueUnSync::AddCommand( CBaseCommand* pCommand )
 {
-	m_Commands.push_back( pCommand );
+	if ( m_bExecuteCommands == true )
+	{
+		m_CommandsBackup.push_back( pCommand );
+	}
+	else
+	{
+		m_Commands.push_back( pCommand );
+	}
 }
 
 
 void iberbar::CCommandQueueUnSync::Execute()
 {
+	m_bExecuteCommands = true;
 	for ( auto pCommand : m_Commands )
 	{
 		pCommand->Execute();
 		delete pCommand;
 	}
 	m_Commands.clear();
+	m_bExecuteCommands = false;
+	m_Commands.swap( m_CommandsBackup );
 }
 
 

@@ -1,13 +1,13 @@
 #pragma once
 
 #include <iberbar/Gui/Object.h>
+#include <iberbar/RHI/ShaderVariables.h>
 
 namespace iberbar
 {
 	namespace RHI
 	{
 		class IShaderState;
-		class IShaderVariableTable;
 	}
 
 	namespace Gui
@@ -57,7 +57,7 @@ namespace iberbar
 		protected:
 			int m_nZOrder;
 			RHI::IShaderState* m_pShaderState;
-			RHI::IShaderVariableTable* m_pShaderVariableTable;
+			RHI::CShaderVariableTableUnion m_pShaderVariableTables;
 			std::vector< PTR_CRenderElement >  m_ChildElements;
 			int m_nState;
 

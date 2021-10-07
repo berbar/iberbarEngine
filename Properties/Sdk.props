@@ -55,6 +55,9 @@
     <sdk_spdlog>$(CppSdkEnv)\spdlog\1.7.0\$(sdk_platform_path)</sdk_spdlog>
     <sdk_spdlog_include>$(sdk_spdlog)\include</sdk_spdlog_include>
     <sdk_spdlog_lib>$(sdk_spdlog)\lib</sdk_spdlog_lib>
+    <sdk_directxtk>$(CppSdkEnv)\DirectXTK\jan2021\$(PlatformTarget)</sdk_directxtk>
+    <sdk_directxtk_include>$(sdk_directxtk)\Inc</sdk_directxtk_include>
+    <sdk_directxtk_lib>$(sdk_directxtk)\Lib</sdk_directxtk_lib>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -217,6 +220,15 @@
     </BuildMacro>
     <BuildMacro Include="sdk_spdlog_lib">
       <Value>$(sdk_spdlog_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directxtk">
+      <Value>$(sdk_directxtk)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directxtk_include">
+      <Value>$(sdk_directxtk_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_directxtk_lib">
+      <Value>$(sdk_directxtk_lib)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

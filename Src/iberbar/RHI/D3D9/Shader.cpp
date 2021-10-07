@@ -1,150 +1,187 @@
 
 #include <iberbar/RHI/D3D9/Shader.h>
 #include <iberbar/RHI/D3D9/Device.h>
+#include <iberbar/RHI/D3D9/ShaderReflection.h>
 
 
 
-iberbar::RHI::D3D9::CShader::CShader( CDevice* pDevice )
-    : IShader()
+iberbar::RHI::D3D9::CShader::CShader( CDevice* pDevice, EShaderType eShaderType )
+    : IShader( eShaderType )
     , m_pDevice( pDevice )
-    , m_pD3DVertexShader( nullptr )
-    , m_pD3DVertexShaderConstTable( nullptr )
-    , m_pD3DPixelShader( nullptr )
-    , m_pD3DPixelShaderConstTable( nullptr )
+    , m_pD3DConstTable( nullptr )
 {
     m_pDevice->AddRef();
+    m_bIsManaged = true;
 }
 
 
 iberbar::RHI::D3D9::CShader::~CShader()
 {
     UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
-    D3D_SAFE_RELEASE( m_pD3DVertexShader );
-    D3D_SAFE_RELEASE( m_pD3DPixelShader );
-    D3D_SAFE_RELEASE( m_pD3DVertexShaderConstTable );
-    D3D_SAFE_RELEASE( m_pD3DPixelShaderConstTable );
+    D3D_SAFE_RELEASE( m_pD3DConstTable );
 }
 
 
-iberbar::CResult iberbar::RHI::D3D9::CShader::LoadFromSource( const char* strVertexSource, const char* strPixelSource )
+iberbar::CResult iberbar::RHI::D3D9::CShader::LoadFromSource( const char* pstrSource )
 {
-    return MakeResult( ResultCode::Bad, "" );
-}
+    ComPtr<ID3DXBuffer> pD3DBuffer = nullptr;
+    ComPtr<ID3DXBuffer> pD3DError = nullptr;
 
+    DWORD nFlag = 0;
+#ifdef _DEBUG
+    nFlag |= D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
+#endif
 
-iberbar::CResult iberbar::RHI::D3D9::CShader::LoadFromFile( const char* strVertexFile, const char* strPixelFile )
-{
-    CResult ret;
+    HRESULT hResult;
 
-    ret = LoadD3DVS( strVertexFile );
-    if ( ret.IsOK() == false )
-        return ret;
+    const char* pstrProfile = nullptr;
+    if ( m_eShaderType == EShaderType::VertexShader )
+    {
+        pstrProfile = "vs_2_0";
+    }
+    else if ( m_eShaderType == EShaderType::PixelShader )
+    {
+        pstrProfile = "ps_2_0";
+    }
+    else
+    {
+        return MakeResult( ResultCode::Bad, "not support" );
+    }
 
-    ret = LoadD3DPS( strPixelFile );
-    if ( ret.IsOK() == false )
-        return ret;
+    hResult = D3DXCompileShader(
+        pstrSource,
+        strlen( pstrSource ),
+        nullptr,
+        nullptr,
+        "Main",
+        pstrProfile,
+        nFlag,
+        &pD3DBuffer,
+        &pD3DError,
+        &m_pD3DConstTable );
+    if ( FAILED( hResult ) )
+    {
+        if ( pD3DError == nullptr )
+            return MakeResult( ResultCode::Bad, "Failed to load VerterShader file" );
+
+        return MakeResult( ResultCode::Bad, (const char*)pD3DError->GetBufferPointer() );
+    }
+
+    CResult Ret;
+
+    Ret = Load( pD3DBuffer->GetBufferPointer(), pD3DBuffer->GetBufferSize() );
+    if ( Ret.IsOK() == false )
+        return Ret;
+
+    Ret = m_Reflection.Initial( m_pD3DConstTable );
+    if ( Ret.IsOK() == false )
+        return Ret;
 
     return CResult();
 }
 
 
-iberbar::CResult iberbar::RHI::D3D9::CShader::LoadD3DVS( const char* strVSFile )
+iberbar::CResult iberbar::RHI::D3D9::CShader::LoadFromFile( const char* pstrFile )
 {
-    ID3DXBuffer* shader = nullptr;
-    ID3DXBuffer* errorBuffer = nullptr;
+    ComPtr<ID3DXBuffer> pD3DBuffer = nullptr;
+    ComPtr<ID3DXBuffer> pD3DError = nullptr;
 
-    DWORD flag = D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
-    //DWORD flag = 0;
+    DWORD nFlag = 0;
+#ifdef _DEBUG
+    nFlag |= D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION;
+#endif
 
     HRESULT hResult;
-    CResult ret;
+
+    const char* pstrProfile = nullptr;
+    if ( m_eShaderType == EShaderType::VertexShader )
+    {
+        pstrProfile = "vs_2_0";
+    }
+    else if ( m_eShaderType == EShaderType::PixelShader )
+    {
+        pstrProfile = "ps_2_0";
+    }
+    else
+    {
+        return MakeResult( ResultCode::Bad, "not support" );
+    }
 
     hResult = D3DXCompileShaderFromFileA(
-        strVSFile,
+        pstrFile,
         0,
         0,
         "Main",
-        "vs_2_0",
-        flag,
-        &shader,
-        &errorBuffer,
-        &m_pD3DVertexShaderConstTable );
+        pstrProfile,
+        nFlag,
+        &pD3DBuffer,
+        &pD3DError,
+        &m_pD3DConstTable );
     if ( FAILED( hResult ) )
     {
-        if ( errorBuffer == nullptr )
-            ret = MakeResult( ResultCode::Bad, "Failed to load VerterShader file" );
-        else
-            ret = MakeResult( ResultCode::Bad, (const char*)errorBuffer->GetBufferPointer() );
-        goto _completed;
+        if ( pD3DError == nullptr )
+            return MakeResult( ResultCode::Bad, "Failed to load VerterShader file" );
+
+        return MakeResult( ResultCode::Bad, (const char*)pD3DError->GetBufferPointer() );
     }
 
-    hResult = m_pDevice->GetD3DDevice()->CreateVertexShader( (const DWORD*)shader->GetBufferPointer(), &m_pD3DVertexShader );
-    if ( FAILED( hResult ) )
-    {
-        ret = MakeResult( ResultCode::Bad, DXGetErrorDescriptionA( hResult ) );
-        goto _completed;
-    }
+    CResult Ret;
 
-_completed:
-    D3D_SAFE_RELEASE( shader );
-    D3D_SAFE_RELEASE( errorBuffer );
+    Ret = Load( pD3DBuffer->GetBufferPointer(), pD3DBuffer->GetBufferSize() );
+    if ( Ret.IsOK() == false )
+        return Ret;
 
-    return ret;
+    Ret = m_Reflection.Initial( m_pD3DConstTable );
+    if ( Ret.IsOK() == false )
+        return Ret;
+
+    return CResult();
 }
 
 
-iberbar::CResult iberbar::RHI::D3D9::CShader::LoadD3DPS( const char* strPSFile )
+
+
+
+
+iberbar::RHI::D3D9::CVertexShader::CVertexShader( CDevice* pDevice )
+    : CShader( pDevice, EShaderType::VertexShader )
+    , m_pD3DShader( nullptr )
 {
-    ID3DXBuffer* shader = nullptr;
-    ID3DXBuffer* errorBuffer = nullptr;
 
-    DWORD flag = D3DXSHADER_DEBUG;
+}
 
-    HRESULT hResult;
-    CResult ret;
 
-    hResult = D3DXCompileShaderFromFileA(
-        strPSFile,
-        0,
-        0,
-        "Main",
-        "ps_2_0",
-        flag,
-        &shader,
-        &errorBuffer,
-        &m_pD3DPixelShaderConstTable );
+iberbar::CResult iberbar::RHI::D3D9::CVertexShader::Load( const void* pCodes, uint32 nCodeLen )
+{
+    HRESULT hResult = m_pDevice->GetD3DDevice()->CreateVertexShader( (const DWORD*)pCodes, &m_pD3DShader );
     if ( FAILED( hResult ) )
     {
-        if ( errorBuffer == nullptr )
-            ret = MakeResult( ResultCode::Bad, "Failed to load PixelShader file" );
-        else
-            ret = MakeResult( ResultCode::Bad, (const char*)errorBuffer->GetBufferPointer() );
-        goto _completed;
+        return MakeResult( ResultCode::Bad, DXGetErrorDescriptionA( hResult ) );
     }
+    return CResult();
+}
 
-    hResult = m_pDevice->GetD3DDevice()->CreatePixelShader( (const DWORD*)shader->GetBufferPointer(), &m_pD3DPixelShader );
+
+
+
+
+
+
+iberbar::RHI::D3D9::CPixelShader::CPixelShader( CDevice* pDevice )
+    : CShader( pDevice, EShaderType::PixelShader )
+    , m_pD3DShader( nullptr )
+{
+
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CPixelShader::Load( const void* pCodes, uint32 nCodeLen )
+{
+    HRESULT hResult = m_pDevice->GetD3DDevice()->CreatePixelShader( (const DWORD*)pCodes, &m_pD3DShader );
     if ( FAILED( hResult ) )
     {
-        ret = MakeResult( ResultCode::Bad, DXGetErrorDescriptionA( hResult ) );
-        goto _completed;
+        return MakeResult( ResultCode::Bad, DXGetErrorDescriptionA( hResult ) );
     }
-
-_completed:
-    D3D_SAFE_RELEASE( shader );
-    D3D_SAFE_RELEASE( errorBuffer );
-
-    //D3DSAMP_MINFILTER;
-    //D3DTEXTUREFILTERTYPE::D3DTEXF_LINEAR;
-    ////auto pD3DPixelShader = m_pShaderState->GetShader()->GetD3DPixelShader();
-    //ID3DXConstantTable* pD3DConstTable = m_pD3DPixelShaderConstTable;
-    ////pD3DConstTable->SetDefaults( m_pDevice->GetD3DDevice() );
-    ////auto hTex = pD3DConstTable->GetConstantByName( 0, "g_MeshTexture" );
-    //auto hTex = pD3DConstTable->GetConstantByName( 0, "MeshTextureSampler" );
-    //UINT count;
-    //D3DXCONSTANT_DESC Tex0Desc;
-    //pD3DConstTable->GetConstantDesc( hTex, &Tex0Desc, &count );
-    ////pD3DConstTable->SetBool();
-
-    return ret;
+    return CResult();
 }
 

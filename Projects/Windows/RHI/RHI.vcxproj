@@ -180,12 +180,16 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\CommandContext.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Device.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\Effect.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\RenderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Resource.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Shader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderReflection.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderVariables.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\StateBlock.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Texture.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\Trace.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Types.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Vertex.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\VertexBuilder.h" />
@@ -195,11 +199,16 @@
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Buffer.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\CommandContext.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Device.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\RenderState.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Resource.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Shader.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderReflection.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderState.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderVariables.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\StateBlock.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Texture.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\Trace.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\Types.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Vertex.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\VertexDeclaration.cpp" />
   </ItemGroup>

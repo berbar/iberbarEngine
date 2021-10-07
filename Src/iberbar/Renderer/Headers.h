@@ -3,6 +3,7 @@
 
 #include <iberbar/Utility/Platform.h>
 #include <iberbar/Utility/Unknown.h>
+#include <iberbar/RHI/Types.h>
 
 //#ifndef __iberbarRendererApi__
 //#if defined ( _WINDOWS ) && ( __iberbarRendererApiExport__ )

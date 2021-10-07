@@ -56,13 +56,21 @@ function CPopo.prototype.OnKeyboard(self, event)
     )
 end
 function Main(self)
-    local dlg = iberbar.Gui.CreateDialog(0)
+    local dlg = iberbar.Gui.CreateDialog()
     dlg:SetId("MainMenu")
     dlg:SetPosition(0, 0)
     dlg:SetSize(800, 600)
+    local dlgPop = iberbar.Gui.CreateDialog()
+    dlgPop:SetId("PopMenu")
+    dlgPop:SetPosition(-50, -50)
+    dlgPop:SetSize(400, 200)
+    dlgPop:SetAlignHorizental(iberbar.UAlignHorizontal.Center)
+    dlgPop:SetAlignVertical(iberbar.UAlignVertical.Center)
+    dlgPop:SetModal(false)
     local guiXmlParser = iberbar.Game.GetGuiXmlParser()
     guiXmlParser:ReadFile("Scripts/MainMenu.xml", dlg)
-    local btn = dlg:FindWidget("Btn-StartGame")
+    guiXmlParser:ReadFile("Scripts/PopMenu.xml", dlgPop)
+    local btn = dlg:GetWidgetRoot():FindWidget("Btn-StartGame")
     if btn ~= nil then
         btn:AddEventCallback(
             0,
@@ -76,12 +84,13 @@ function Main(self)
         )
     end
     local listbox = iberbar.Gui.CListBox:new()
+    listbox:SetDebugId(15)
     listbox:SetPosition(0, 0)
     listbox:SetSize(200, 100)
-    listbox:SetEnableDrag(true)
+    listbox:SetDragStyle(iberbar.Gui.EListBoxDragStyle.DragView)
     listbox:SetSelectType(2)
     listbox:SetItemSize(200, 40)
-    listbox:SetCallback_CreateItemElements(
+    listbox:SetCallback_ItemElementCreate(
         function(element, item, index)
             local elementLabel = iberbar.Gui.CElementStateLabel:new()
             elementLabel:SetId(
@@ -96,6 +105,7 @@ function Main(self)
             elementLabel:SetColor(1, 4278190335)
             elementLabel:SetColor(2, 4294901760)
             elementLabel:SetColor(3, 4278255360)
+            elementLabel:SetColor(iberbar.Gui.UWidgetState.Disabled, 4286611584)
             element:AddElement(elementLabel)
         end
     )
@@ -104,6 +114,7 @@ function Main(self)
     listbox:AddItem({id = 22, text = "gaga"})
     listbox:AddItem({id = 22, text = "我"})
     listbox:AddItem({id = 22, text = "好可爱哟"})
+    listbox:SetItemEnable(2, false)
     listbox:AddEventCallback(
         iberbar.Gui.UEvents.ValueChanged,
         function(widget, event, valueInt)
@@ -128,7 +139,7 @@ function Main(self)
             end
         end
     )
-    dlg:AddWidget(listbox)
+    dlg:GetWidgetRoot():AddWidget(listbox)
     local find = listbox:FindItemOne(
         function(item)
             if item.id == 22 then

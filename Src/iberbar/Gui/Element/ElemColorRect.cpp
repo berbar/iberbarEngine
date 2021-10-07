@@ -36,7 +36,7 @@ void iberbar::Gui::CElementColorRect::Init()
 {
 	CRenderElement::Init();
 
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Pixel, Renderer::s_strShaderVarName_UseTexture, false );
+	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetBool( Renderer::s_strShaderVarName_UseTexture, false );
 }
 
 
@@ -64,7 +64,9 @@ void iberbar::Gui::CElementColorRect::Render()
 {
 	if ( GetVisible() == false )
 		return;
-	if ( m_pShaderState == nullptr || m_pShaderVariableTable == nullptr )
+	if ( m_pShaderState == nullptr ||
+		m_pShaderVariableTables.GetVariableTableForVertexShader() == nullptr ||
+		m_pShaderVariableTables.GetVariableTableForPixelShader() == nullptr )
 		return;
 
 	const CRect2i* pViewport = CEngine::sGetInstance()->GetViewportState()->GetClipViewport();
@@ -86,7 +88,8 @@ void iberbar::Gui::CElementColorRect::Render()
 		m_BlendColor.currentColor,
 		CRect2f(),
 		m_pShaderState,
-		m_pShaderVariableTable
+		m_pShaderVariableTables.GetVariableTableForVertexShader(),
+		m_pShaderVariableTables.GetVariableTableForPixelShader()
 	);
 
 	CRenderElement::Render();

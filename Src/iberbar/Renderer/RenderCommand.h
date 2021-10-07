@@ -16,13 +16,15 @@ namespace iberbar
 		enum class URenderCommandType
 		{
 			Unknown,
-			Triangles
+			Triangles,
+			Callback,
+			Group
 		};
 
 		class __iberbarRendererApi__ CRenderCommand
 		{
 		public:
-			CRenderCommand();
+			CRenderCommand( URenderCommandType nType );
 			virtual ~CRenderCommand();
 
 		public:
@@ -30,15 +32,15 @@ namespace iberbar
 			void SetZOrder( int nZOrder );
 			int GetZOrder() const;
 			void SetShaderState( RHI::IShaderState* pEffectState );
-			void SetShaderVariableTable( RHI::IShaderVariableTable* pShaderVariableTable );
+			void SetShaderVariableTable( RHI::EShaderType eShaderType, RHI::IShaderVariableTable* pShaderVariableTable );
 			RHI::IShaderState* GetShaderState() const;
-			RHI::IShaderVariableTable* GetShaderVariableTable() const;
+			RHI::IShaderVariableTable* GetShaderVariableTable( RHI::EShaderType eShaderType ) const;
 
 		protected:
 			URenderCommandType m_nCommandType;
 			int m_nZOrder;
 			RHI::IShaderState* m_pShaderState;
-			RHI::IShaderVariableTable* m_pShaderVariableTable;
+			RHI::IShaderVariableTable* m_pShaderVariableTableArray[ (int)RHI::EShaderType::__Count ];
 		};
 	}
 }
@@ -68,9 +70,9 @@ FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderState( RHI::IShader
 }
 
 
-FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderVariableTable( RHI::IShaderVariableTable* pShaderVariableTable )
+FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderVariableTable( RHI::EShaderType eShaderType, RHI::IShaderVariableTable* pShaderVariableTable )
 {
-	m_pShaderVariableTable = pShaderVariableTable;
+	m_pShaderVariableTableArray[ (int)eShaderType ] = pShaderVariableTable;
 }
 
 
@@ -80,7 +82,7 @@ FORCEINLINE iberbar::RHI::IShaderState* iberbar::Renderer::CRenderCommand::GetSh
 }
 
 
-FORCEINLINE iberbar::RHI::IShaderVariableTable* iberbar::Renderer::CRenderCommand::GetShaderVariableTable() const
+FORCEINLINE iberbar::RHI::IShaderVariableTable* iberbar::Renderer::CRenderCommand::GetShaderVariableTable( RHI::EShaderType eShaderType ) const
 {
-	return m_pShaderVariableTable;
+	return m_pShaderVariableTableArray[ (int)eShaderType ];
 }

@@ -3,7 +3,10 @@
 #include <iberbar/Gui/BaseTypes.h>
 #include <iberbar/Gui/Widget.h>
 #include <iberbar/Gui/Dialog.h>
+#include <iberbar/Renderer/Renderer.h>
 #include <iberbar/Renderer/RendererSprite.h>
+#include <iberbar/Renderer/CallbackCommand.h>
+#include <iberbar/Renderer/GroupCommand.h>
 #include <iberbar/Utility/Command.h>
 
 
@@ -16,11 +19,14 @@ iberbar::Gui::CEngine* iberbar::Gui::CEngine::sm_pInstance = nullptr;
 iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueue* pCommandQueue )
 	: m_pRenderer( pSprite->GetRenderer() )
 	, m_pSprite( pSprite )
+	, m_pRenderGroupCommandManager( pSprite->GetRenderer()->GetRenderGroupCommandManager() )
+	, m_pRenderCommand_Callback( new Renderer::CRenderCallbackCommand() )
 	, m_pCommandQueue( pCommandQueue )
 	, m_bMemoryResAuto( true )
 	, m_pMemoryRes( new std::pmr::unsynchronized_pool_resource() )
 	, m_pWidgetFocus( nullptr )
 	, m_Dialogs()
+	, m_RenderGroupCommandList()
 	, m_ViewportState()
 {
 	sm_pInstance = this;
@@ -30,11 +36,14 @@ iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueu
 iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes )
 	: m_pRenderer( pSprite->GetRenderer() )
 	, m_pSprite( pSprite )
+	, m_pRenderGroupCommandManager( pSprite->GetRenderer()->GetRenderGroupCommandManager() )
+	, m_pRenderCommand_Callback( new Renderer::CRenderCallbackCommand() )
 	, m_pCommandQueue( pCommandQueue )
 	, m_bMemoryResAuto( pMemoryRes == nullptr ? true : false )
 	, m_pMemoryRes( pMemoryRes == nullptr ? new std::pmr::unsynchronized_pool_resource() : pMemoryRes )
 	, m_pWidgetFocus( nullptr )
 	, m_Dialogs()
+	, m_RenderGroupCommandList()
 	, m_ViewportState()
 {
 	sm_pInstance = this;
@@ -43,6 +52,17 @@ iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueu
 
 iberbar::Gui::CEngine::~CEngine()
 {
+	if ( m_RenderGroupCommandList.empty() == false )
+	{
+		auto iter = m_RenderGroupCommandList.begin();
+		auto end = m_RenderGroupCommandList.end();
+		for ( ; iter != end; iter++ )
+		{
+			SAFE_DELETE( *iter );
+		}
+		m_RenderGroupCommandList.clear();
+	}
+
 	if ( m_Dialogs.empty() == false )
 	{
 		auto iter = m_Dialogs.begin();
@@ -59,6 +79,8 @@ iberbar::Gui::CEngine::~CEngine()
 		SAFE_DELETE( m_pMemoryRes );
 	}
 
+	SAFE_DELETE( m_pRenderCommand_Callback );
+
 	sm_pInstance = nullptr;
 }
 
@@ -74,7 +96,11 @@ void iberbar::Gui::CEngine::AddDialog( CDialog* pDialog )
 	m_Dialogs.push_back( pDialog );
 	pDialog->AddRef();
 
-	UpdateZOrder();
+	if ( m_RenderGroupCommandList.size() < m_Dialogs.size() )
+	{
+		Renderer::CRenderGroupCommand* pGroupCommand = new Renderer::CRenderGroupCommand( m_pRenderGroupCommandManager );
+		m_RenderGroupCommandList.push_back( pGroupCommand );
+	}
 }
 
 
@@ -108,8 +134,6 @@ void iberbar::Gui::CEngine::RemoveDialog( CDialog* pDialog )
 			}
 		}
 	}
-
-	UpdateZOrder();
 }
 
 
@@ -126,6 +150,8 @@ void iberbar::Gui::CEngine::RequestFocus( CWidget* pWidget )
 
 	m_pWidgetFocus = pWidget;
 	m_pWidgetFocus->OnFocusIn();
+
+	RequestTop( m_pWidgetFocus->GetDialog() );
 }
 
 
@@ -163,8 +189,6 @@ void iberbar::Gui::CEngine::RequestTop( CDialog* pDialog )
 			break;
 		}
 	}
-
-	UpdateZOrder();
 }
 
 
@@ -187,11 +211,25 @@ void iberbar::Gui::CEngine::Update( int64 nElapsedTimeMs, float nElapsedTimeSeco
 
 void iberbar::Gui::CEngine::Render()
 {
+	int nIndex = 0;
+	Renderer::CRenderGroupCommand* pGroupCommand = nullptr;
 	for ( auto& pDialog : m_Dialogs )
 	{
 		if ( pDialog->IsVisible() == false )
 			continue;
+
+		// 开启队列
+		pGroupCommand = m_RenderGroupCommandList[nIndex];
+		m_pRenderer->AddCommand( pGroupCommand, 0 );
+		m_pRenderer->PushRenderQueue( pGroupCommand->GetQueueId() );
+
+		// 渲染对话框
 		pDialog->Render();
+
+		// 结束队列
+		m_pRenderer->PopRenderQueue();
+
+		nIndex++;
 	}
 }
 
@@ -203,6 +241,10 @@ void iberbar::Gui::CEngine::HandleMouse( const UMouseEventData* EventData )
 	for ( ; iter != end; iter++ )
 	{
 		if ( (*iter)->HandleMouse( EventData ) == UHandleMessageResult::Succeed )
+		{
+			return;
+		}
+		if ( ( *iter )->IsModal() )
 		{
 			return;
 		}
@@ -220,13 +262,11 @@ void iberbar::Gui::CEngine::HandleKeyboard( const UKeyboardEventData* pEvent )
 		{
 			return;
 		}
+		if ( ( *iter )->IsModal() )
+		{
+			return;
+		}
 	}
-}
-
-
-void iberbar::Gui::CEngine::UpdateZOrder()
-{
-
 }
 
 

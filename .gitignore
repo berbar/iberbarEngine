@@ -5,3 +5,4 @@ Bin/**
 **/node_modules/**
 **/.vs/**
 **.log
+**/RefZombies.txt

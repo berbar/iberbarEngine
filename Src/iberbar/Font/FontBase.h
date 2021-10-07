@@ -13,6 +13,8 @@ namespace iberbar
 	{
 		int   nCharWidth; // 字符逻辑宽度，用于排版,小于nBmpWidth，斜体需要渲染的宽度大于逻辑宽度
 		int   nCharHeight;
+		int nDeltaX;
+		int nDeltaY;
 		int   nBmpWidth;  // 纹理宽度
 		int   nBmpHeight; // 纹理高度
 		void* pBitsFill;      // ARGB_8888 32bit
@@ -21,6 +23,8 @@ namespace iberbar
 		UFontCharBitmapDesc()
 			: nCharWidth( 0 )
 			, nCharHeight( 0 )
+			, nDeltaX( 0 )
+			, nDeltaY( 0 )
 			, nBmpWidth( 0 )
 			, nBmpHeight( 0 )
 			, pBitsFill( nullptr )

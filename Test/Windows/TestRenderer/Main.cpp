@@ -27,6 +27,8 @@
 #include <iberbar/Lua/LuaDevice.h>
 #include <iberbar/Lua/FunctionHelper.h>
 
+#include <iberbar/Utility/RefStatistics.h>
+
 
 #pragma comment(lib,"winmm.lib")
 
@@ -79,8 +81,9 @@ iberbar::CResult CTestApplication::OnCreated()
 	iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
 	if ( m_pFontManager->GetFontDefault( &pFont ) )
 	{
-		pFont->LoadText( L"fps:0123456798." );
+		pFont->LoadText( L"fps: 0123456798." );
 	}
+	m_pLuaDevice->AddLuaPath( "Scripts/Game2/?.lua" );
 	m_pLuaDevice->ExecuteFile( "Scripts/Game2/main.lua" );
 	
 	iberbar::Lua::CFunctionHelper::sExecuteGlobalFunction( m_pLuaDevice->GetLuaState(), "Main" );
@@ -112,7 +115,29 @@ iberbar::CResult CTestApplication::OnCreated()
 
 	auto pDialog = iberbar::Gui::CEngine::sGetInstance()->GetDialog( "MainMenu" );
 
-	pDialog->AddWidget( pEditBox );
+	pDialog->GetWidgetRoot()->AddWidget( pEditBox );
+
+#ifdef _DEBUG
+	FILE* f = nullptr;
+	fopen_s( &f, "SnapShot.txt", "wt" );
+	if ( f != nullptr )
+	{
+		iberbar::CRefStatistics::sGetShared()->ForEach(
+			[=]( iberbar::CRef* pRefZombie )
+			{
+#ifdef _WINDOWS
+				auto n = typeid( *pRefZombie ).name();
+				auto r = pRefZombie->Refcount();
+				std::string strText = iberbar::StdFormat( "0x%016llx: TypeName=<%s> Ref=%d\n", (uint64)pRefZombie, n, r );
+#else
+				std::string strText = iberbar::StdFormat( "0x%016llx: Ref=%d\n", (uint64)pRefZombie, pRefZombie->Refcount() );
+#endif
+				fwrite( strText.c_str(), 1, strlen( strText.c_str() ), f );
+			} );
+		fclose( f );
+		f = nullptr;
+	}
+#endif
 
 	return iberbar::CResult();
 }
@@ -135,12 +160,10 @@ void CTestApplication::OnRender()
 	{
 		iberbar::CRect2i rect( 0, 100, 200, 150 );
 		wchar_t strText[ 256 ];
-		swprintf_s( strText, L"fps:%4.4f", GetFPS() );
+		swprintf_s( strText, L"fps: %4.4f", GetFPS() );
 		m_pRendererSprite->DrawText( INT_MAX, pFont, nullptr, strText, -1, &rect, iberbar::CColor4B( 0xffffffff ), iberbar::UFontDrawTextOptions() );
 	}
 }
-
-
 
 
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow )
@@ -156,10 +179,15 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLin
 	//	}
 	//}
 
+	const wchar_t* pStr = L"sfuon\nsofnxg\nsoo\r\n";
+	std::wregex Regex( L"(\\\n)|(\\\r\\\n)" );
+	std::wstring strFmt;
+	std::wstring strInsert = std::regex_replace( pStr, Regex, strFmt );
+
 	int n = sizeof( wchar_t );
 
 	iberbar::Game::UApplicationCreateParams appInitData;
-	appInitData.strAppName = TEXT( "TestRenderer" );
+	appInitData.strAppName = TEXT( "TestRenderer2" );
 	appInitData.nWndWidth = 800;
 	appInitData.nWndHeight = 600;
 	appInitData.bFullScreen = false;
@@ -167,7 +195,12 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLin
 	appInitData.bUseLoadingThread = true;
 	CTestApplication app;
 	app.SetConfiguration( appInitData );
-	app.Initial( hInstance );
+	iberbar::CResult Ret = app.Initial( hInstance );
+	if ( Ret.IsOK() == false )
+	{
+		::MessageBoxA( nullptr, Ret.data.c_str(), "", MB_ICONERROR );
+		return 0;
+	}
 	app.Run();
 	return 0;
 }

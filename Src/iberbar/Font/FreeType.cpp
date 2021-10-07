@@ -21,6 +21,7 @@ namespace iberbar
 		~CBitsBuffer();
 
 		void PaintChar( const CSize2i& BitmapSize, const CSize2i& CopySize, const CPoint2i& CopyOffset, const uint8* pBytes );
+		void PaintChar( const CSize2i& BitmapSize, const uint8* pBytes );
 		void* GetBitsFill() { return m_pBits.GetPointer(); }
 
 	private:
@@ -264,51 +265,36 @@ iberbar::CResult iberbar::CFontFaceFt::CreateCharBitmap( wchar_t nChar, UFontCha
 	FT_Bitmap& lc_bitmap = pBitmapGlyph->bitmap;
 
 	//把位图数据拷贝自己定义的数据区里.这样旧可以画到需要的东西上面了。
-	int lc_copy_width = lc_bitmap.width;
-	int lc_copy_height = lc_bitmap.rows;
-	int l = pFtFace->glyph->bitmap_left;
-	int _ascender = (int)(pFtFace->size->metrics.ascender / 64.0f);
-	int _adv_x = (int)(pFtFace->glyph->metrics.horiAdvance / 64.0f);  //步进宽度
-	int _adv_y = (int)/*( pFtFace->pGlyph->metrics.vertAdvance / 64.0f )*/pFtFace->size->metrics.y_ppem;
-	int _delta_x = (int)pBitmapGlyph->left;			//left:字形原点(0,0)到字形位图最左边象素的水平距离.它以整数象素的形式表示。 
-	int _delta_y = (int)(_ascender - pFtFace->glyph->bitmap_top);
-	_adv_y = tMax( _delta_y + lc_copy_height, _adv_y );
+	int nBitmapWidth = lc_bitmap.width;
+	int nBitmapHeight = lc_bitmap.rows;
+	int nAscender = (int)(pFtFace->size->metrics.ascender / 64.0f);
+	int nAdvX = (int)(pFtFace->glyph->metrics.horiAdvance / 64.0f);  //步进宽度
+	int nAdvY = (int)/*( pFtFace->pGlyph->metrics.vertAdvance / 64.0f )*/pFtFace->size->metrics.y_ppem;
+	int nDeltaX = (int)pBitmapGlyph->left;			//left:字形原点(0,0)到字形位图最左边象素的水平距离.它以整数象素的形式表示。 
+	int nDeltaY = (int)(nAscender - pFtFace->glyph->bitmap_top);
+	nAdvY = tMax( nDeltaY + nBitmapHeight, nAdvY );
 
-	if ( nChar == L'j' )
+	if ( nBitmapWidth > 0 && nBitmapHeight > 0 )
 	{
-		int a = 0;
+		m_pByteBuffer->PaintChar( CSize2i( nBitmapWidth, nBitmapHeight ), lc_bitmap.buffer );
+		pDesc->pBitsFill = m_pByteBuffer->GetBitsFill();
 	}
-	m_pByteBuffer->PaintChar(
-		CSize2i( _adv_x, _adv_y ),
-		CSize2i( lc_copy_width, lc_copy_height ),
-		CPoint2i( _delta_x, _delta_y ),
-		lc_bitmap.buffer
-	);
-	//pBuffer->StartPaint( CSize2i( _adv_x, _adv_y ), nBitsFormat );
-	//if ( pBuffer->GetBitsFill() == NULL )
-	//{
-	//	FT_Done_Glyph( pGlyph );
-	//	return MakeResult( ResultCode::Bad, "out of memory" );
-	//}
-	//pBuffer->PaintChar(
-	//	_adv_x,
-	//	CSize2i( lc_copy_width, lc_copy_height ),
-	//	CPoint2i( _delta_x, _delta_y ),
-	//	lc_bitmap.buffer );
-	//pBuffer->EndPaint();
-
-	pDesc->pBitsFill = m_pByteBuffer->GetBitsFill();
+	else
+	{
+		pDesc->pBitsFill = nullptr;
+	}
+	
 	pDesc->bOutline = false;
-	pDesc->nBmpWidth = _adv_x;
-	pDesc->nBmpHeight = _adv_y;
-	pDesc->nCharWidth = _adv_x;
+	pDesc->nBmpWidth = nBitmapWidth;
+	pDesc->nBmpHeight = nBitmapHeight;
+	pDesc->nCharWidth = nAdvX;
 	pDesc->nCharHeight = m_nFontSizeNow;
+	pDesc->nDeltaX = nDeltaX;
+	pDesc->nDeltaY = nDeltaY;
 
 	FT_Done_Glyph( pGlyph );
 
 	return CResult();
-
-	//return MakeResult( ResultCode::Bad, "Not support" );
 }
 
 
@@ -459,6 +445,39 @@ void iberbar::CBitsBuffer::PaintChar( const CSize2i& BitmapSize, const CSize2i& 
 
 	//m_nPaintOffset += nCharWidth;
 	//m_nPaintSize += ChBitmapSize.w;
+}
+
+
+void iberbar::CBitsBuffer::PaintChar( const CSize2i& BitmapSize, const uint8* pBytes )
+{
+	int nByteCount = BitmapSize.w * BitmapSize.h * 4;
+	if ( nByteCount > (int)m_pBits.GetDataSize() )
+	{
+		m_pBits.Resize( nByteCount );
+	}
+	memset( m_pBits.GetPointer(), 0xff, nByteCount );
+
+	int nAlphaIndex = 3;
+
+	uint8* pDst = m_pBits.GetPointer();
+	const uint8* pSrc = pBytes;
+
+	//int nSrcStartX = ( ptDelta.x < 0 ) ? 0 : ptDelta.x;
+	//int nSrcStartY = ( ptDelta.y < 0 ) ? 0 : ptDelta.y;
+	//int nSrcEndX = nSrcStartX + CopySize.w;
+	//int nSrcEndY = nSrcStartY + CopySize.h;
+	int nDstStride = BitmapSize.w * 4;
+	int nSrcStride = BitmapSize.w;
+
+	for ( int y = 0; y < BitmapSize.h; y++ )
+	{
+		for ( int x = 0; x < BitmapSize.w; x++ )
+		{
+			pDst[nAlphaIndex] = pSrc[0];
+			pDst += 4;
+			pSrc += 1;
+		}
+	}
 }
 
 

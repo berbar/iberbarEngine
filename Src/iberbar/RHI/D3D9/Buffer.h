@@ -45,7 +45,6 @@ namespace iberbar
 			protected:
 				CDevice* m_pDevice;
 				IDirect3DVertexBuffer9* m_pD3DVertexBuffer;
-				bool m_bD3DManaged;
 				bool m_bLocked;
 			};
 
@@ -82,7 +81,6 @@ namespace iberbar
 			protected:
 				CDevice* m_pDevice;
 				IDirect3DIndexBuffer9* m_pD3DIndexBuffer;
-				bool m_bD3DManaged;
 				bool m_bLocked;
 			};
 		}

@@ -56,7 +56,8 @@ void iberbar::Paper2d::CImage::SetTexture( RHI::ITexture* pTexture )
 		m_pTexture = pTexture;
 		UNKNOWN_SAFE_ADDREF( m_pTexture );
 
-		m_pShaderVariableTable->SetSampler( Renderer::s_strShaderVarName_TextureSampler, m_pTexture, RHI::UTextureSamplerState() );
+		m_pShaderVariableTableUnion.GetVariableTableForPixelShader()->SetTexture( Renderer::s_strShaderVarName_Texture, m_pTexture );
+		m_pShaderVariableTableUnion.GetVariableTableForPixelShader()->SetSamplerState( Renderer::s_strShaderVarName_TextureSampler, RHI::UTextureSamplerState() );
 	}
 }
 
@@ -65,8 +66,8 @@ void iberbar::Paper2d::CImage::Init()
 {
 	CNode::Init();
 
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Vertex, Renderer::s_strShaderVarName_RHW, false );
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Pixel, Renderer::s_strShaderVarName_UseTexture, true );
+	m_pShaderVariableTableUnion.GetVariableTableForVertexShader()->SetBool( Renderer::s_strShaderVarName_RHW, false );
+	m_pShaderVariableTableUnion.GetVariableTableForPixelShader()->SetBool( Renderer::s_strShaderVarName_UseTexture, true );
 
 	RHI::BuildRectVertexIndices( m_pIndices, 0 );
 	SetColor( 0xffffffff );
@@ -80,7 +81,8 @@ void iberbar::Paper2d::CImage::Init()
 	);
 	m_pRenderCommand->SetTriangles( Triangles );
 	m_pRenderCommand->SetShaderState( m_pShaderState );
-	m_pRenderCommand->SetShaderVariableTable( m_pShaderVariableTable );
+	m_pRenderCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, m_pShaderVariableTableUnion.GetVariableTableForVertexShader() );
+	m_pRenderCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, m_pShaderVariableTableUnion.GetVariableTableForPixelShader() );
 }
 
 
@@ -105,7 +107,7 @@ void iberbar::Paper2d::CImage::UpdateTransform()
 
 void iberbar::Paper2d::CImage::DrawSelf( CDrawContext* pContext )
 {
-	m_pShaderVariableTable->SetMatrix( RHI::UShaderType::Vertex, Renderer::s_strShaderVarName_MatViewProjection, pContext->GetMatViewProjection() );
+	m_pShaderVariableTableUnion.GetVariableTableForVertexShader()->SetMatrix( Renderer::s_strShaderVarName_MatViewProjection, pContext->GetMatViewProjection() );
 	m_pRenderCommand->SetZOrder( m_nZOrder );
 	pContext->GetRenderer()->AddCommand( m_pRenderCommand );
 }

@@ -2,6 +2,7 @@
 
 #include <iberbar/RHI/Device.h>
 #include <iberbar/RHI/D3D11/Headers.h>
+#include <iberbar/RHI/D3D11/Types.h>
 
 namespace iberbar
 {
@@ -9,7 +10,9 @@ namespace iberbar
 	{
 		namespace D3D11
 		{
-			class __iberbarD3DApi__ CDevice
+			class CSamplerState;
+
+			class CDevice
 				: public IDevice
 			{
 			public:
@@ -22,30 +25,42 @@ namespace iberbar
 				virtual void CreateTexture( ITexture** ppTexture ) override;
 				virtual CResult CreateVertexBuffer( uint32 nInSize, uint32 nUsage, IVertexBuffer** ppOutBuffer ) override;
 				virtual CResult CreateIndexBuffer( uint32 nStride, uint32 nInSize, uint32 nUsage, IIndexBuffer** ppOutBuffer ) override;
-				virtual CResult CreateShader( IShader** ppOutShader );
+				virtual CResult CreateVertexShader( IShader** ppOutShader ) override;
+				virtual CResult CreatePixelShader( IShader** ppOutShader ) override;
+				virtual CResult CreateHullShader( IShader** ppOutShader ) override;
+				virtual CResult CreateGeometryShader( IShader** ppOutShader ) override;
+				virtual CResult CreateDomainShader( IShader** ppOutShader ) override;
+				virtual CResult CreateComputeShader( IShader** ppOutShader ) override;
 				virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride ) override;
-				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IShader* pShader, IVertexDeclaration* pVertexDeclaration ) override;
+				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) override;
 				virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) override;
+				virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) override;
+				virtual CResult CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc ) override;
 				virtual void CreateCommandContext( ICommandContext** ppOutContext ) override;
-				virtual void Begin() override;
+				virtual CResult Begin() override;
 				virtual void End() override;
+				virtual void SetClearColor( const CColor4B& color ) override;
 
 			public:
 				CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight );
 
-				void BindVertexBuffer( IDirect3DVertexBuffer11* pD3DVertexBuffer, uint32 stride );
-				void BindIndexBuffer( IDirect3DIndexBuffer9* pD3DIndexBuffer );
-				void SetVertexShader( IDirect3DVertexShader9* pD3DVertexShader );
-				void SetPixelShader( IDirect3DPixelShader9* pD3DVertexShader );
-				void SetTexture( uint32 nStage, IDirect3DTexture9* pD3DTexture );
+				void BindVertexBuffer( ID3D11Buffer* pD3DVertexBuffer, uint32 stride );
+				void BindIndexBuffer( ID3D11Buffer* pD3DIndexBuffer );
+				void SetVertexShader( ID3D11VertexShader* pD3DShader );
+				void SetPixelShader( ID3D11PixelShader* pD3DShader );
+				void SetHullShader( ID3D11HullShader* pD3DShader );
+				void SetGeometryShader( ID3D11GeometryShader* pD3DShader );
+				void SetDomainShader( ID3D11DomainShader* pD3DShader );
+				void SetComputeShader( ID3D11ComputeShader* pD3DShader );
+
+				void SetTexture( uint32 nStage, ID3D11ShaderResourceView* pD3DShaderResourceView );
+				void SetSamplerState( uint32 nStage, ID3D11SamplerState* pD3DSamplerState );
 
 			public:
-				void SetSamplerState( uint32 nStage, const UTextureSamplerState& SamplerState );
-
-			public:
-				ID3D11Device* GetD3DDevice() { return m_pD3DDevice; }
+				ID3D11Device* GetD3DDevice() { return m_pD3DDevice.Get(); }
+				ID3D11DeviceContext* GetD3DDeviceContext() { return m_pD3DDeviceContext.Get(); }
 				// Ó²¼þ´¦Àí
-				bool IsHardwareVertexProcessing() { return m_bIsHardwareVertexProcessing; }
+				//bool IsHardwareVertexProcessing() { return m_bIsHardwareVertexProcessing; }
 
 			protected:
 				CResult ResetDevice() { return ResetDevice( m_ContextSize.w, m_ContextSize.h, m_bIsWindow ); }
@@ -53,39 +68,45 @@ namespace iberbar
 			protected:
 				HWND m_hWnd;
 				HINSTANCE m_hInstance;
-				IDXGIFactory1* m_DXGIFactory;             // DXGI Factory object
-				IDXGIAdapter1* m_DXGIAdapter;            // The DXGI adapter object for the D3D11 device
-				IDXGIOutput** m_DXGIOutputArray;        // The array of output obj for the D3D11 adapter obj
+				float m_D3DClearColorRGBA[ 4 ];
+				ComPtr<IDXGIFactory> m_pDXGIFactory;             // DXGI Factory object
+				ComPtr<IDXGIAdapter1> m_pDXGIAdapter;            // The DXGI adapter object for the D3D11 device
+				//ComPtr<IDXGIOutput** m_DXGIOutputArray;        // The array of output obj for the D3D11 adapter obj
 				UINT                    m_DXGIOutputArraySize;    // Number of elements in m_D3D11OutputArray
-				IDXGISwapChain* m_DXGISwapChain;          // the D3D11 swapchain
-				DXGI_SURFACE_DESC       m_BackBufferSurfaceDescDXGI; // D3D11 back buffer surface description
-				bool                    m_RenderingOccluded;       // Rendering is occluded by another window
-				bool                    m_DoNotStoreBufferSize;    // Do not store the buffer size on WM_SIZE messages
+				ComPtr<IDXGISwapChain> m_pDXGISwapChain;          // the D3D11 swapchain
+				//DXGI_SURFACE_DESC       m_BackBufferSurfaceDescDXGI; // D3D11 back buffer surface description
+				//bool                    m_RenderingOccluded;       // Rendering is occluded by another window
+				//bool                    m_DoNotStoreBufferSize;    // Do not store the buffer size on WM_SIZE messages
 
 				// D3D11 specific
-				ID3D11Device* m_D3D11Device;             // the D3D11 rendering device
-				ID3D11DeviceContext* m_D3D11DeviceContext;	   // the D3D11 immediate device context
-				D3D_FEATURE_LEVEL		m_D3D11FeatureLevel;	   // the D3D11 feature level that this device supports
-				ID3D11Texture2D* m_D3D11DepthStencil;       // the D3D11 depth stencil texture (optional)
-				ID3D11DepthStencilView* m_D3D11DepthStencilView;   // the D3D11 depth stencil view (optional)
-				ID3D11RenderTargetView* m_D3D11RenderTargetView;   // the D3D11 render target view
-				ID3D11RasterizerState* m_D3D11RasterizerState;    // the D3D11 Rasterizer state
+				D3D_FEATURE_LEVEL		m_D3DFeatureLevel;
+				ComPtr<ID3D11Device> m_pD3DDevice;
+				ComPtr<ID3D11DeviceContext> m_pD3DDeviceContext;
+				ComPtr<ID3D11Texture2D> m_pD3DDepthStencil;
+				ComPtr<ID3D11DepthStencilState> m_pD3DDepthStencilState;
+				ComPtr<ID3D11DepthStencilView> m_pD3DDepthStencilView;
+				ComPtr<ID3D11RenderTargetView> m_pD3DRenderTargetView;
+				ComPtr<ID3D11RasterizerState> m_pD3DRasterizerState;
 
-				ID3D11Device* m_pD3DDevice;
+				bool m_bEnableMultisampleQuality;
+				UINT m_nMultisampleQualityLevels;
+				//ID3D11Device* m_pD3DDevice;
 
-				IDirect3DVertexBuffer9* m_pD3DVertexBuffer;
+				ID3D11Buffer* m_pD3DVertexBuffers[ MAX_VERTEX_BUFFERS_COUNT ];
 				uint32 m_nVertexBufferStride;
-				IDirect3DIndexBuffer9* m_pD3DIndexBuffer;
-				IDirect3DVertexShader9* m_pD3DVertexShader;
-				IDirect3DPixelShader9* m_pD3DPixelShader;
+				ComPtr<ID3D11Buffer> m_pD3DIndexBuffer;
+				//IDirect3DVertexShader9* m_pD3DVertexShader;
+				//IDirect3DPixelShader9* m_pD3DPixelShader;
 
-				bool m_bIsHardwareVertexProcessing;
-				bool m_bIsRendering;
-				bool m_bHasLostDevice;
+				//bool m_bIsHardwareVertexProcessing;
+				//bool m_bIsRendering;
+				//bool m_bHasLostDevice;
 
-				IDirect3DTexture9* m_pD3DTextures[ 8 ];
+				ComPtr<ID3D11ShaderResourceView> m_pD3DTextures[ 8 ];
+				ComPtr<ID3D11SamplerState> m_pD3DSamplerStates[ 8 ];
 
-				D3DPRESENT_PARAMETERS m_D3DPresentParams;
+				std::vector<CSamplerState*> m_SamplerStatesCache;
+				//D3DPRESENT_PARAMETERS m_D3DPresentParams;
 			};
 		}
 	}

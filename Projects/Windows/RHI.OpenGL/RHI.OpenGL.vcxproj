@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\Buffer.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\CommandContext.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\CommonDynamic.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\Device.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\ShaderProgram.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\ShaderState.cpp" />
@@ -200,6 +201,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\Buffer.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\CommandContext.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\CommonDynamic.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\Device.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\ShaderProgram.h" />

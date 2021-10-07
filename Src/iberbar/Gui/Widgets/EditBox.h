@@ -35,6 +35,7 @@ namespace iberbar
             virtual void SetCaret( int nAtCharIndex ) = 0;
             virtual void SetCaret( const CPoint2i& Point ) = 0;
             int GetCaretAtCharIndex() { return m_nCaretAtCharIndex; }
+            void SetCaretVisible( bool bValue ) { m_bCaretVisible = bValue; };
 
             virtual void SelectText( const CPoint2i& Point ) = 0;
             virtual void SelectText( const CPoint2i& PointFrom, const CPoint2i& PointTo ) = 0;
@@ -48,6 +49,7 @@ namespace iberbar
             std::wstring m_strTextSelected;
 
             int m_nCaretAtCharIndex;
+            bool m_bCaretVisible;
         };
 
         class __iberbarGuiApi__ CEditBoxTextElement
@@ -91,6 +93,7 @@ namespace iberbar
             virtual void SelectText( const CPoint2i& Point ) override;
             virtual void SelectText( const CPoint2i& PointFrom, const CPoint2i& PointTo ) override;
             virtual void ClearSelectedText() override;
+            
 
         private:
             void UpdateUniBuffer();
@@ -113,6 +116,9 @@ namespace iberbar
             int m_nSelectStart;
             int m_nSelectCount;
             CRect2i m_SelectBounding;
+
+            int m_nTabStyle;
+            int m_nTabOfWhiteSpace;
 
             CEditBoxTextUniBuffer* m_pUniBuffer;
         };

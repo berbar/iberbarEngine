@@ -1,6 +1,6 @@
 
-#include <iberbar/LuaCppApis/Network.h>
-#include <iberbar/LuaCppApis/Network_Names.h>
+#include "Network.h"
+#include "Network_Names.h"
 #include <iberbar/Lua/LuaCppBuilder.h>
 #include <iberbar/Lua/LuaCallback.h>
 #include <iberbar/Lua/LuaCppInstantiateDef.h>

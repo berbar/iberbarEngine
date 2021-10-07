@@ -18,12 +18,15 @@
 
 // RHI
 #include <iberbar/RHI/Device.h>
-#include <iberbar/RHI/OpenGL/Device.h>
-#ifdef _WIN32
-#include <iberbar/RHI/D3D9/Device.h>
-#endif
+//#include <iberbar/RHI/OpenGL/Device.h>
+//#ifdef _WIN32
+//#include <iberbar/RHI/D3D9/Device.h>
+//#endif
 #include <iberbar/RHI/VertexDeclaration.h>
 #include <iberbar/RHI/ShaderState.h>
+#include <iberbar/RHI/RenderState.h>
+#include <iberbar/RHI/CommandContext.h>
+
 #include <iberbar/Gui/Xml/XmlProc.h>
 #ifdef __ANDROID__
 #include <iberbar/Utility/Platform/Android/JniHelper.h>
@@ -38,20 +41,21 @@
 #include <iberbar/Paper2d/Director.h>
 
 // Network
-#include <iberbar/Network/IO.h>
+#include <iberbar/Network/ApiTypedef.h>
+#include <iberbar/Network/SocketClient.h>
+
 
 // Lua
 #include <iberbar/Lua/LuaDevice.h>
 #include <iberbar/Lua/LoggingHelper.h>
 #include <iberbar/LuaCppApis/Utility.h>
-#include <iberbar/LuaCppApis/Utility/Xml.h>
 #include <iberbar/LuaCppApis/Rhi.h>
 #include <iberbar/LuaCppApis/Gui.h>
 #include <iberbar/LuaCppApis/Paper2d.h>
 #include <iberbar/LuaCppApis/Game.h>
 #include <iberbar/LuaCppApis/MsgPack.h>
 #include <iberbar/LuaCppApis/Json.h>
-#include <iberbar/LuaCppApis/Network.h>
+#include <iberbar/LuaCppApis/Xml.h>
 
 // Logging
 #include <iberbar/Utility/Log/OutputDeviceFile.h>
@@ -63,6 +67,8 @@
 #include <iberbar/Utility/FileHelper.h>
 #include <iberbar/Utility/String.h>
 #include <iberbar/Utility/Command.h>
+#include <iberbar/Utility/OS/MultiEventWaiter.h>
+#include <iberbar/Utility/OS/DynamicLibrary.h>
 
 
 
@@ -76,30 +82,29 @@
 
 
 
-
-
-enum class UGameAppEvent
-	: uint32
-{
-	OnTime,
-	OnRender,
-	WakeupLoading,
-	Count
-};
-
-
 namespace iberbar
 {
 	namespace Game
 	{
+
 		void OnPreloadTexture( const CResourcePreloader::ULoadTextureContext& Context );
 		void OnPreloadFont( const CResourcePreloader::ULoadFontContext& Context );
+
+		struct UNetworkProcAddressInfo
+		{
+			IO::PFunctionInitial pInitial;
+			IO::PFunctionDestroy pDestroy;
+			IO::PFunctionRead pRead;
+			IO::PFunctionLuaCppRegister pLuaCppRegister;
+		};
 	}
 }
 
 
 
-iberbar::Game::CApplication* s_pApplication = nullptr;
+
+
+iberbar::Game::CApplication* iberbar::Game::CApplication::sm_pInstance = nullptr;
 
 
 iberbar::Game::CApplication::CApplication()
@@ -114,7 +119,7 @@ iberbar::Game::CApplication::CApplication()
 #ifdef __ANDROID__
 	, m_pJNIEnv( nullptr )
 #endif
-	, m_bPause( false )
+	, m_bWndActive( false )
 	, m_Configuration()
 
 	, m_pLoggingOutputDevice( nullptr )
@@ -141,11 +146,16 @@ iberbar::Game::CApplication::CApplication()
 
 	, m_pLoadingThread( nullptr )
 
+	, m_pDynamicLib_Rhi( nullptr )
+	, m_pDynamicLib_Network( nullptr )
+	, m_pNetworkProcAddressInfo( nullptr )
+	, m_pDpiHelper( nullptr )
+
 	, m_pCommandQueue( nullptr )
 
 	, m_pMemoryRes( new std::pmr::unsynchronized_pool_resource() )
 {
-	s_pApplication = this;
+	sm_pInstance = this;
 }
 
 
@@ -154,7 +164,7 @@ iberbar::Game::CApplication::~CApplication()
 #ifdef __ANDROID__
 	Destroy();
 #endif
-	s_pApplication = nullptr;
+	sm_pInstance = nullptr;
 }
 
 
@@ -187,6 +197,8 @@ void iberbar::Game::CApplication::Destroy()
 		delete m_pLoadingThread;
 		m_pLoadingThread = nullptr;
 	}
+
+	SAFE_DELETE( m_pDpiHelper );
 
 	// 释放Lua占用的东西
 	UNKNOWN_SAFE_RELEASE_NULL( m_pLuaDevice );
@@ -227,11 +239,14 @@ void iberbar::Game::CApplication::Destroy()
 	UNKNOWN_SAFE_RELEASE_NULL( m_pLoggingOutputDevice );
 
 	// 释放 IO
-	IO::Destroy();
+	if ( m_pNetworkProcAddressInfo && m_pNetworkProcAddressInfo->pDestroy )
+		m_pNetworkProcAddressInfo->pDestroy();
+	SAFE_DELETE( m_pNetworkProcAddressInfo );
 
 	// 释放内存池
 	SAFE_DELETE( m_pMemoryRes );
 
+	// 先打印僵尸对象
 #ifdef _DEBUG
 	FILE* f = nullptr;
 	fopen_s( &f, "RefZombies.txt", "wt" );
@@ -253,267 +268,56 @@ void iberbar::Game::CApplication::Destroy()
 		f = nullptr;
 	}
 #endif
+
+	// 释放动态库
+	SAFE_DELETE( m_pDynamicLib_Rhi );
+	SAFE_DELETE( m_pDynamicLib_Network );
 }
 
 
 void iberbar::Game::CApplication::Resume()
 {
-	m_bPause = false;
+	m_pLoggingOutputDevice->Serialize( Logging::ULevel::Info, "active", "Application" );
+	m_bWndActive = true;
 	OnResume();
 }
 
 
 void iberbar::Game::CApplication::Pause()
 {
-	m_bPause = true;
+	m_pLoggingOutputDevice->Serialize( Logging::ULevel::Info, "inactive", "Application" );
+	m_bWndActive = false;
 	OnPause();
 }
 
 
-#ifdef _WINDOWS
-iberbar::CResult iberbar::Game::CApplication::Initial( HINSTANCE hInstance )
+void iberbar::Game::CApplication::RhiDeviceLost()
 {
-	assert( m_hWnd == NULL );
+	if ( m_pRenderer )
+	{
+		m_pRenderer->OnRhiLost();
+	}
 
-	if ( hInstance == NULL )
-		hInstance = (HINSTANCE)GetModuleHandle( NULL );
-	m_hInstance = hInstance;
+	OnRhiDeviceLost();
+}
 
-	CResult ret;
 
-	m_pGlobalTimer = new CGlobalTimer();
-	m_pGlobalTimer->SetTimeout( FPS_MS60 );
-	m_pGlobalTimer->SetFunctionOnRun( std::bind( &CApplication::OnRunTimer, this, std::placeholders::_1, std::placeholders::_2 ) );
-	m_pGlobalTimer->Initial( true );
+iberbar::CResult iberbar::Game::CApplication::RhiDeviceReset()
+{
+	CResult Ret;
+	if ( m_pRenderer )
+	{
+		Ret = m_pRenderer->OnRhiReset();
+		if ( Ret.IsOK() == false )
+			return Ret;
+	}
 
-	CreateHandleEvents();
-
-	ret = CreateWnd();
-	if ( ret.IsOK() == false )
-		return ret;
-
-	ret = CreateAll();
-	if ( ret.IsOK() == false )
-		return ret;
-
-	m_nSysTimer = ::SetTimer( m_hWnd, 1, 10, sTimerProc );
-
-	m_bInit = true;
-
-	ret = OnCreated();
-	if (ret.IsOK() == false)
-		return ret;
+	Ret = OnRhiDeviceReset();
+	if ( Ret.IsOK() == false )
+		return Ret;
 
 	return CResult();
 }
-
-
-
-iberbar::CResult iberbar::Game::CApplication::CreateWnd()
-{
-	WCHAR szExePath[ MAX_PATH ];
-	GetModuleFileName( NULL, szExePath, MAX_PATH );
-	HICON hIcon = ExtractIcon( m_hInstance, szExePath, 0 );
-	DWORD nWndStyle = WS_OVERLAPPED | \
-		WS_CAPTION | \
-		WS_SYSMENU | \
-		WS_MINIMIZEBOX;
-
-	// Register the windows class
-	WNDCLASS wndClass;
-	wndClass.style = CS_DBLCLKS;
-	wndClass.lpfnWndProc = sWndProc;
-	wndClass.cbClsExtra = 0;
-	wndClass.cbWndExtra = 0;
-	wndClass.hInstance = m_hInstance;
-	wndClass.hIcon = hIcon;
-	wndClass.hCursor = LoadCursor( NULL, IDC_ARROW );
-	wndClass.hbrBackground = (HBRUSH)GetStockObject( BLACK_BRUSH );
-	wndClass.lpszMenuName = NULL;
-	wndClass.lpszClassName = TEXT( "iberbarWindowClass" );
-
-	if ( !RegisterClass( &wndClass ) )
-	{
-		DWORD dwError = GetLastError();
-		if ( dwError != ERROR_CLASS_ALREADY_EXISTS )
-		{
-		}
-		return MakeResult( ResultCode::Bad, "" );
-	}
-
-	RECT rc;
-	SetRect( &rc, 0, 0, m_Configuration.nWndWidth, m_Configuration.nWndHeight );
-	AdjustWindowRect( &rc, nWndStyle, FALSE );
-
-	HWND hWnd = CreateWindow( wndClass.lpszClassName, m_Configuration.strAppName.c_str(), nWndStyle,
-		0, 0, (rc.right - rc.left), (rc.bottom - rc.top), 0,
-		nullptr, m_hInstance, 0 );
-	if ( hWnd == NULL )
-	{
-		DWORD dwError = GetLastError();
-		return MakeResult( ResultCode::Bad, "" );
-	}
-
-	m_hWnd = hWnd;
-
-	ShowWindow( m_hWnd, SW_SHOWDEFAULT );
-	UpdateWindow( m_hWnd );
-
-	return CResult();
-}
-
-
-void iberbar::Game::CApplication::CreateHandleEvents()
-{
-	m_hEvents = new HANDLE[ (uint32)UGameAppEvent::Count ];
-	m_nEventCount = (uint32)UGameAppEvent::Count;
-	for ( int i = 0; i < m_nEventCount; i++ )
-		m_hEvents[ i ] = ::CreateEventW( NULL, FALSE, FALSE, NULL );
-}
-
-
-iberbar::CResult iberbar::Game::CApplication::CreateRHI()
-{
-	CResult ret;
-
-	RECT ClientRect;
-	::GetClientRect( m_hWnd, &ClientRect );
-
-	switch ( m_Configuration.nRHIApi )
-	{
-		case RHI::UApiType::OpenGL:
-		{
-			m_pRHIDevice = new RHI::OpenGL::CDevice();
-			RHI::OpenGL::CDevice* pOpenGLDevice = (RHI::OpenGL::CDevice*)m_pRHIDevice;
-			ret = pOpenGLDevice->CreateDevice(
-				m_hWnd,
-				m_Configuration.bWindow,
-				ClientRect.right - ClientRect.left,
-				ClientRect.bottom - ClientRect.top );
-			if ( ret.IsOK() == false )
-				return ret;
-
-			break;
-		}
-
-		case RHI::UApiType::D3D9:
-		{
-			m_pRHIDevice = new RHI::D3D9::CDevice();
-			RHI::D3D9::CDevice* pRHIDeviceTemp = (RHI::D3D9::CDevice*)m_pRHIDevice;
-			ret = pRHIDeviceTemp->CreateDevice(
-				m_hWnd,
-				m_Configuration.bWindow,
-				ClientRect.right - ClientRect.left,
-				ClientRect.bottom - ClientRect.top );
-			if ( ret.IsOK() == false )
-				return ret;
-			break;
-		}
-
-		case RHI::UApiType::D3D11:
-		{
-			ret = MakeResult( ResultCode::Bad, "Not support D3D11" );
-			break;
-		}
-
-		case RHI::UApiType::D3D12:
-		{
-			ret = MakeResult( ResultCode::Bad, "Not support D3D11" );
-			break;
-		}
-
-		default:
-			ret = MakeResult( ResultCode::Bad, "Unknown RHI api" );
-			break;
-	}
-
-	if ( m_pRHIDevice != nullptr )
-	{
-		m_pRHIDevice->SetClearColor( CColor4B( 255, 0, 0, 0 ) );
-	}
-
-	return ret;
-}
-
-
-int iberbar::Game::CApplication::Run()
-{
-	if ( m_hEvents == nullptr )
-		return 0;
-
-	for ( ;; )
-	{
-		DWORD nWaitResult = MsgWaitForMultipleObjects( m_nEventCount, m_hEvents, FALSE, INFINITE, QS_ALLEVENTS );
-
-		int nTriggerEventId = nWaitResult - WAIT_OBJECT_0;
-		if ( nTriggerEventId == m_nEventCount )
-		{
-			MSG lc_msg;
-
-			while ( PeekMessageW( &lc_msg, 0, 0, 0, PM_REMOVE ) )
-			{
-				if ( lc_msg.message != WM_QUIT )
-				{
-					TranslateMessage( &lc_msg );
-					DispatchMessage( &lc_msg );
-				}
-				else
-				{
-					Destroy();
-					return 0;
-				}
-			}
-
-			HandleEvent( nTriggerEventId );
-		}
-		else if ( nTriggerEventId < m_nEventCount && nTriggerEventId >= 0 )
-		{
-			HandleEvent( nTriggerEventId );
-		}
-	} // end for
-
-	Destroy();
-	return 0;
-}
-
-
-void iberbar::Game::CApplication::HandleEvent( int nEventId )
-{
-	switch ( nEventId )
-	{
-		case (int)UGameAppEvent::OnTime:
-		{
-			::SetEvent( m_hEvents[ (int)UGameAppEvent::OnRender ] );
-			break;
-		}
-
-		case (int)UGameAppEvent::OnRender:
-		{
-			m_pGlobalTimer->Run();
-			break;
-		}
-
-		case (int)UGameAppEvent::Count:
-		{
-			::SetEvent( m_hEvents[ (int)UGameAppEvent::OnRender ] );
-			break;
-		}
-
-		case (int)UGameAppEvent::WakeupLoading:
-		{
-			if ( m_pLoadingThread )
-				m_pLoadingThread->Wakeup();
-			break;
-		}
-
-		default:
-		{
-			break;
-		}
-	}
-	OnHandleEvent( nEventId );
-}
-#endif
 
 
 #ifdef __ANDROID__
@@ -584,25 +388,7 @@ iberbar::CResult iberbar::Game::CApplication::ExportAssetsPreInitial()
 }
 
 
-iberbar::CResult iberbar::Game::CApplication::Initial()
-{
-	CResult ret;
 
-	m_pGlobalTimer = new CGlobalTimer();
-	m_pGlobalTimer->SetTimeout( FPS_MS60 );
-	m_pGlobalTimer->SetFunctionOnRun( std::bind( &CApplication::OnRunTimer, this, std::placeholders::_1, std::placeholders::_2 ) );
-	m_pGlobalTimer->Initial( false );
-
-	ret = CreateAll();
-	if ( ret.IsOK() == false )
-		return ret;
-
-	m_bInit = true;
-
-	OnCreated();
-
-	return CResult();
-}
 
 
 iberbar::CResult iberbar::Game::CApplication::CreateRHI()
@@ -627,10 +413,11 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	CResult ret;
 
 	// 初始化IO
-	IO::Initial();
+	ret = CreateNetwork();
+	if ( ret.IsOK() == false )
+		return ret;
 
-	// 初始化Logging
-	m_pLoggingOutputDevice = new Logging::COutputDeviceFile( CResourceFileSystem::GetResoucePath( "Game.log" ).c_str() );
+
 
 	// 创建底层RHI
 	ret = CreateRHI();
@@ -651,6 +438,11 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 		return ret;
 	m_pPaper2dLoader = new CPaper2dLoader();
 
+	// 初始化默认的渲染状态
+	ret = InitDefaultRenderState();
+	if ( ret.IsOK() == false )
+		return ret;
+
 	// 加载默认shader
 	ret = LoadDefaultShaders();
 	if ( ret.IsOK() == false )
@@ -669,9 +461,16 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 
 	// 创建Gui的XML解释器
 	m_pGuiXmlParser = new Gui::CXmlParser();
-	//m_pGuiXmlParser->SetBaseDir( iberbar::Android::CFileUtil::GetShared()->GetBestFilesDir() + "/" );
+	m_pGuiXmlParser->SetLogOutputDevice( m_pLoggingOutputDevice );
 	m_pGuiXmlParser->RegisterGetTexture( std::bind( &CTextureManager::GetOrCreateTextureA, m_pTextureManager, std::placeholders::_1, std::placeholders::_2 ) );
-	m_pGuiXmlParser->RegisterGetFont( std::bind( &CFontManager::GetFont, m_pFontManager, std::placeholders::_1, std::placeholders::_2 ) );
+	m_pGuiXmlParser->RegisterGetFont( [=]( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc )
+		{
+			if ( m_pFontManager->GetFont( ppOutFont, FontDesc ) == true )
+				return CResult();
+			if ( m_pFontManager->GetFontDefault( ppOutFont ) == true )
+				return CResult();
+			return MakeResult( ResultCode::Bad, "Can't find font" );
+		} );
 
 	m_pGuiXmlParser->RegisterCreateProc_Widget( "Default", std::bind( &Gui::XmlCreateProc_Widget, std::placeholders::_1 ) );
 	m_pGuiXmlParser->RegisterCreateProc_Widget( "Button", std::bind( &Gui::XmlCreateProc_Widget_Button, std::placeholders::_1 ) );
@@ -679,6 +478,7 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	m_pGuiXmlParser->RegisterCreateProc_Widget( "RadioBox", std::bind( &Gui::XmlCreateProc_Widget_RadioBox, std::placeholders::_1 ) );
 	m_pGuiXmlParser->RegisterCreateProc_Widget( "ListBox", std::bind( &Gui::XmlCreateProc_Widget_ListBox, std::placeholders::_1 ) );
 	m_pGuiXmlParser->RegisterCreateProc_Widget( "EditBox", std::bind( &Gui::XmlCreateProc_Widget_EditBox, std::placeholders::_1 ) );
+	m_pGuiXmlParser->RegisterCreateProc_Widget( "ProgressBar", std::bind( &Gui::XmlCreateProc_Widget_ProgressBar, std::placeholders::_1 ) );
 
 	m_pGuiXmlParser->RegisterCreateProc_Element( "Default", std::bind( &Gui::XmlCreateProc_Element, std::placeholders::_1 ) );
 	m_pGuiXmlParser->RegisterCreateProc_Element( "ColorRect", std::bind( &Gui::XmlCreateProc_Element_ColorRect, std::placeholders::_1 ) );
@@ -697,6 +497,8 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	m_pGuiXmlParser->RegisterReadProc_Widget( "ListBox", std::bind( &Gui::XmlReadProc_Widget_ListBox,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
 	m_pGuiXmlParser->RegisterReadProc_Widget( "EditBox", std::bind( &Gui::XmlReadProc_Widget_EditBox,
+		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	m_pGuiXmlParser->RegisterReadProc_Widget( "ProgressBar", std::bind( &Gui::XmlReadProc_Widget_ProgressBar,
 		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
 
 	m_pGuiXmlParser->RegisterReadProc_Element( "Default", std::bind( &Gui::XmlReadProc_Element,
@@ -731,16 +533,18 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	Lua::CLoggingHelper::sInitial( m_pLoggingOutputDevice );
 	m_pLuaDevice = new CLuaDevice();
 	m_pLuaDevice->Initial();
+
 	// 注册Lua方法
 	RegisterLuaCpp_ForUtility( m_pLuaDevice->GetLuaState() );
-	Xml::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	RHI::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Gui::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Paper2d::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Game::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	MsgPack::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Json::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
-	IO::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
+	Xml::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
+	if ( m_pNetworkProcAddressInfo && m_pNetworkProcAddressInfo->pLuaCppRegister )
+		m_pNetworkProcAddressInfo->pLuaCppRegister( m_pLuaDevice->GetLuaState() );
 
 	// Timer系统
 	m_pTimerEasySystem = new CTimerEasySystem();
@@ -758,40 +562,144 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 }
 
 
+iberbar::CResult iberbar::Game::CApplication::CreateLog()
+{
+	// 初始化Logging
+	m_pLoggingOutputDevice = new Logging::COutputDeviceFile( CResourceFileSystem::GetResoucePath( "Game.log" ).c_str() );
+
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::Game::CApplication::CreateRHI()
+{
+	CResult Ret;
+
+	RECT ClientRect;
+	::GetClientRect( m_hWnd, &ClientRect );
+
+	std::string strRhiApiName = GetRhiApiName( m_Configuration.nRHIApi );
+	if ( StringIsNullOrEmpty( strRhiApiName.c_str() ) )
+		return MakeResult( ResultCode::Bad, "Unknown rhi api" );
+
+	std::string strLibName = "iberbarRHI." + strRhiApiName;
+	m_pDynamicLib_Rhi = new OS::CDynamicLibrary();
+	Ret = m_pDynamicLib_Rhi->Load( strLibName.c_str() );
+	if ( Ret.IsOK() == false )
+		return Ret;
+
+	typedef RHI::IDevice* ( *PCallbackRhiDeviceCreate )( );
+	PCallbackRhiDeviceCreate pCallbackRhiDeviceCreate = ( PCallbackRhiDeviceCreate )m_pDynamicLib_Rhi->GetProcAddress( "iberbarRhiDeviceCreate" );
+	if ( pCallbackRhiDeviceCreate == nullptr )
+		return MakeResult( ResultCode::Bad, "Can't find the function to create dynamic rhi device" );
+
+	m_pRHIDevice = pCallbackRhiDeviceCreate();
+	if ( m_pRHIDevice == nullptr )
+		return MakeResult( ResultCode::Bad, "Failed to create dynamic rhi device" );
+
+#ifdef _WINDOWS
+	Ret = m_pRHIDevice->CreateDevice(
+		m_hWnd,
+		m_Configuration.bWindow,
+		ClientRect.right - ClientRect.left,
+		ClientRect.bottom - ClientRect.top );
+#endif
+	if ( Ret.IsOK() == false )
+		return Ret;
+
+	m_pRHIDevice->SetCallbackOnLost( std::bind( &CApplication::RhiDeviceLost, this ) );
+	m_pRHIDevice->SetCallbackOnReset( std::bind( &CApplication::RhiDeviceReset, this ) );
+
+	m_pRHIDevice->SetClearColor( CColor4B( 255, 255, 0, 0 ) );
+
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::Game::CApplication::CreateNetwork()
+{
+	CResult Ret;
+
+	if ( m_Configuration.bUseNetwork == false )
+		return CResult();
+
+	m_pDynamicLib_Network = new OS::CDynamicLibrary();
+	Ret = m_pDynamicLib_Network->Load( "iberbarNetwork" );
+	if ( Ret.IsOK() == false )
+		return Ret;
+
+	m_pNetworkProcAddressInfo = new UNetworkProcAddressInfo();
+	m_pNetworkProcAddressInfo->pInitial = (IO::PFunctionInitial)m_pDynamicLib_Network->GetProcAddress( "iberbarNetworkInitial" );
+	m_pNetworkProcAddressInfo->pDestroy = (IO::PFunctionDestroy)m_pDynamicLib_Network->GetProcAddress( "iberbarNetworkDestroy" );
+	m_pNetworkProcAddressInfo->pRead = (IO::PFunctionRead)m_pDynamicLib_Network->GetProcAddress( "iberbarNetworkRead" );
+	m_pNetworkProcAddressInfo->pLuaCppRegister = (IO::PFunctionLuaCppRegister)m_pDynamicLib_Network->GetProcAddress( "iberbarNetworkRegisterLuaCpp" );
+
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::Game::CApplication::InitDefaultRenderState()
+{
+	CResult Ret;
+
+	TSmartRefPtr<RHI::IBlendState> pBlendState = nullptr;
+	RHI::UBlendDesc BlendDesc;
+	memset( &BlendDesc, 0, sizeof( RHI::UBlendDesc ) );
+	BlendDesc.RenderTargets[ 0 ].BlendEnable = true;
+	BlendDesc.RenderTargets[ 0 ].SrcBlend = RHI::EBlend::SrcAlpha;
+	BlendDesc.RenderTargets[ 0 ].DestBlend = RHI::EBlend::InvSrcAlpha;
+	BlendDesc.RenderTargets[ 0 ].BlendOp = RHI::EBlendOP::Add;
+	BlendDesc.RenderTargets[ 0 ].SrcBlendAlpha = RHI::EBlend::One;
+	BlendDesc.RenderTargets[ 0 ].DestBlendAlpha = RHI::EBlend::Zero;
+	BlendDesc.RenderTargets[ 0 ].BlendOpAlpha = RHI::EBlendOP::Add;
+	Ret = m_pRHIDevice->CreateBlendState( &pBlendState, BlendDesc );
+	if ( Ret.IsOK() == false )
+		return Ret;
+
+	m_pRenderer->GetRHIContext()->SetBlendStateDefault( pBlendState );
+
+	return CResult();
+}
+
+
 iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 {
 	CResult ret;
 
-	std::string strShaderRootDir = "";
-	if ( iberbar::RHI::IsOpenGLApi( m_pRHIDevice->GetApiType() ) )
-	{
-		strShaderRootDir += "Shaders/OpenGL";
-	}
-#ifdef _WIN32
-	else if ( iberbar::RHI::IsD3DApi( m_pRHIDevice->GetApiType() ) )
-	{
-		strShaderRootDir += "Shaders/D3D";
-	}
-#endif
+	std::string strShaderRootDir = "Shaders/";
+	const char* strRhiApiName = GetRhiApiName( m_Configuration.nRHIApi );
+	if ( StringIsNullOrEmpty( strRhiApiName ) )
+		return MakeResult( ResultCode::Bad, "Unknown rhi api" );
+	strShaderRootDir += strRhiApiName;
+
 	m_pShaderManager->SetRootDir( strShaderRootDir.c_str() );
 
 	{
 		RHI::UVertexElement VertexElements[] =
 		{
-			{ RHI::UVertexDeclareUsage::Position, 0, RHI::UVertexFormat::FLOAT3, 0 },
-			{ RHI::UVertexDeclareUsage::Color, 0, RHI::UVertexFormat::COLOR, 12 },
-			{ RHI::UVertexDeclareUsage::TexCoord, 0, RHI::UVertexFormat::FLOAT2, 16 }
+			{ RHI::UVertexDeclareUsage::Position, 0, RHI::UVertexFormat::FLOAT3, offsetof( RHI::UVertex_V3F_C4B_T2F, position ) },
+			{ RHI::UVertexDeclareUsage::Color, 0, RHI::UVertexFormat::FLOAT4, offsetof( RHI::UVertex_V3F_C4B_T2F, color ) },
+			{ RHI::UVertexDeclareUsage::TexCoord, 0, RHI::UVertexFormat::FLOAT2, offsetof( RHI::UVertex_V3F_C4B_T2F, texcoord ) }
 		};
-		TSmartRefPtr<RHI::IShader> pShader;
-		ret = m_pShaderManager->GetOrCreateShader( "PositionColorTexture2d", &pShader );
+		TSmartRefPtr<RHI::IShader> pVertexShader;
+		TSmartRefPtr<RHI::IShader> pPixelShader;
+		ret = m_pShaderManager->GetOrCreateShader( RHI::EShaderType::VertexShader, "PositionColorTexture2d", &pVertexShader );
+		if ( ret.IsOK() == false )
+			return ret;
+		
+		ret = m_pShaderManager->GetOrCreateShader( RHI::EShaderType::PixelShader, "PositionColorTexture2d", &pPixelShader );
 		if ( ret.IsOK() == false )
 			return ret;
 
 		TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
-		m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, 24 );
+		ret = m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, sizeof(RHI::UVertex_V3F_C4B_T2F) );
+		if ( ret.IsOK() == false )
+			return ret;
 
 		TSmartRefPtr<RHI::IShaderState> pShaderState;
-		m_pRHIDevice->CreateShaderState( &pShaderState, pShader, pVertexDeclaration );
+		ret = m_pRHIDevice->CreateShaderState( &pShaderState, pVertexDeclaration, pVertexShader, pPixelShader, nullptr, nullptr, nullptr );
+		if ( ret.IsOK() == false )
+			return ret;
 
 		m_pRendererSprite->SetDefaultShaderState( pShaderState );
 	}
@@ -803,7 +711,8 @@ iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 void iberbar::Game::CApplication::OnRunTimer( int64 nElapsedTimeMilliSecond, float nElapsedTimeSecond )
 {
 	// Network IO 读取
-	IO::Read();
+	if ( m_pNetworkProcAddressInfo && m_pNetworkProcAddressInfo->pRead )
+		m_pNetworkProcAddressInfo->pRead();
 
 	if ( m_pLoadingThread )
 	{
@@ -820,6 +729,7 @@ void iberbar::Game::CApplication::OnRunTimer( int64 nElapsedTimeMilliSecond, flo
 	// easy timer system
 	m_pTimerEasySystem->Run( nElapsedTimeSecond );
 
+
 	m_pPaper2dDirector->UpdateScene( nElapsedTimeSecond );
 	m_pGuiEngine->Update( nElapsedTimeMilliSecond, nElapsedTimeSecond );
 	OnUpdate( nElapsedTimeMilliSecond, nElapsedTimeSecond );
@@ -828,47 +738,30 @@ void iberbar::Game::CApplication::OnRunTimer( int64 nElapsedTimeMilliSecond, flo
 	//if ( m_pLoadingThread->IsWakeup() )
 	//	m_pLoadingThread->Unlock();
 
-	m_pRendererSprite->Clean();
-	OnRender();
-	m_pPaper2dDirector->DrawScene();
-	m_pGuiEngine->Render();
-
-	m_pRHIDevice->Begin();
-	m_pRenderer->Render();
-	m_pRHIDevice->End();
-}
-
-
-void iberbar::Game::CApplication::Quit()
-{
-#ifdef _WINDOWS
-	if ( m_hWnd != nullptr )
+	if ( m_bWndActive == true )
 	{
-		::PostMessageW( m_hWnd, WM_DESTROY, 0, 0 );
+		// 
+		m_pRendererSprite->Clean();
+		OnRender();
+		m_pPaper2dDirector->DrawScene();
+		m_pGuiEngine->Render();
+
+		CResult RetRhiBegin = m_pRHIDevice->Begin();
+		if ( RetRhiBegin.IsOK() )
+		{
+			m_pRenderer->Render();
+			m_pRHIDevice->End();
+		}
+		else
+		{
+			std::string strErr = StdFormat( "Failed to begin draw: %s", RetRhiBegin.data.c_str() );
+			m_pLoggingOutputDevice->Serialize(
+				Logging::ULevel::Error,
+				strErr.c_str(),
+				"Rhi" );
+		}
 	}
-#endif
 
-#ifdef __ANDROID__
-	jclass pClass = m_pJNIEnv->FindClass( "com/iberbar/lib/MyHelper" );
-	if ( pClass == nullptr )
-		return;
-
-	jmethodID pMethodId = nullptr;
-
-	pMethodId = m_pJNIEnv->GetStaticMethodID( pClass, "tryQuit", "()V" );
-	if ( pMethodId != nullptr )
-	{
-		m_pJNIEnv->CallStaticObjectMethod( pClass, pMethodId );
-	}
-#endif
-}
-
-
-void iberbar::Game::CApplication::WakeupLoadingThread()
-{
-#ifdef _WINDOWS
-	::SetEvent( m_hEvents[ (int)UGameAppEvent::WakeupLoading ] );
-#endif
 }
 
 
@@ -877,127 +770,6 @@ void iberbar::Game::CApplication::AddLoadingTask( CLoadingTask* pTask )
 	if ( m_pLoadingThread )
 		m_pLoadingThread->AddTask( pTask );
 }
-
-
-#ifdef _WIN32
-LRESULT CALLBACK iberbar::Game::CApplication::sWndProc( HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam )
-{
-	switch ( nMsg )
-	{
-		case WM_CLOSE:
-			s_pApplication->Quit();
-			return 0;
-			break;
-
-		case WM_DESTROY:
-			PostQuitMessage( 0 );
-			break;
-
-		case WM_CAPTURECHANGED:
-		{
-			if ( hWnd == s_pApplication->GetHWnd() )
-			{
-				// 				if ( iberbar::CGlobalTimer::GetSharedInstance()->IsStop() )
-				// 				{
-				// 					iberbar::GetLogConsole()->logva(
-				// 						iberbar::PRIORITY_DEBUG,
-				// 						"WNDPROC",
-				// 						"Got message < WM_CAPTURECHANGED, %d, %d >.Start timer.",
-				// 						(int)wParam, (int)lParam );
-				// 					iberbar::CGlobalTimer::GetSharedInstance()->Start();
-				// 				}
-				// 				else
-				// 				{
-				// 					iberbar::GetLogConsole()->logva(
-				// 						iberbar::PRIORITY_DEBUG,
-				// 						"WNDPROC",
-				// 						"Got message < WM_CAPTURECHANGED, %d, %d >.Stop timer.",
-				// 						(int)wParam, (int)lParam );
-				// 					iberbar::CGlobalTimer::GetSharedInstance()->Stop();
-				// 				}
-
-								//iberbar::CGlobalTimer::GetSharedInstance()->Start();
-			}
-		}
-		break;
-
-		case WM_ACTIVATE:
-		{
-			if ( hWnd == s_pApplication->GetHWnd() )
-			{
-				if ( wParam == WA_CLICKACTIVE || wParam == WA_ACTIVE )
-				{
-					s_pApplication->Resume();
-				}
-				else if ( wParam == WA_INACTIVE )
-				{
-					s_pApplication->Pause();
-				}
-			}
-		}
-		break;
-
-
-		case WM_CREATE:
-		{
-		}
-		break;
-
-
-
-		case WM_SYSCOMMAND:
-		{
-			switch ( wParam )
-			{
-				case SC_SCREENSAVE:
-				case SC_MONITORPOWER:
-					return 0;
-			}
-		}
-		break;
-
-
-		case WM_MOUSEMOVE:
-			::SetEvent( s_pApplication->m_hEvents[ (int)UGameAppEvent::OnRender ] );
-			//s_ptMouse.x = LOWORD( lParam );
-			//s_ptMouse.y = HIWORD( lParam );
-			break;
-
-		// 	case WM_EXITSIZEMOVE:
-		// 		{
-		// 			if ( GetApp() && GetApp()->isInit() )
-		// 			{
-		// 				iberbar::CDXDevice::GetSharedInstance()->getDevice();
-		// 				iberbar::CDXDevice::GetSharedInstance()->lostDevice();
-		// 				iberbar::CDXDevice::GetSharedInstance()->resetDevice();
-		// 			}
-		// 		}
-		// 		break;
-
-		default:break;
-	}
-
-	//if ( GetApp() && GetApp()->isInit() )
-	//{
-	//	GetApp()->m_Callbacks.pOnWndProc( message, lParam, wParam );
-	//}
-
-	if ( s_pApplication->m_bInit == true )
-	{
-		s_pApplication->m_pInput->HandleWndProc( hWnd, nMsg, wParam, lParam );
-		s_pApplication->OnWndProc( nMsg, wParam, lParam );
-	}
-
-	return ::DefWindowProcW( hWnd, nMsg, wParam, lParam );
-}
-
-
-void CALLBACK iberbar::Game::CApplication::sTimerProc( HWND hWnd, UINT, UINT_PTR, DWORD )
-{
-	::SetEvent( s_pApplication->m_hEvents[ (int)UGameAppEvent::OnTime ] );
-}
-
-#endif
 
 
 #ifdef __ANDROID__
@@ -1098,21 +870,41 @@ JNIEXPORT void iberbar::Game::CApplication::sJNI_nativeSetContext( JNIEnv* env, 
 
 
 
-iberbar::Game::CApplication* iberbar::Game::GetApp()
+//iberbar::Game::CApplication* iberbar::Game::GetApp()
+//{
+//	return s_pApplication;
+//}
+
+
+
+
+
+
+
+
+inline const char* iberbar::Game::GetRhiApiName( RHI::UApiType nApiType )
 {
-	return s_pApplication;
+	switch ( nApiType )
+	{
+		case RHI::UApiType::OpenGL:
+			return "OpenGL";
+#ifdef _WINDOWS
+		case RHI::UApiType::D3D9:
+			return "D3D9";
+		case RHI::UApiType::D3D11:
+			return "D3D11";
+		case RHI::UApiType::D3D12:
+			return "D3D12";
+#endif
+		default:break;
+	}
+	return "";
 }
-
-
-
-
-
-
 
 
 void iberbar::Game::OnPreloadTexture( const CResourcePreloader::ULoadTextureContext& Context )
 {
-	CResult ret = GetApp()->GetTextureManager()->GetOrCreateTextureA( Context.strFile, nullptr );
+	CResult ret = CApplication::sGetApp()->GetTextureManager()->GetOrCreateTextureA( Context.strFile, nullptr );
 	if ( ret.IsOK() == false )
 	{
 
@@ -1127,7 +919,7 @@ void iberbar::Game::OnPreloadFont( const CResourcePreloader::ULoadFontContext& C
 	FontDesc.Size = Context.nSize;
 	FontDesc.Weight = (Context.bIsBold == true) ? 1000 : 500;
 	FontDesc.Italic = 0;
-	CResult ret = GetApp()->GetFontManager()->GetOrCreateFont( nullptr, FontDesc, Renderer::UFontCharVocabularyType::Unknown );
+	CResult ret = CApplication::sGetApp()->GetFontManager()->GetOrCreateFont( nullptr, FontDesc, Renderer::UFontCharVocabularyType::Unknown );
 	if ( ret.IsOK() == false )
 	{
 	}

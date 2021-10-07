@@ -241,6 +241,11 @@ iberbar::CResult iberbar::CFontFaceFreeType::CreateCharBitmap( wchar_t ch, iberb
 	int _delta_y = (int)(_ascender - lc_Face->glyph->bitmap_top);
 	_adv_y = tMax( _delta_y + lc_copy_height, _adv_y );
 
+	if ( ch == L'j' )
+	{
+		int aaa = 0;
+	}
+
 	m_buffer->start_paint( CSize2i( _adv_x, _adv_y ), bitsFormat );
 	if ( m_buffer->get_bits_fill() == NULL )
 	{
@@ -260,6 +265,7 @@ iberbar::CResult iberbar::CFontFaceFreeType::CreateCharBitmap( wchar_t ch, iberb
 	pDesc->nBmpHeight = _adv_y;
 	pDesc->nCharWidth = _adv_x;
 	pDesc->nCharHeight = m_fontDesc.Size;
+	pDesc->nDeltaX = 0;
 
 	FT_Done_Glyph( glyph );
 

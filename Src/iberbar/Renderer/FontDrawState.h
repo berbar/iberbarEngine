@@ -67,13 +67,16 @@ FORCEINLINE void iberbar::Renderer::CFontDrawState::DrawCharBitmap( CFont* pFont
 	if ( pBitmap == nullptr )
 		return;
 
-	CRect2i rcDst( ptDst, pBitmap->TextureSize );
-	AddDrawCommand(
-		pFont->GetTexture( pBitmap->nTextureIndex ),
-		rcDst,
-		pBitmap->rcTexCoord,
-		FillColor,
-		pRcViewport
-	);
+	CRect2i rcDst( CPoint2i( ptDst.x + pBitmap->nDeltaX, ptDst.y + pBitmap->nDeltaY ), pBitmap->TextureSize );
+	if ( pBitmap->nTextureIndex >= 0 )
+	{
+		AddDrawCommand(
+			pFont->GetTexture( pBitmap->nTextureIndex ),
+			rcDst,
+			pBitmap->rcTexCoord,
+			FillColor,
+			pRcViewport
+		);
+	}
 }
 

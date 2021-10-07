@@ -86,29 +86,29 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(iberbarBinDir)</OutDir>
     <TargetName>iberbar$(ProjectName)</TargetName>
-    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_spdlog_include);$(IncludePath)</IncludePath>
-    <LibraryPath>$(sdk_libevent_lib);$(sdk_spdlog_lib);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_libevent_lib);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(iberbarBinDir)</OutDir>
     <TargetName>iberbar$(ProjectName)</TargetName>
-    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_spdlog_include);$(IncludePath)</IncludePath>
-    <LibraryPath>$(sdk_libevent_lib);$(sdk_spdlog_lib);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_libevent_lib);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(iberbarBinDir)</OutDir>
     <TargetName>iberbar$(ProjectName)</TargetName>
-    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_spdlog_include);$(IncludePath)</IncludePath>
-    <LibraryPath>$(sdk_libevent_lib);$(sdk_spdlog_lib);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_libevent_lib);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(iberbarBinDir)</OutDir>
     <TargetName>iberbar$(ProjectName)</TargetName>
-    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_spdlog_include);$(IncludePath)</IncludePath>
-    <LibraryPath>$(sdk_libevent_lib);$(sdk_spdlog_lib);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(iberbarSrcDir);$(sdk_libevent_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_libevent_lib);$(sdk_lua_lib);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -122,7 +122,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>ws2_32.lib;event.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;event.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,7 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>ws2_32.lib;event.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;event.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -156,7 +156,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>ws2_32.lib;event.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;event.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -175,12 +175,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>ws2_32.lib;event.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;event.lib;lua53.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\ApiTypeDef.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Network\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Network\IO.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\LuaCppApi\Network.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\LuaCppApi\Network_Names.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Device.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Logger.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -190,9 +193,11 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Network\Private\MsgQueue.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Socket.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\SocketClient.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Network\IO.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Network\LuaCppApi\Network.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Device.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Logger.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -204,6 +209,9 @@
     <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Socket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lua\Lua.vcxproj">
+      <Project>{19354e10-e280-4145-896a-7eab42b9cec2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Utility\Utility.vcxproj">
       <Project>{295545fc-44b3-43cd-b1a5-6871e9be9217}</Project>
     </ProjectReference>

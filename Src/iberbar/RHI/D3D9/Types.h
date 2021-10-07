@@ -14,6 +14,8 @@ namespace iberbar
 			D3DPRIMITIVETYPE ConvertPrimitiveType( UPrimitiveType nPrimitiveType );
 			D3DTEXTUREFILTERTYPE ConvertTextureFilterType( UTextureFilterType nFilterType );
 			D3DTEXTUREADDRESS ConvertTextureAddress( UTextureAddress nAddress );
+			D3DBLEND ConvertBlend( EBlend nBlend );
+			D3DBLENDOP ConvertBlendOP( EBlendOP nBlendOP );
 		}
 	}
 }
@@ -143,4 +145,88 @@ inline D3DTEXTUREADDRESS iberbar::RHI::D3D9::ConvertTextureAddress( UTextureAddr
 		default:break;
 	}
 	return D3DTADDRESS_WRAP;
+}
+
+
+inline D3DBLEND iberbar::RHI::D3D9::ConvertBlend( EBlend nBlend )
+{
+	switch ( nBlend )
+	{
+		case EBlend::Zero:
+			return D3DBLEND_ZERO;
+
+		case EBlend::One:
+			return D3DBLEND_ONE;
+
+		case EBlend::SrcColor:
+			return D3DBLEND_SRCCOLOR;
+
+		case EBlend::InvSrcColor:
+			return D3DBLEND_INVSRCCOLOR;
+
+		case EBlend::SrcAlpha:
+			return D3DBLEND_SRCALPHA;
+
+		case EBlend::InvSrcAlpha:
+			return D3DBLEND_INVSRCALPHA;
+
+		case EBlend::DestAlpha:
+			return D3DBLEND_DESTALPHA;
+
+		case EBlend::InvDestAlpha:
+			return D3DBLEND_INVDESTALPHA;
+
+		case EBlend::DestColor:
+			return D3DBLEND_DESTCOLOR;
+
+		case EBlend::InvDestColor:
+			return D3DBLEND_INVDESTCOLOR;
+
+		case EBlend::SrcAlphaSat:
+			return D3DBLEND_SRCALPHASAT;
+
+		case EBlend::BlendFactor:
+			return D3DBLEND_BLENDFACTOR;
+
+		case EBlend::InvBlendFactor:
+			return D3DBLEND_INVBLENDFACTOR;
+
+		case EBlend::Src1Color:
+			return D3DBLEND_SRCCOLOR2;
+
+		case EBlend::InvSrc1Color:
+			return D3DBLEND_INVSRCCOLOR2;
+
+		default:
+			break;
+	}
+
+	return D3DBLEND_ZERO;
+}
+
+
+inline D3DBLENDOP iberbar::RHI::D3D9::ConvertBlendOP( EBlendOP nBlendOP )
+{
+	switch ( nBlendOP )
+	{
+		case EBlendOP::Add:
+			return D3DBLENDOP_ADD;
+
+		case EBlendOP::Subtract:
+			return D3DBLENDOP_SUBTRACT;
+
+		case EBlendOP::RevSubtract:
+			return D3DBLENDOP_REVSUBTRACT;
+
+		case EBlendOP::Min:
+			return D3DBLENDOP_MIN;
+
+		case EBlendOP::Max:
+			return D3DBLENDOP_MAX;
+
+		default:
+			break;
+	}
+
+	return D3DBLENDOP_ADD;
 }

@@ -17,6 +17,12 @@ namespace iberbar
 	class CGlobalTimer;
 	class CCommandQueue;
 
+	namespace OS
+	{
+		class CDynamicLibrary;
+		class CDpiHelper;
+	}
+
 	namespace Logging
 	{
 		class COutputDevice;
@@ -53,6 +59,8 @@ namespace iberbar
 		class CFontManager;
 		class CTimerEasySystem;
 
+		struct UNetworkProcAddressInfo;
+
 		class CLoadingTask;
 		class CLoadingThread;
 
@@ -66,6 +74,7 @@ namespace iberbar
 			int nWndWidth;
 			int nWndHeight;
 			bool bUseLoadingThread;
+			bool bUseNetwork;
 
 #ifdef _WIN32
 			bool bWindow;
@@ -97,6 +106,8 @@ namespace iberbar
 			virtual void OnQuit() {}
 			virtual void OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTimeSecond ) {}
 			virtual void OnRender() {}
+			virtual void OnRhiDeviceLost() {}
+			virtual CResult OnRhiDeviceReset() { return CResult(); }
 
 #ifdef _WINDOWS
 			virtual void OnHandleEvent( int nEventId ) {}
@@ -110,8 +121,13 @@ namespace iberbar
 			void Destroy();
 			void Resume();
 			void Pause();
+			void RhiDeviceLost();
+			CResult RhiDeviceReset();
 			CResult CreateAll();
+			CResult CreateLog();
 			CResult CreateRHI();
+			CResult CreateNetwork();
+			CResult InitDefaultRenderState();
 			CResult LoadDefaultShaders();
 			void OnRunTimer( int64 nElapsedTimeMilliSecond, float nElapsedTimeSecond );
 
@@ -174,10 +190,11 @@ namespace iberbar
 			CFontManager* GetFontManager() { return m_pFontManager; }
 			CLuaDevice* GetLuaDevice() { return m_pLuaDevice; }
 			CTimerEasySystem* GetTimerSystem() { return m_pTimerEasySystem; }
+			OS::CDpiHelper* GetDpiHelper() { return m_pDpiHelper; }
 
 		protected:
 
-			bool m_bPause;
+			bool m_bWndActive;
 			UApplicationCreateParams m_Configuration;
 
 			Logging::COutputDevice* m_pLoggingOutputDevice;
@@ -204,15 +221,29 @@ namespace iberbar
 
 			CResourcePreloader* m_ResourcePreloader;
 
+			OS::CDynamicLibrary* m_pDynamicLib_Rhi;
+			OS::CDynamicLibrary* m_pDynamicLib_Network;
+			UNetworkProcAddressInfo* m_pNetworkProcAddressInfo;
+			OS::CDpiHelper* m_pDpiHelper;
+
 			CLoadingThread* m_pLoadingThread;
 
 			CCommandQueue* m_pCommandQueue;
 			std::pmr::memory_resource* m_pMemoryRes;
+
+
+		private:
+			static CApplication* sm_pInstance;
+		public:
+			static CApplication* sGetApp() { return sm_pInstance; }
+			template < typename T >
+			static T* sGetApp() { return (T*)sm_pInstance; }
 		};
 
-		__iberbarGameEngineApi__ CApplication* GetApp();
+		//__iberbarGameEngineApi__ CApplication* GetApp();
+
+		const char* GetRhiApiName( RHI::UApiType nApiType );
 	}
 }
-
 
 

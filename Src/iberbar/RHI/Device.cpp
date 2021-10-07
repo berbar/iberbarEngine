@@ -2,7 +2,6 @@
 #include <iberbar/RHI/Device.h>
 
 
-
 namespace iberbar
 {
 	namespace RHI
@@ -26,3 +25,4 @@ iberbar::RHI::IDevice::IDevice( UApiType nApiType )
 	, m_CallbackRender( std::bind( &DefaultRender, std::placeholders::_1 ) )
 {
 }
+

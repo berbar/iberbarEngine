@@ -23,7 +23,7 @@ namespace iberbar
 		int LuaCppFunction_Texture_SaveToFile( lua_State* pLuaState );
 
 
-		void LuaCppClassBuilder_Texture( const char*, LuaCpp::CClassBuilder* cb );
+		void LuaCppClassBuilder_Texture( const char*, Lua::CClassBuilder* cb );
 	}
 }
 
@@ -33,8 +33,8 @@ namespace iberbar
 
 void iberbar::RHI::RegisterLuaCpp( lua_State* pLuaState )
 {
-	LuaCpp::CBuilder builder( pLuaState );
-	builder.ResolveScope( []( LuaCpp::CScopeBuilder* scope )
+	Lua::CBuilder builder( pLuaState );
+	builder.ResolveScope( []( Lua::CScopeBuilder* scope )
 		{
 			scope->AddClass( LuaCppName_Texture, &LuaCppClassBuilder_Texture );
 		}, LuaCppNamespace );
@@ -96,12 +96,12 @@ int iberbar::RHI::LuaCppFunction_Texture_SaveToFile( lua_State* pLuaState )
 
 
 
-void iberbar::RHI::LuaCppClassBuilder_Texture( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::RHI::LuaCppClassBuilder_Texture( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "GetSize", &LuaCppFunction_Texture_GetSize );
 	cb->AddMemberMethod( "SaveToFile", &LuaCppFunction_Texture_SaveToFile );
 
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<ITexture> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<ITexture> );
 }
 
 

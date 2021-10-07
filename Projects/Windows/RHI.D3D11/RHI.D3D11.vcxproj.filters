@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="D3D11">
+      <UniqueIdentifier>{ee5adc5a-fb3d-437d-b31d-5a3232fcc219}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DCommon">
+      <UniqueIdentifier>{45ba44c6-6295-4df3-b369-6dfd382e0691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{43a91c01-379a-4042-a7a4-5bbc2975bcaf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3DCommon\Macros.h">
+      <Filter>D3DCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Device.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Headers.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Buffer.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Shader.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariableDeclaration.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariables.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\EffectReflection.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderReflection.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderState.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\VertexDeclaration.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\CommandContext.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Types.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\RenderState.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Buffer.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Device.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Shader.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\EffectReflection.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderReflection.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderState.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\VertexDeclaration.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariables.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\CommandContext.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\RenderState.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\CommonDynamic.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\..\Src\Shaders\D3D\PositionColorTexture2d_PS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\..\..\Src\Shaders\D3D\PositionColorTexture2d_VS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

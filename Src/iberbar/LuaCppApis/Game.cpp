@@ -26,7 +26,9 @@ namespace iberbar
 	{
 		//int LuaCFunction_GetGuiEngine( lua_State* pLuaState );
 		int LuaCFunction_GetGuiXmlParser( lua_State* pLuaState );
+		int LuaCFunction_GetOrCreateTexture( lua_State* pLuaState );
 		int LuaCFunction_GetTexture( lua_State* pLuaState );
+		int LuaCFunction_GetOrCreateFont( lua_State* pLuaState );
 		int LuaCFunction_GetFont( lua_State* pLuaState );
 		int LuaCFunction_GetResourcePath( lua_State* pLuaState );
 		int LuaCFunction_Paper2dLoadAnimations( lua_State* pLuaState );
@@ -101,12 +103,14 @@ extern const char iberbar::Game::s_ClassName_LoadingTaskKeyTask_FullName[] = "ib
 
 void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 {
-	LuaCpp::CBuilder builder( pLuaState );
-	builder.ResolveScope( []( LuaCpp::CScopeBuilder* scope )
+	Lua::CBuilder builder( pLuaState );
+	builder.ResolveScope( []( Lua::CScopeBuilder* scope )
 		{
 			//scope->AddFunctionOne( "GetGuiEngine", &LuaCFunction_GetGuiEngine );
 			scope->AddFunctionOne( "GetGuiXmlParser", &LuaCFunction_GetGuiXmlParser );
+			scope->AddFunctionOne( "GetOrCreateTexture", &LuaCFunction_GetOrCreateTexture );
 			scope->AddFunctionOne( "GetTexture", &LuaCFunction_GetTexture );
+			scope->AddFunctionOne( "GetOrCreateFont", &LuaCFunction_GetOrCreateFont );
 			scope->AddFunctionOne( "GetFont", &LuaCFunction_GetFont );
 			scope->AddFunctionOne( "GetResourcePath", LuaCFunction_GetResourcePath );
 
@@ -120,7 +124,7 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 			scope->AddFunctionOne( "DestroyTimer", &LuaCFunction_DestroyTimer );
 			scope->AddFunctionOne( "FindTimer", &LuaCFunction_FindTimer );
 			scope->AddClass( s_ClassName_Timer,
-				[]( const char*, LuaCpp::CClassBuilder* pClass )
+				[]( const char*, Lua::CClassBuilder* pClass )
 				{
 					pClass->AddMemberMethod( "Start", &LuaCppFunction_Timer_Start );
 					pClass->AddMemberMethod( "Stop", &LuaCppFunction_Timer_Stop );
@@ -130,22 +134,22 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 					pClass->AddMemberMethod( "SetCallbackExecute", &LuaCppFunction_Timer_SetCallbackExecute );
 					pClass->AddMemberMethod( "SetId", &LuaCppFunction_Timer_SetId );
 					pClass->AddMemberMethod( "GetId", &LuaCppFunction_Timer_GetId );
-					pClass->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CTimer> );
+					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CTimer> );
 				}
 			);
 
 			scope->AddClass( s_ClassName_LoadingTask,
-				[]( const char*, LuaCpp::CClassBuilder* pClass )
+				[]( const char*, Lua::CClassBuilder* pClass )
 				{
-					pClass->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CLoadingTask> );
+					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CLoadingTask> );
 					pClass->AddMemberMethod( "SetTaskName", &LuaCppFunction_LoadingTask_SetTaskName );
 				} );
 
 			scope->AddClass( s_ClassName_LoadingTaskTextures,
-				[]( const char*, LuaCpp::CClassBuilder* pClass )
+				[]( const char*, Lua::CClassBuilder* pClass )
 				{
-					pClass->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CLoadingTask_Textures> );
-					pClass->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CLoadingTask_Textures> );
+					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CLoadingTask_Textures> );
+					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CLoadingTask_Textures> );
 					pClass->AddMemberMethod( "SetSleepFor", &LuaCppFunction_LoadingTaskTextures_SetSleepFor );
 					pClass->AddMemberMethod( "AddTexture", &LuaCppFunction_LoadingTaskTextures_AddTexture );
 					pClass->AddMemberMethod( "SetCallbackOnStep", &LuaCppFunction_LoadingTaskTextures_SetCallbackOnStep );
@@ -153,10 +157,10 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 				}, s_ClassName_LoadingTask_FullName );
 
 			scope->AddClass( s_ClassName_LoadingTaskKeyTask,
-				[]( const char*, LuaCpp::CClassBuilder* pClass )
+				[]( const char*, Lua::CClassBuilder* pClass )
 				{
-					pClass->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CLoadingTask_KeyTask> );
-					pClass->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CLoadingTask_KeyTask> );
+					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CLoadingTask_KeyTask> );
+					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CLoadingTask_KeyTask> );
 					pClass->AddMemberMethod( "SetCallback", &LuaCppFunction_LoadingTaskKeyTask_SetCallback );
 				}, s_ClassName_LoadingTask_FullName );
 
@@ -165,12 +169,12 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 		"iberbar.Game" );
 
 	builder.ResolveScope(
-		[]( LuaCpp::CScopeBuilder* scope )
+		[]( Lua::CScopeBuilder* scope )
 		{
 			scope->AddClass( s_ClassName_Font,
-				[]( const char*, LuaCpp::CClassBuilder* pClass )
+				[]( const char*, Lua::CClassBuilder* pClass )
 				{
-					pClass->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<Renderer::CFont> );
+					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<Renderer::CFont> );
 				}
 			);
 		}, "iberbar.Renderer"
@@ -180,7 +184,7 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 
 //int iberbar::Game::LuaCFunction_GetGuiEngine( lua_State* pLuaState )
 //{
-//	auto pEngine = GetApp()->GetGuiEngine();
+//	auto pEngine = CApplication::sGetApp()->GetGuiEngine();
 //	lua_pushcppobject( pLuaState, "iberbar.Gui.CEngine", pEngine );
 //	return 1;
 //}
@@ -188,8 +192,37 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 
 int iberbar::Game::LuaCFunction_GetGuiXmlParser( lua_State* pLuaState )
 {
-	auto pEngine = GetApp()->GetGuiXmlParser();
+	auto pEngine = CApplication::sGetApp()->GetGuiXmlParser();
 	lua_pushcppobject( pLuaState, "iberbar.Gui.CXmlParser", pEngine );
+	return 1;
+}
+
+
+int iberbar::Game::LuaCFunction_GetOrCreateTexture( lua_State* pLuaState )
+{
+	int t = lua_gettop( pLuaState );
+	if ( t != 1 )
+		return iberbar_LuaError_ArgumentsCountIsNotMatch( pLuaState, 1 );
+
+	const char* strFile = lua_tostring( pLuaState, 1 );
+	if ( StringIsNullOrEmpty( strFile ) )
+	{
+		lua_pushnil( pLuaState );
+	}
+	else
+	{
+		TSmartRefPtr<RHI::ITexture> pTexture = nullptr;
+		CResult ret = CApplication::sGetApp()->GetTextureManager()->GetOrCreateTextureA( strFile, &pTexture );
+		if ( ret.IsOK() == false || pTexture == nullptr )
+		{
+			lua_pushnil( pLuaState );
+		}
+		else
+		{
+			lua_pushcppref( pLuaState, "iberbar.Rhi.CTexture", pTexture );
+		}
+	}
+
 	return 1;
 }
 
@@ -208,8 +241,8 @@ int iberbar::Game::LuaCFunction_GetTexture( lua_State* pLuaState )
 	else
 	{
 		TSmartRefPtr<RHI::ITexture> pTexture = nullptr;
-		CResult ret = GetApp()->GetTextureManager()->GetOrCreateTextureA( strFile, &pTexture );
-		if ( ret.IsOK() == false )
+		CResult ret = CApplication::sGetApp()->GetTextureManager()->GetOrCreateTextureA( strFile, &pTexture );
+		if ( ret.IsOK() == false || pTexture == nullptr )
 		{
 			lua_pushnil( pLuaState );
 		}
@@ -223,16 +256,43 @@ int iberbar::Game::LuaCFunction_GetTexture( lua_State* pLuaState )
 }
 
 
+int iberbar::Game::LuaCFunction_GetOrCreateFont( lua_State* pLuaState )
+{
+	int top = lua_gettop( pLuaState );
+	iberbar_LuaCheckArguments( pLuaState, top, 4 );
+
+	TSmartRefPtr<Renderer::CFont> pFont = nullptr;
+
+	UFontDesc FontDesc;
+	FontDesc.FamilyName = lua_tostring( pLuaState, 1 );
+	FontDesc.Size = (int)lua_tointeger( pLuaState, 2 );
+	FontDesc.Weight = (int)lua_tointeger( pLuaState, 3 );
+	FontDesc.Italic = lua_toboolean( pLuaState, 4 );
+	CResult ret = CApplication::sGetApp()->GetFontManager()->GetOrCreateFont( &pFont, FontDesc, Renderer::UFontCharVocabularyType::Unknown );
+
+	if ( ret.IsOK() == false || pFont == nullptr )
+	{
+		lua_pushstring( pLuaState, ret.data.c_str() );
+	}
+	else
+	{
+		lua_pushcppref( pLuaState, s_ClassName_Font_FullName, pFont );
+	}
+
+	return 1;
+}
+
+
 int iberbar::Game::LuaCFunction_GetFont( lua_State* pLuaState )
 {
 	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments3( pLuaState, top, 0, 2, 3 );
+	iberbar_LuaCheckArguments2( pLuaState, top, 0, 4 );
 
 	TSmartRefPtr<Renderer::CFont> pFont = nullptr;
 	bool ret = false;
 	if ( top == 0 )
 	{
-		ret = GetApp()->GetFontManager()->GetFontDefault( &pFont );
+		ret = CApplication::sGetApp()->GetFontManager()->GetFontDefault( &pFont );
 	}
 	else
 	{
@@ -245,12 +305,12 @@ int iberbar::Game::LuaCFunction_GetFont( lua_State* pLuaState )
 		UFontDesc FontDesc;
 		FontDesc.FamilyName = lua_tostring( pLuaState, 1 );
 		FontDesc.Size = (int)lua_tointeger( pLuaState, 2 );
-		if ( top >= 3 )
-			FontDesc.Weight = (int)lua_tointeger( pLuaState, 3 );
-		ret = GetApp()->GetFontManager()->GetFont( &pFont, FontDesc );
+		FontDesc.Weight = (int)lua_tointeger( pLuaState, 3 );
+		FontDesc.Italic = lua_toboolean( pLuaState, 4 );
+		ret = CApplication::sGetApp()->GetFontManager()->GetFont( &pFont, FontDesc );
 	}
 
-	if ( ret == false )
+	if ( ret == false || pFont == nullptr )
 	{
 		lua_pushnil( pLuaState );
 	}
@@ -347,7 +407,7 @@ int iberbar::Game::LuaCFunction_Paper2dLoadGridTerrain( lua_State* pLuaState )
 int iberbar::Game::LuaCFunction_CreateTimer( lua_State* pLuaState )
 {
 	TSmartRefPtr<CTimer> pTimer = TSmartRefPtr<CTimer>::_sNew();
-	GetApp()->GetTimerSystem()->AddTimer( pTimer );
+	CApplication::sGetApp()->GetTimerSystem()->AddTimer( pTimer );
 	lua_pushcppref( pLuaState, s_ClassName_Timer_FullName, pTimer );
 	return 1;
 }
@@ -365,7 +425,7 @@ int iberbar::Game::LuaCFunction_DestroyTimer( lua_State* pLuaState )
 		return 1;
 	}
 
-	GetApp()->GetTimerSystem()->RemoveTimer( pTimer );
+	CApplication::sGetApp()->GetTimerSystem()->RemoveTimer( pTimer );
 
 	lua_pushboolean( pLuaState, 1 );
 	return 1;
@@ -386,7 +446,7 @@ int iberbar::Game::LuaCFunction_FindTimer( lua_State* pLuaState )
 
 	TSmartRefPtr<CTimer> pTimer = nullptr;
 
-	if ( GetApp()->GetTimerSystem()->FindTimer( strId, &pTimer ) == false && pTimer == nullptr )
+	if ( CApplication::sGetApp()->GetTimerSystem()->FindTimer( strId, &pTimer ) == false && pTimer == nullptr )
 	{
 		lua_pushnil( pLuaState );
 		return 1;
@@ -590,7 +650,7 @@ int iberbar::Game::LuaCFunction_AddLoadingTask( lua_State* pLuaState )
 	if ( pTask == nullptr )
 		return 0;
 
-	GetApp()->AddLoadingTask( pTask );
+	CApplication::sGetApp()->AddLoadingTask( pTask );
 
 	return 0;
 }
@@ -598,7 +658,7 @@ int iberbar::Game::LuaCFunction_AddLoadingTask( lua_State* pLuaState )
 
 int iberbar::Game::LuaCFunction_WakeupLoadingThread( lua_State* pLuaState )
 {
-	GetApp()->WakeupLoadingThread();
+	CApplication::sGetApp()->WakeupLoadingThread();
 
 	return 0;
 }
@@ -842,7 +902,7 @@ int iberbar::Game::LuaCFunction_Log( lua_State* pLuaState )
 	if ( StringIsNullOrEmpty( strCategory ) || StringIsNullOrEmpty( strText ) )
 		return 0;
 
-	GetApp()->GetLoggingOutputDevice()->Serialize( tLevel, strText, strCategory );
+	CApplication::sGetApp()->GetLoggingOutputDevice()->Serialize( tLevel, strText, strCategory );
 
 	return 0;
 }

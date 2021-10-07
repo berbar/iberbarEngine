@@ -5,6 +5,7 @@
 #include <iberbar/Gui/Widget.h>
 
 
+
 namespace iberbar
 {
 	namespace Gui
@@ -16,18 +17,26 @@ namespace iberbar
 			CContainer();
 		protected:
 			CContainer( const CContainer& container );
+			virtual ~CContainer();
 
 		public:
 			virtual CContainer* Clone() const override;
 			virtual const char* GetWidgetType() override { return "Container"; }
-			virtual UHandleMessageResult HandleMouse( const UMouseEventData* EventData ) override;
-			//virtual BOOL HandleKeyboard( const GuiMessage& MsgIn ) { return FALSE; }
+			virtual bool IsContainer() const override { return true; }
+			virtual void SetDialog( CDialog* pDialog ) override;
 
 		public:
-			CWidget* GetActiveWidgetAtPoint( const CPoint2i& point );
+			void AddWidget( CWidget* pWidget );
+			CWidget* FindWidget( const char* strId );
+			void RemoveWidget( CWidget* pWidget );
+			void RemoveWidgetsAll();
+			int GetWidgetCount() const { return (int)m_Widgets.size(); }
+			CWidget* GetWidgetAt( int nIndex ) { return m_Widgets[nIndex]; }
+			void ForeachWidgets( std::function<void( CWidget* )> Func, int nDepth = -1 );
+
 
 		protected:
-			std::list<CWidget*> m_Widgets;
+			std::vector<CWidget*> m_Widgets;
 		};
 	}
 }

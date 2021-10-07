@@ -45,48 +45,51 @@ namespace iberbar
 //}
 
 
-iberbar::Gui::CDialog::CDialog( UDialogStyle nStyle, CDialog* pDlgParent )
-	: m_nDialogStyle( nStyle )
-	, m_pDialogParent( pDlgParent )
-	, m_pWidgetMouseOver( nullptr )
+iberbar::Gui::CDialog::CDialog( CDialog* pDlgParent )
+	: m_pDialogParent( pDlgParent )
+	, m_pContainer( nullptr )
 	, m_bMouseInput( true )
 	, m_bKeyboardInput( true )
 	, m_bNeedClip( true )
-	, m_Widgets()
-	, m_Dialogs()
+	, m_bModal( false )
 {
+	if ( m_pDialogParent )
+		m_pTransform->SetParentTransform( m_pDialogParent->GetTransform() );
+	PTR_CWidget pContainer = PTR_CWidget::_sNew();
+	pContainer->SetSize( 100, 100 );
+	pContainer->SetPercentW( true );
+	pContainer->SetPercentH( true );
+	SetWidgetRoot( pContainer );
 }
 
 
 iberbar::Gui::CDialog::CDialog(const CDialog& dialog )
 	: CObject( dialog )
-	, m_nDialogStyle( dialog.m_nDialogStyle )
 	, m_pDialogParent( dialog.m_pDialogParent )
-	, m_pWidgetMouseOver( nullptr )
+	, m_pContainer( nullptr )
 	, m_bMouseInput( dialog.m_bMouseInput )
 	, m_bKeyboardInput( dialog.m_bKeyboardInput )
 	, m_bNeedClip( dialog.m_bNeedClip )
-	, m_Widgets()
-	, m_Dialogs()
+	, m_bModal( dialog.m_bModal )
 {
+	if ( dialog.m_pDialogParent )
+		m_pTransform->SetParentTransform( dialog.m_pDialogParent->GetTransform() );
+	PTR_CWidget pContainerClone = PTR_CWidget::_sClone( dialog.m_pContainer );
+	SetWidgetRoot( pContainerClone );
 }
 
 
 
 iberbar::Gui::CDialog::~CDialog()
 {
-	RemoveWidgetsAll();
-	RemoveDialogs();
+	RemoveContainer();
 }
 
 
 
 void iberbar::Gui::CDialog::UpdateRect()
 {
-	for ( auto& pWidget : m_Widgets )
-	{
-		pWidget->UpdateRect();
-	}
+	m_pContainer->UpdateRect();
 }
 
 
@@ -98,57 +101,41 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CDialog::HandleMouse( const UMo
 		IsMouseInputEnabled() == false )
 		return UHandleMessageResult::Ignore;
 
-	//--------------------------------------
-	// 访问孩子控件
-	if ( m_Widgets.empty() == false )
+	if ( EventData->nMouseEvent == UMouseEvent::Move )
 	{
-		// 1. Handle focus control first
-		CWidget* pWidgetFocus = CEngine::sGetInstance()->GetFocus();
+		HandleMouseMoveInContainer( m_pContainer, EventData );
+	}
+
+	// 优先处理焦点控件
+	CWidget* pWidgetFocus = CEngine::sGetInstance()->GetFocus();
+	if ( pWidgetFocus != NULL &&
+		pWidgetFocus->IsEnable() &&
+		pWidgetFocus->IsVisible() &&
+		pWidgetFocus->GetDialog() == this )
+	{
+		if ( pWidgetFocus->HandleMouse( EventData ) == UHandleMessageResult::Succeed )
+			return UHandleMessageResult::Succeed;
+	}
+
+	if ( EventData->nMouseEvent != UMouseEvent::Move )
+	{
+		if ( HandleMouseInContainer( m_pContainer, EventData ) == true )
+			return UHandleMessageResult::Succeed;
+	}
+
+	if ( ( EventData->nMouseEvent == UMouseEvent::LDown ||
+			EventData->nMouseEvent == UMouseEvent::LDoubleClick ||
+			EventData->nMouseEvent == UMouseEvent::RDown ||
+			EventData->nMouseEvent == UMouseEvent::RDoubleClick ) &&
+		HitTest( EventData->MousePoint ) )
+	{
 		if ( pWidgetFocus != NULL &&
-			pWidgetFocus->IsEnable() &&
-			pWidgetFocus->IsVisible() &&
-			pWidgetFocus->GetParent() == this )
+			pWidgetFocus->GetDialog() == this )
 		{
-			if ( pWidgetFocus->HandleMouse( EventData ) == UHandleMessageResult::Succeed )
-				return UHandleMessageResult::Succeed;
+			CEngine::sGetInstance()->ClearFocus( true );
 		}
-
-		//  hit test
-		CWidget* pWidgetActive = GetActiveWidgetAtPoint( EventData->MousePoint );
-		if ( pWidgetActive )
-		{
-			if ( pWidgetActive->IsMouseInputEnabled() && pWidgetActive->HandleMouse( EventData ) == UHandleMessageResult::Succeed )
-				return UHandleMessageResult::Succeed;
-		}
-		else
-		{
-			// Mouse not over any controls in this dialog, if there was a control
-			// which had focus it just lost it
-			if ( EventData->nMouseEvent == UMouseEvent::LDown )
-			{
-				if ( pWidgetFocus != nullptr &&
-					pWidgetFocus->GetParent() == this )
-				{
-					CEngine::sGetInstance()->ClearFocus( true );
-				}
-			}
-		}
-
-		if ( EventData->nMouseEvent == UMouseEvent::Move )
-		{
-			// If the mouse is still over the same control, nothing needs to be done
-			if ( pWidgetActive != m_pWidgetMouseOver )
-			{
-				// Handle mouse leaving the old control
-				if ( m_pWidgetMouseOver )
-					m_pWidgetMouseOver->OnMouseLeave();
-
-				// Handle mouse entering the new control
-				m_pWidgetMouseOver = pWidgetActive;
-				if ( m_pWidgetMouseOver != NULL )
-					m_pWidgetMouseOver->OnMouseEnter();
-			}
-		}
+		RequestTop();
+		return UHandleMessageResult::Succeed;
 	}
 
 	return UHandleMessageResult::Ignore;
@@ -176,8 +163,9 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CDialog::HandleKeyboard( const 
 			// it the first chance at handling the message.
 			CWidget* pWidgetFocus = CEngine::sGetInstance()->GetFocus();
 			if ( pWidgetFocus &&
-				pWidgetFocus->GetParent() == this &&
-				pWidgetFocus->GetEnable() )
+				pWidgetFocus->GetDialog() == this &&
+				pWidgetFocus->IsEnable() &&
+				pWidgetFocus->IsMouseInputEnabled() )
 			{
 				if ( pWidgetFocus->HandleKeyboard( pEvent ) == UHandleMessageResult::Succeed )
 					return UHandleMessageResult::Succeed;
@@ -188,32 +176,7 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CDialog::HandleKeyboard( const 
 			// edit box.
 			if ( pEvent->nEvent == UKeyboardEvent::KeyDown || pEvent->nEvent == UKeyboardEvent::Char )
 			{
-				auto iter = m_Widgets.rbegin();
-				auto end = m_Widgets.rend();
-				for ( ; iter != end; iter++ )
-				{
-					if ( (*iter)->HandleKeyboard( pEvent ) == UHandleMessageResult::Succeed )
-						return UHandleMessageResult::Succeed;
-				}
-				//GuiWidgetVector lc_vector( this );
-				//GuiWidgetVector::reserve_iterator lc_iter = lc_vector.rbegin();
-				//GuiWidgetVector::reserve_iterator lc_end = lc_vector.rend();
-				//for ( ; lc_iter != lc_end; ++ lc_iter )
-				//{
-				//	if ( (*lc_iter)->HandleKeyboard( input ) )
-				//	{
-				//		return GuiHandlMessageRet_Succeed;
-				//	}
-				//}
-// 				for ( int i = 0; i < m_Controls.GetSize(); i++ )
-// 				{
-// 					CDXUTControl* pControl = m_Controls.GetAt( i );
-// 					if ( pControl->GetHotkey() == wParam )
-// 					{
-// 						pControl->OnHotkey();
-// 						return true;
-// 					}
-// 				}
+				HandleKeyboardInContainer( m_pContainer, pEvent );
 			}
 		}
 		break;
@@ -223,23 +186,16 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CDialog::HandleKeyboard( const 
 }
 
 
-
 void iberbar::Gui::CDialog::Refresh()
 {
-	for ( auto& pWidget : m_Widgets )
-	{
-		pWidget->Refresh();
-	}
+	m_pContainer->Refresh();
 }
 
 
 
 void iberbar::Gui::CDialog::Update( float nElapsedTime )
 {
-	for ( auto& pWidget : m_Widgets )
-	{
-		pWidget->Update( nElapsedTime );
-	}
+	m_pContainer->Update( nElapsedTime );
 }
 
 
@@ -256,107 +212,11 @@ void iberbar::Gui::CDialog::Render()
 		bPopViewport = true;
 	}
 
-	for ( auto& pWidget : m_Widgets )
-	{
-		pWidget->Render();
-	}
+	m_pContainer->Render();
 
 	if ( bPopViewport == true )
 	{
 		CEngine::sGetInstance()->GetViewportState()->PopViewport();
-	}
-}
-
-
-void iberbar::Gui::CDialog::AddWidget( CWidget* pWidget )
-{
-	if ( pWidget == nullptr )
-		return;
-
-	if ( pWidget->GetParent() != nullptr )
-		return;
-
-	for ( auto& pWidgetTemp : m_Widgets )
-	{
-		if ( pWidgetTemp == pWidget )
-			return;
-	}
-
-	m_Widgets.push_back( pWidget );
-	pWidget->SetParent( this );
-	pWidget->AddRef();
-}
-
-
-iberbar::Gui::CWidget* iberbar::Gui::CDialog::FindWidget( const char* strId )
-{
-	if ( StringIsNullOrEmpty( strId ) == true )
-		return nullptr;
-
-	for ( auto& pWidget : m_Widgets )
-	{
-		if ( strcmp( pWidget->GetId().c_str(), strId ) == 0 )
-			return pWidget;
-	}
-
-	return nullptr;
-}
-
-
-void iberbar::Gui::CDialog::RemoveWidget( CWidget* pWidget )
-{
-	if ( pWidget == nullptr )
-		return;
-
-	auto iter = m_Widgets.begin();
-	auto end = m_Widgets.end();
-	for ( ; iter != end; iter++ )
-	{
-		if ( (*iter) == pWidget )
-		{
-			if ( CEngine::sGetInstance()->GetFocus() == pWidget )
-			{
-				CEngine::sGetInstance()->ClearFocus( true );
-			}
-			if ( m_pWidgetMouseOver == pWidget )
-			{
-				m_pWidgetMouseOver = nullptr;
-			}
-
-			pWidget->SetParent( nullptr );
-			pWidget->Release();
-
-			m_Widgets.erase( iter );
-
-			return;
-		}
-	}
-}
-
-
-void iberbar::Gui::CDialog::RemoveWidgetsAll()
-{
-	if ( m_Widgets.empty() == false )
-	{
-		auto iter = m_Widgets.begin();
-		auto end = m_Widgets.end();
-		for ( ; iter != end; iter++ )
-		{
-			if ( (*iter) == CEngine::sGetInstance()->GetFocus() )
-			{
-				CEngine::sGetInstance()->ClearFocus( false );
-			}
-
-			if ( (*iter) == m_pWidgetMouseOver )
-			{
-				m_pWidgetMouseOver = nullptr;
-			}
-
-			(*iter)->SetParent( nullptr );
-
-			UNKNOWN_SAFE_RELEASE_NULL( *iter );
-		}
-		m_Widgets.clear();
 	}
 }
 
@@ -367,93 +227,186 @@ void iberbar::Gui::CDialog::RequestTop()
 }
 
 
-void iberbar::Gui::CDialog::ForeachWidgets( std::function<void( CWidget* )> Func )
+void iberbar::Gui::CDialog::SetWidgetRoot( CWidget* pContainer )
 {
-	for ( auto& pWidget : m_Widgets )
+	assert( pContainer );
+	assert( pContainer->GetDialog() == nullptr );
+
+	if ( pContainer == m_pContainer )
+		return;
+
+	RemoveContainer();
+
+	m_pContainer = pContainer;
+	m_pContainer->SetDialog( this );
+	m_pContainer->GetTransform()->SetParentTransform( this->GetTransform() );
+	m_pContainer->AddRef();
+}
+
+
+void iberbar::Gui::CDialog::HandleMouseMoveInContainer( CWidget* pContainer, const UMouseEventData* pEventData )
+{
+	if ( pContainer->IsVisible() == false ||
+		pContainer->IsEnable() == false ||
+		pContainer->IsMouseInputEnabled() == false )
+		return;
+
+	int nWidgetCount = pContainer->GetWidgetCount();
+	if ( nWidgetCount == 0 )
+		return;
+
+	CWidget* pWidgetTemp = nullptr;
+	for ( int i = nWidgetCount-1; i >= 0; i -- )
 	{
-		Func( pWidget );
+		pWidgetTemp = pContainer->GetWidgetAt( i );
+
+		HandleMouseMoveInContainer( pWidgetTemp, pEventData );
+
+		if ( pWidgetTemp->IsVisible() &&
+			pWidgetTemp->IsEnable() &&
+			pWidgetTemp->IsMouseInputEnabled() &&
+			pWidgetTemp->GetCanFocus() )
+		{
+			if ( pWidgetTemp->HitTest( pEventData->MousePoint ) )
+			{
+				if ( pWidgetTemp->GetMouseOver() == false )
+					pWidgetTemp->OnMouseEnter();
+
+				pWidgetTemp->HandleMouse( pEventData );
+			}
+			else
+			{
+				if ( pWidgetTemp->GetMouseOver() == true )
+					pWidgetTemp->OnMouseLeave();
+			}
+		}
 	}
 }
 
 
-iberbar::Gui::CWidget* iberbar::Gui::CDialog::GetActiveWidgetAtPoint( const CPoint2i& point )
+bool iberbar::Gui::CDialog::HandleMouseInContainer( CWidget* pContainer, const UMouseEventData* pEventData )
 {
-	auto iter = m_Widgets.rbegin();
-	auto end = m_Widgets.rend();
-	CWidget* pWidget = nullptr;
-	for ( ; iter != end; iter++ )
+	if ( pContainer->IsVisible() == false ||
+		pContainer->IsEnable() == false ||
+		pContainer->IsMouseInputEnabled() == false )
+		return false;
+
+	int nWidgetCount = pContainer->GetWidgetCount();
+	if ( nWidgetCount == 0 )
+		return false;
+
+	CWidget* pWidgetTemp = nullptr;
+	for ( int i = nWidgetCount - 1; i >= 0; i-- )
 	{
-		pWidget = (*iter);
-		if ( pWidget->IsEnable() == true &&
-			pWidget->IsVisible() == true &&
-			pWidget->GetCanFocus() == true &&
-			pWidget->HitTest( point ) == true )
+		pWidgetTemp = pContainer->GetWidgetAt( i );
+
+		// 先访问子控件
+		if ( HandleMouseInContainer( pWidgetTemp, pEventData ) == true )
+			return true;
+
+		// 再访问自己
+		if ( pWidgetTemp->IsVisible() &&
+			pWidgetTemp->IsEnable() &&
+			pWidgetTemp->IsMouseInputEnabled() &&
+			pWidgetTemp->GetCanFocus() )
 		{
-			return pWidget;
+			if ( pWidgetTemp->GetMouseOver() == true &&
+				pWidgetTemp->HandleMouse( pEventData ) == UHandleMessageResult::Succeed )
+				return true;
 		}
 	}
 
-	return nullptr;
+	return false;
 }
 
 
-void iberbar::Gui::CDialog::AddDialog( CDialog* pDialog )
+bool iberbar::Gui::CDialog::HandleKeyboardInContainer( CWidget* pContainer, const UKeyboardEventData* pEventData )
 {
-	if ( pDialog->m_nDialogStyle == UDialogStyle::Overlapped )
-	{
-		m_DialogsOverlapped.push_back( pDialog );
-	}
-	else
-	{
-		m_Dialogs.push_back( pDialog );
-	}
-	pDialog->AddRef();
-}
+	if ( pContainer->IsVisible() == false ||
+		pContainer->IsEnable() == false ||
+		pContainer->IsKeyboardInputEnabled() == false )
+		return false;
 
+	int nWidgetCount = pContainer->GetWidgetCount();
+	if ( nWidgetCount == 0 )
+		return false;
 
-void iberbar::Gui::CDialog::RemoveDialogs()
-{
-	if ( m_Dialogs.empty() == false )
+	CWidget* pWidgetTemp = nullptr;
+	for ( int i = nWidgetCount - 1; i >= 0; i-- )
 	{
-		for ( auto& pDialogTemp : m_Dialogs )
+		pWidgetTemp = pContainer->GetWidgetAt( i );
+
+		// 先访问子控件
+		if ( HandleKeyboardInContainer( pWidgetTemp, pEventData ) == true )
+			return true;
+
+		// 再访问自己
+		if ( pWidgetTemp->IsVisible() &&
+			pWidgetTemp->IsEnable() &&
+			pWidgetTemp->IsKeyboardInputEnabled() &&
+			pWidgetTemp->GetCanFocus() )
 		{
-			pDialogTemp->m_pDialogParent = nullptr;
-			pDialogTemp->RemoveDialogs();
-			pDialogTemp->Release();
+			if ( pWidgetTemp->HandleKeyboard( pEventData ) == UHandleMessageResult::Succeed )
+				return true;
 		}
-		m_Dialogs.clear();
 	}
 
-	if ( m_DialogsOverlapped.empty() == false )
-	{
-		for ( auto& pDialogTemp : m_DialogsOverlapped )
-		{
-			CEngine::sGetInstance()->RemoveDialog( pDialogTemp );
-			pDialogTemp->m_pDialogParent = nullptr;
-			pDialogTemp->RemoveDialogs();
-			pDialogTemp->Release();
-		}
-		m_DialogsOverlapped.clear();
-	}
+	return false;
+}
+
+//
+//void iberbar::Gui::CDialog::AddDialog( CDialog* pDialog )
+//{
+//	assert( pDialog );
+//	m_Dialogs.push_back( pDialog );
+//	pDialog->AddRef();
+//}
+//
+//
+//void iberbar::Gui::CDialog::RemoveDialogs()
+//{
+//	//if ( m_Dialogs.empty() == false )
+//	//{
+//	//	for ( auto& pDialogTemp : m_Dialogs )
+//	//	{
+//	//		pDialogTemp->m_pDialogParent = nullptr;
+//	//		pDialogTemp->RemoveDialogs();
+//	//		pDialogTemp->Release();
+//	//	}
+//	//	m_Dialogs.clear();
+//	//}
+//
+//	if ( m_Dialogs.empty() == false )
+//	{
+//		for ( CDialog* pDialogTemp : m_Dialogs )
+//		{
+//			CEngine::sGetInstance()->RemoveDialog( pDialogTemp );
+//			pDialogTemp->m_pDialogParent = nullptr;
+//			pDialogTemp->RemoveDialogs();
+//			pDialogTemp->Release();
+//		}
+//		m_Dialogs.clear();
+//	}
+//}
+
+
+void iberbar::Gui::CDialog::RemoveContainer()
+{
+	if ( m_pContainer == nullptr )
+		return;
+
+	m_pContainer->SetDialog( nullptr );
+	m_pContainer->GetTransform()->SetParentTransform( nullptr );
+	m_pContainer->Release();
+	m_pContainer = nullptr;
 }
 
 
-iberbar::CResult iberbar::Gui::CDialog::sCreateDialog( CDialog** ppOutDlg, UDialogStyle nStyle, CDialog* pDlgParent )
+iberbar::CResult iberbar::Gui::CDialog::sCreateDialog( CDialog** ppOutDlg, CDialog* pDlgParent )
 {
-	if ( nStyle == UDialogStyle::Child && pDlgParent == nullptr )
-		return MakeResult( ResultCode::Bad, "the style(Child) of dialog " );
+	CDialog* pDlg = new CDialog( pDlgParent );
 
-	CDialog* pDlg = new CDialog( nStyle, pDlgParent );
-
-	if ( nStyle == UDialogStyle::Overlapped )
-	{
-		CEngine::sGetInstance()->AddDialog( pDlg );
-	}
-
-	if ( pDlgParent != nullptr )
-	{
-		pDlgParent->AddDialog( pDlg );
-	}
+	CEngine::sGetInstance()->AddDialog( pDlg );
 
 	(*ppOutDlg) = pDlg;
 
@@ -466,32 +419,9 @@ void iberbar::Gui::CDialog::sDestroyDialog( CDialog* pDialog )
 	if ( pDialog == nullptr )
 		return;
 
-	pDialog->RemoveDialogs();
+	pDialog->m_pDialogParent = nullptr;
 
-	if ( pDialog->m_nDialogStyle == UDialogStyle::Overlapped )
-	{
-		pDialog->m_pDialogParent = nullptr;
-
-		CEngine::sGetInstance()->RemoveDialog( pDialog );
-	}
-	else if ( pDialog->m_nDialogStyle == UDialogStyle::Child )
-	{
-		if ( pDialog->m_pDialogParent->m_Dialogs.empty() == false )
-		{
-			auto iter = pDialog->m_pDialogParent->m_Dialogs.begin();
-			auto end = pDialog->m_pDialogParent->m_Dialogs.end();
-			for ( ; iter != end; iter++ )
-			{
-				if ( (*iter) == pDialog )
-				{
-					pDialog->m_pDialogParent->m_Dialogs.erase( iter );
-					break;
-				}
-			}
-		}
-
-		pDialog->m_pDialogParent = nullptr;
-	}
+	CEngine::sGetInstance()->RemoveDialog( pDialog );
 }
 
 

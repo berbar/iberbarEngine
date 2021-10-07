@@ -30,7 +30,7 @@ namespace iberbar
 			uint32 CalculateVertexCountMax( uint32 nVertexSize ) { return sm_nVertexBufferResizeStep / nVertexSize; }
 			uint32 CalculateIndexCountMax() { return sm_nIndexBufferResizeStep >> 1; }
 			CTrianglesCommand* AllocTrianglesCommand();
-			RHI::IShaderVariableTable* AllocShaderVariableTable();
+			RHI::CShaderVariableTableUnion* AllocShaderVariableTable();
 			CFontDrawState* GetFontDrawState() { return m_pFontDrawState; }
 
 		private:
@@ -40,7 +40,7 @@ namespace iberbar
 			uint32 m_nTrianglesCommandUsed;
 			uint32 m_nShaderVariableTableUsed;
 			std::vector<CTrianglesCommand*> m_TrianglesCommands;
-			std::vector<RHI::IShaderVariableTable*> m_ShaderVariableTableCache;
+			std::vector<RHI::CShaderVariableTableUnion*> m_ShaderVariableTableCache;
 			CFontDrawState* m_pFontDrawState;
 
 			static const uint32 sm_nVertexBufferResizeStep = 65536;
@@ -86,7 +86,7 @@ iberbar::Renderer::CRendererSpriteState::~CRendererSpriteState()
 	m_TrianglesCommands.clear();
 	for ( size_t i = 0, s = m_ShaderVariableTableCache.size(); i < s; i++ )
 	{
-		UNKNOWN_SAFE_RELEASE_NULL( m_ShaderVariableTableCache[ i ] );
+		SAFE_DELETE( m_ShaderVariableTableCache[ i ] );
 	}
 	m_ShaderVariableTableCache.clear();
 	SAFE_DELETE( m_pFontDrawState );
@@ -130,20 +130,28 @@ FORCEINLINE iberbar::Renderer::CTrianglesCommand* iberbar::Renderer::CRendererSp
 }
 
 
-FORCEINLINE iberbar::RHI::IShaderVariableTable* iberbar::Renderer::CRendererSpriteState::AllocShaderVariableTable()
+FORCEINLINE iberbar::RHI::CShaderVariableTableUnion* iberbar::Renderer::CRendererSpriteState::AllocShaderVariableTable()
 {
-	RHI::IShaderVariableTable* pShaderVarTable = nullptr;
+	RHI::CShaderVariableTableUnion* pShaderVarTableUnion = nullptr;
 	if ( m_nShaderVariableTableUsed == m_ShaderVariableTableCache.size() )
 	{
-		m_pRendererSprite->CreateDefaultShaderVariableTable( &pShaderVarTable );
-		m_ShaderVariableTableCache.push_back( pShaderVarTable );
+		pShaderVarTableUnion = new RHI::CShaderVariableTableUnion();
+
+		TSmartRefPtr<RHI::IShaderVariableTable> pShaderVarTable;
+		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+		{
+			m_pRendererSprite->CreateDefaultShaderVariableTable( &pShaderVarTable, (RHI::EShaderType)i );
+			pShaderVarTableUnion->SetVariableTable( (RHI::EShaderType)i, pShaderVarTable );
+		}
+		
+		m_ShaderVariableTableCache.push_back( pShaderVarTableUnion );
 	}
 	else
 	{
-		pShaderVarTable = m_ShaderVariableTableCache[ m_nShaderVariableTableUsed ];
+		pShaderVarTableUnion = m_ShaderVariableTableCache[ m_nShaderVariableTableUsed ];
 	}
 	m_nShaderVariableTableUsed++;
-	return pShaderVarTable;
+	return pShaderVarTableUnion;
 }
 
 
@@ -268,7 +276,9 @@ int iberbar::Renderer::CRendererSprite::DrawRect( int nZOrder,
 	RHI::UVertex_V3F_C4B_T2F* pVertices = (RHI::UVertex_V3F_C4B_T2F*)m_pState->AllocVertices( CRendererSpriteState::sm_nRectVerticsByteSize );
 	uint16* pIndices = (uint16*)m_pState->AllocIndices( CRendererSpriteState::sm_nRectIndicesByteSize );
 	CTrianglesCommand* pCommand = m_pState->AllocTrianglesCommand();
-	RHI::IShaderVariableTable* pShaderVariableTable = m_pState->AllocShaderVariableTable();
+	RHI::CShaderVariableTableUnion* pShaderVarTableUnion = m_pState->AllocShaderVariableTable();
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::VertexShader );
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::PixelShader );
 
 	BuildVertices_V3F_C4B_T2F(
 		pVertices,
@@ -278,11 +288,12 @@ int iberbar::Renderer::CRendererSprite::DrawRect( int nZOrder,
 	);
 	RHI::BuildRectVertexIndices( pIndices, 0 );
 
-	pShaderVariableTable->SetBool( RHI::UShaderType::Vertex, s_strShaderVarName_RHW, true );
-	pShaderVariableTable->SetBool( RHI::UShaderType::Pixel, s_strShaderVarName_UseTexture, false );
+	pShaderVarTable_Vertex->SetBool( s_strShaderVarName_RHW, true );
+	pShaderVarTable_Pixel->SetBool( s_strShaderVarName_UseTexture, false );
 
 	pCommand->SetShaderState( m_pDefaultShaderState );
-	pCommand->SetShaderVariableTable( pShaderVariableTable );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, pShaderVarTable_Pixel );
 	pCommand->SetTriangles( CTrianglesCommand::UTriangles(
 		pVertices,
 		pIndices,
@@ -310,7 +321,9 @@ int iberbar::Renderer::CRendererSprite::DrawRect( int nZOrder,
 	RHI::UVertex_V3F_C4B_T2F* pVertices = (RHI::UVertex_V3F_C4B_T2F*)m_pState->AllocVertices( CRendererSpriteState::sm_nRectVerticsByteSize );
 	uint16* pIndices = (uint16*)m_pState->AllocIndices( CRendererSpriteState::sm_nRectIndicesByteSize );
 	CTrianglesCommand* pCommand = m_pState->AllocTrianglesCommand();
-	RHI::IShaderVariableTable* pShaderVariableTable = m_pState->AllocShaderVariableTable();
+	RHI::CShaderVariableTableUnion* pShaderVarTableUnion = m_pState->AllocShaderVariableTable();
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::VertexShader );
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::PixelShader );
 
 	BuildVertices_V3F_C4B_T2F(
 		pVertices,
@@ -320,11 +333,14 @@ int iberbar::Renderer::CRendererSprite::DrawRect( int nZOrder,
 	);
 	RHI::BuildRectVertexIndices( pIndices, 0 );
 
-	pShaderVariableTable->SetBool( RHI::UShaderType::Vertex, s_strShaderVarName_RHW, true );
-	pShaderVariableTable->SetBool( RHI::UShaderType::Pixel, s_strShaderVarName_UseTexture, false );
-	pShaderVariableTable->SetSampler( s_strShaderVarName_TextureSampler, pTexture, m_DefaultSamplerState );
+	pShaderVarTable_Vertex->SetBool( s_strShaderVarName_RHW, true );
+	pShaderVarTable_Pixel->SetBool( s_strShaderVarName_UseTexture, false );
+	pShaderVarTable_Pixel->SetTexture( s_strShaderVarName_Texture, pTexture );
+	pShaderVarTable_Pixel->SetSamplerState( s_strShaderVarName_TextureSampler, m_DefaultSamplerState );
 
 	pCommand->SetShaderState( m_pDefaultShaderState );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, pShaderVarTable_Pixel );
 	pCommand->SetTriangles( CTrianglesCommand::UTriangles(
 		pVertices,
 		pIndices,
@@ -351,7 +367,9 @@ int iberbar::Renderer::CRendererSprite::DrawRectsBatch( int nZOrder,
 	uint16* pIndices = (uint16*)m_pState->AllocIndices( CRendererSpriteState::sm_nRectIndicesByteSize * nRectCount );
 	uint16* pIndicesPointer = pIndices;
 	CTrianglesCommand* pCommand = m_pState->AllocTrianglesCommand();
-	RHI::IShaderVariableTable* pShaderVarTable = m_pState->AllocShaderVariableTable();
+	RHI::CShaderVariableTableUnion* pShaderVarTableUnion = m_pState->AllocShaderVariableTable();
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::VertexShader );
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::PixelShader );
 
 	const uint8* pDataPointer = (const uint8*)pData;
 	for ( int i = 0; i < nRectCount; i++ )
@@ -369,10 +387,12 @@ int iberbar::Renderer::CRendererSprite::DrawRectsBatch( int nZOrder,
 		pDataPointer += nStride;
 	}
 
-	pShaderVarTable->SetBool( RHI::UShaderType::Vertex, s_strShaderVarName_RHW, true );
-	pShaderVarTable->SetBool( RHI::UShaderType::Pixel, s_strShaderVarName_UseTexture, false );
+	pShaderVarTable_Vertex->SetBool( s_strShaderVarName_RHW, true );
+	pShaderVarTable_Pixel->SetBool( s_strShaderVarName_UseTexture, false );
 
 	pCommand->SetShaderState( m_pDefaultShaderState );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, pShaderVarTable_Pixel );
 	pCommand->SetTriangles( CTrianglesCommand::UTriangles(
 		pVertices,
 		pIndices,
@@ -417,7 +437,9 @@ int iberbar::Renderer::CRendererSprite::DrawRectsBatch(
 	uint16* pIndices = (uint16*)m_pState->AllocIndices( CRendererSpriteState::sm_nRectIndicesByteSize * nRectCount );
 	uint16* pIndicesPointer = pIndices;
 	CTrianglesCommand* pCommand = m_pState->AllocTrianglesCommand();
-	RHI::IShaderVariableTable* pShaderVarTable = m_pState->AllocShaderVariableTable();
+	RHI::CShaderVariableTableUnion* pShaderVarTableUnion = m_pState->AllocShaderVariableTable();
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::VertexShader );
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel = pShaderVarTableUnion->GetVariableTable( RHI::EShaderType::PixelShader );
 
 	const uint8* pDataPointer = (const uint8*)pData;
 	for ( int i = 0; i < nRectCount; i++ )
@@ -435,13 +457,15 @@ int iberbar::Renderer::CRendererSprite::DrawRectsBatch(
 		pDataPointer += nStride;
 	}
 
-	pShaderVarTable->SetBool( RHI::UShaderType::Vertex, s_strShaderVarName_RHW, true );
-	pShaderVarTable->SetBool( RHI::UShaderType::Pixel, s_strShaderVarName_UseTexture, true );
-	pShaderVarTable->SetSampler( s_strShaderVarName_TextureSampler, pTexture, m_DefaultSamplerState );
+	pShaderVarTable_Vertex->SetBool( s_strShaderVarName_RHW, true );
+	pShaderVarTable_Pixel->SetBool( s_strShaderVarName_UseTexture, true );
+	pShaderVarTable_Pixel->SetTexture( s_strShaderVarName_Texture, pTexture );
+	pShaderVarTable_Pixel->SetSamplerState( s_strShaderVarName_TextureSampler, m_DefaultSamplerState );
 
 	pCommand->SetZOrder( nZOrder );
 	pCommand->SetShaderState( m_pDefaultShaderState );
-	pCommand->SetShaderVariableTable( pShaderVarTable );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, pShaderVarTable_Pixel );
 	pCommand->SetTriangles( CTrianglesCommand::UTriangles(
 		pVertices,
 		pIndices,
@@ -573,7 +597,8 @@ int iberbar::Renderer::CRendererSprite::DrawRectRhwEx(
 	const CColor4B& color,
 	const CRect2f& rcTextureCoord,
 	RHI::IShaderState* pShaderState,
-	RHI::IShaderVariableTable* pShaderVariableTable )
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex,
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel )
 {
 
 	if ( color.a == 0 )
@@ -600,7 +625,8 @@ int iberbar::Renderer::CRendererSprite::DrawRectRhwEx(
 
 	pCommand->SetZOrder( nZOrder );
 	pCommand->SetShaderState( pShaderState );
-	pCommand->SetShaderVariableTable( pShaderVariableTable );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, pShaderVarTable_Pixel );
 	pCommand->SetTriangles( CTrianglesCommand::UTriangles(
 		pVertices,
 		pIndices,
@@ -618,7 +644,8 @@ int iberbar::Renderer::CRendererSprite::DrawRectEx(
 	const CColor4B& color,
 	const CRect2f& rcTextureCoord,
 	RHI::IShaderState* pShaderState,
-	RHI::IShaderVariableTable* pShaderVariableTable )
+	RHI::IShaderVariableTable* pShaderVarTable_Vertex,
+	RHI::IShaderVariableTable* pShaderVarTable_Pixel )
 {
 
 	if ( color.a == 0 )
@@ -638,7 +665,8 @@ int iberbar::Renderer::CRendererSprite::DrawRectEx(
 
 	pCommand->SetZOrder( nZOrder );
 	pCommand->SetShaderState( pShaderState );
-	pCommand->SetShaderVariableTable( pShaderVariableTable );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, pShaderVarTable_Vertex );
+	pCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, pShaderVarTable_Pixel );
 	pCommand->SetTriangles( CTrianglesCommand::UTriangles(
 		pVertices,
 		pIndices,
@@ -659,10 +687,33 @@ void iberbar::Renderer::CRendererSprite::GetDefaultShaderState( RHI::IShaderStat
 }
 
 
-void iberbar::Renderer::CRendererSprite::CreateDefaultShaderVariableTable( RHI::IShaderVariableTable** ppOutShaderVariableTable )
+void iberbar::Renderer::CRendererSprite::CreateDefaultShaderVariableTable( RHI::IShaderVariableTable** ppOutShaderVariableTable, RHI::EShaderType eShaderType )
 {
 	assert( ppOutShaderVariableTable );
 
-	m_pDevice->CreateShaderVariableTable( ppOutShaderVariableTable );
-	(*ppOutShaderVariableTable)->SetShaderState( m_pDefaultShaderState );
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderVariableTable );
+
+	RHI::IShader* pShader = m_pDefaultShaderState->GetShader( eShaderType );
+	if ( pShader == nullptr )
+		return;
+
+	TSmartRefPtr<RHI::IShaderVariableTable> pTable;
+	m_pDevice->CreateShaderVariableTable( &pTable );
+	pTable->SetShader( pShader );
+	( *ppOutShaderVariableTable ) = pTable;
+	( *ppOutShaderVariableTable )->AddRef();
+}
+
+
+void iberbar::Renderer::CRendererSprite::CreateDefaultShaderVariableTableUnion( RHI::CShaderVariableTableUnion* pShaderVariableTableUnion )
+{
+	assert( pShaderVariableTableUnion );
+
+	TSmartRefPtr<RHI::IShaderVariableTable> pTable;
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	{
+		m_pDevice->CreateShaderVariableTable( &pTable );
+		pTable->SetShader( m_pDefaultShaderState->GetShader( (RHI::EShaderType)i ) );
+		pShaderVariableTableUnion->SetVariableTable( (RHI::EShaderType)i, pTable );
+	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <wrl/client.h>
 
 #ifndef D3D_SAFE_ADDREF
 #define D3D_SAFE_ADDREF( p ) if ( (p) != nullptr ) { (p)->AddRef(); }
@@ -16,3 +17,5 @@
 #define __iberbarD3DApi__ __declspec(dllimport)
 #endif
 #endif
+
+using Microsoft::WRL::ComPtr;

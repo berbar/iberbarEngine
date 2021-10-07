@@ -8,6 +8,11 @@ local m = {};
 function m.new() end
 
 
+--- 初始化
+--- @return void
+function m:Init() end
+
+
 --- @param zorder number
 function m:SetZOrder( zorder ) end
 
@@ -19,7 +24,7 @@ function m:FindElement( id ) end
 
 --- @param element iberbar.Gui.CRenderElement
 --- @return void
-function m:AddChildElement( element ) end
+function m:AddElement( element ) end
 
 
 --- @return iberbar.Gui.CRenderElement

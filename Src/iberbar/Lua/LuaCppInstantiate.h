@@ -6,7 +6,7 @@
 
 namespace iberbar
 {
-	namespace LuaCpp
+	namespace Lua
 	{
 		struct UClassObjectType
 		{
@@ -62,7 +62,7 @@ namespace iberbar
 
 
 template < typename T >
-int iberbar::LuaCpp::Class_Default_Constructor_New( lua_State* L )
+int iberbar::Lua::Class_Default_Constructor_New( lua_State* L )
 {
 	int metatable;
 	const char* strClassFullName;
@@ -72,13 +72,13 @@ int iberbar::LuaCpp::Class_Default_Constructor_New( lua_State* L )
 
 	// 构造对象
 	T* instance = new T();
-	iberbar::LuaCpp::Class_Default_PushObject( L, metatable, instance, strClassFullName );
+	iberbar::Lua::Class_Default_PushObject( L, metatable, instance, strClassFullName );
 
 	return 1;
 }
 
 template < typename T >
-int iberbar::LuaCpp::Class_Default_Distructor_Delete( lua_State* L )
+int iberbar::Lua::Class_Default_Distructor_Delete( lua_State* L )
 {
 	int n = lua_gettop( L );
 
@@ -100,7 +100,7 @@ int iberbar::LuaCpp::Class_Default_Distructor_Delete( lua_State* L )
 
 
 template < typename T >
-int iberbar::LuaCpp::Class_Unknown_Constructor_New( lua_State* L )
+int iberbar::Lua::Class_Unknown_Constructor_New( lua_State* L )
 {
 	int metatable;
 	const char* strClassFullName;
@@ -110,13 +110,13 @@ int iberbar::LuaCpp::Class_Unknown_Constructor_New( lua_State* L )
 
 	// 构造对象
 	T* instance = new T();
-	iberbar::LuaCpp::Class_Default_PushObject( L, metatable, instance, strClassFullName );
+	iberbar::Lua::Class_Default_PushObject( L, metatable, instance, strClassFullName );
 
 	return 1;
 }
 
 template < typename T >
-int iberbar::LuaCpp::Class_Unknown_Distructor_Release( lua_State* L )
+int iberbar::Lua::Class_Unknown_Distructor_Release( lua_State* L )
 {
 	int n = lua_gettop( L );
 
@@ -138,7 +138,7 @@ int iberbar::LuaCpp::Class_Unknown_Distructor_Release( lua_State* L )
 
 
 template < typename T >
-T* iberbar::LuaCpp::ToClassObject( lua_State* L, int narg )
+T* iberbar::Lua::ToClassObject( lua_State* L, int narg )
 {
 	if ( lua_isuserdata( L, narg ) == false )
 		return nullptr;
@@ -152,7 +152,7 @@ T* iberbar::LuaCpp::ToClassObject( lua_State* L, int narg )
 
 
 template < typename T >
-T* iberbar::LuaCpp::ToClassObject( lua_State* pLuaState, int nArg, const char* strClassName )
+T* iberbar::Lua::ToClassObject( lua_State* pLuaState, int nArg, const char* strClassName )
 {
 	if ( lua_isuserdata( pLuaState, nArg ) == false )
 		return nullptr;
@@ -168,7 +168,7 @@ T* iberbar::LuaCpp::ToClassObject( lua_State* pLuaState, int nArg, const char* s
 
 
 template < typename T >
-int iberbar::LuaCpp::Class_Unknown_Dynamic_Cast( lua_State* pLuaState )
+int iberbar::Lua::Class_Unknown_Dynamic_Cast( lua_State* pLuaState )
 {
 	int top = lua_gettop( pLuaState );
 	iberbar_LuaCheckArguments( pLuaState, top, 2 );
@@ -199,13 +199,13 @@ int iberbar::LuaCpp::Class_Unknown_Dynamic_Cast( lua_State* pLuaState )
 //#endif
 	T* pReturn = static_cast<T*>(pRef);
 
-	LuaCpp::Class_Ref_PushObject( pLuaState, nMetatable, pReturn, strClassName );
+	Lua::Class_Ref_PushObject( pLuaState, nMetatable, pReturn, strClassName );
 
 	return 1;
 }
 
 
-inline int iberbar::LuaCpp::Class_Unknown_Constructor_New_GetMetatable( lua_State* L, const char* (*ppClassFullName), int* metatable )
+inline int iberbar::Lua::Class_Unknown_Constructor_New_GetMetatable( lua_State* L, const char* (*ppClassFullName), int* metatable )
 {
 	return Class_Default_Constructor_New_GetMetatable( L, ppClassFullName, metatable );
 }

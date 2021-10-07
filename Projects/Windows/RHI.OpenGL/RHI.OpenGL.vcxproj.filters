@@ -10,6 +10,7 @@
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\TextureReadFunc.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\VertexDeclaration.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\ShaderVariables.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\OpenGL\CommonDynamic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\Buffer.h" />
@@ -23,5 +24,6 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\Types.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\VertexDeclaration.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\ShaderVariables.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\OpenGL\CommonDynamic.h" />
   </ItemGroup>
 </Project>

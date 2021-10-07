@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<iberbarGui version="0.1">
+
+    <Widget Type="Default" Id="Background"
+        X="0" Y="0"
+        Width="100%" Height="100%"
+        AlignHorizental="Center"
+        AlignVertical="Center">
+        <Styles>
+            <Element Type="ColorRect" X="0" Y="0" Width="100%" Height="100%" ZOrder="-2">
+                <Color State="All" Value="0xfff1f1f1" />
+            </Element>
+        </Styles>
+    </Widget>
+
+    <Widget Type="Button" Id="Btn-StartGame"
+        X="0" Y="0"
+        Width="200" Height="50"
+        AlignHorizental="Center" AlignVertical="Center" >
+        <Styles>
+            <Element Type="StateLabel" X="0" Y="0" Width="100%" Height="100%" ZOrder="-1" >
+                <Font Family="Fonts/STHUPO.TTF" Size="21" Weight="Bold" />
+                <Text>这是弹窗</Text>
+                <Color State="Normal" Value="0xff000000" />
+                <Color State="MouseOver" Value="0xff0000ff" />
+                <Color State="Pressed" Value="0xffff0000" />
+                <Color State="Focus" Value="0xff00ff00" />
+                <Color State="Disabled" Value="0xff8c8c8c" />
+                <Color State="Hidden" Value="0x00000000" />
+            </Element>
+        </Styles>
+    </Widget>
+
+
+</iberbarGui>

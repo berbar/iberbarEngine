@@ -1,4 +1,4 @@
-
+iberbar.Game = iberbar.Game or {};
 
 --- 批量纹理加载任务
 --- @class iberbar.Game.CLoadingTask_Textures : iberbar.Game.CLoadingTask

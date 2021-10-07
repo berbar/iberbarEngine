@@ -50,11 +50,11 @@ namespace iberbar
 
 		int LuaCppFunction_NodeListA_GetNodeCount( lua_State* L );
 
-		void LuaCppClassBuilder_DocumentA( const char*, LuaCpp::CClassBuilder* classBuilder );
+		void LuaCppClassBuilder_DocumentA( const char*, Lua::CClassBuilder* classBuilder );
 
-		void LuaCppClassBuilder_NodeA( const char*, LuaCpp::CClassBuilder* classBuilder );
+		void LuaCppClassBuilder_NodeA( const char*, Lua::CClassBuilder* classBuilder );
 
-		void LuaCppClassBuilder_NodeListA( const char*, LuaCpp::CClassBuilder* classBuilder );
+		void LuaCppClassBuilder_NodeListA( const char*, Lua::CClassBuilder* classBuilder );
 	}
 }
 
@@ -62,8 +62,8 @@ namespace iberbar
 
 void iberbar::Xml::RegisterLuaCpp( lua_State* L )
 {
-	LuaCpp::CBuilder builder( L );
-	builder.ResolveScope( []( LuaCpp::CScopeBuilder* scope )
+	Lua::CBuilder builder( L );
+	builder.ResolveScope( []( Lua::CScopeBuilder* scope )
 	{
 		scope->AddFunctionOne( "CreateRapidXmlDocumentA", &LuaCFunction_CreateRapidXmlDocumentA );
 		scope->AddClass( LuaCppName_DocumentA, &LuaCppClassBuilder_DocumentA );
@@ -72,28 +72,28 @@ void iberbar::Xml::RegisterLuaCpp( lua_State* L )
 	}, LuaCppNamespace );
 }
 
-void iberbar::Xml::LuaCppClassBuilder_DocumentA( const char*, LuaCpp::CClassBuilder* classBuilder )
+void iberbar::Xml::LuaCppClassBuilder_DocumentA( const char*, Lua::CClassBuilder* classBuilder )
 {
 	classBuilder->AddMemberMethod( "Load", &LuaCppFunction_DocumentA_Load );
 	classBuilder->AddMemberMethod( "LoadFromFile", &LuaCppFunction_DocumentA_LoadFromFile );
 	classBuilder->AddMemberMethod( "GetRoot", &LuaCppFunction_DocumentA_GetRoot );
-	classBuilder->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CDocumentA> );
+	classBuilder->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CDocumentA> );
 }
 
-void iberbar::Xml::LuaCppClassBuilder_NodeA( const char*, LuaCpp::CClassBuilder* classBuilder )
+void iberbar::Xml::LuaCppClassBuilder_NodeA( const char*, Lua::CClassBuilder* classBuilder )
 {
 	classBuilder->AddMemberMethod( "SelectSingleNode", &LuaCppFunction_NodeA_SelectSingleNode );
 	classBuilder->AddMemberMethod( "SelectNodes", &LuaCppFunction_NodeA_SelectNodes );
 	classBuilder->AddMemberMethod( "GetAttribute", &LuaCppFunction_NodeA_GetAttribute );
 	classBuilder->AddMemberMethod( "GetValueText", &LuaCppFunction_NodeA_GetValueText );
-	classBuilder->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CNodeA> );
+	classBuilder->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CNodeA> );
 }
 
-void iberbar::Xml::LuaCppClassBuilder_NodeListA( const char*, LuaCpp::CClassBuilder* classBuilder )
+void iberbar::Xml::LuaCppClassBuilder_NodeListA( const char*, Lua::CClassBuilder* classBuilder )
 {
 	classBuilder->AddMemberMethod( "GetNodeAt", &LuaCppFunction_NodeListA_GetNodeAt );
 	classBuilder->AddMemberMethod( "GetNodeCount", &LuaCppFunction_NodeListA_GetNodeCount );
-	classBuilder->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CNodeListA> );
+	classBuilder->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CNodeListA> );
 }
 
 
@@ -106,7 +106,7 @@ int iberbar::Xml::LuaCFunction_CreateRapidXmlDocumentA( lua_State* L )
 
 	Xml::PTR_CDocumentA document = Xml::CreateRapidXmlDocumentA();
 	CDocumentA* pointer = document;
-	LuaCpp::Class_Default_PushObjectWithName( L, LuaCppName_DocumentA_FullName, pointer );
+	Lua::Class_Default_PushObjectWithName( L, LuaCppName_DocumentA_FullName, pointer );
 	pointer->AddRef();
 
 	return 1;
@@ -140,7 +140,7 @@ int iberbar::Xml::LuaCppFunction_DocumentA_GetRoot( lua_State* L )
 
 	Xml::CNodeA* node = nullptr;
 	document->GetRoot( &node );
-	LuaCpp::Class_Default_PushObjectWithName( L, LuaCppName_NodeA_FullName, node );
+	Lua::Class_Default_PushObjectWithName( L, LuaCppName_NodeA_FullName, node );
 
 	return 1;
 }
@@ -156,7 +156,7 @@ int iberbar::Xml::LuaCppFunction_NodeA_SelectSingleNode( lua_State* L )
 
 	Xml::CNodeA* nodeChild = nullptr;
 	node->SelectSingleNode( tagName, &nodeChild );
-	LuaCpp::Class_Default_PushObjectWithName( L, LuaCppName_NodeA_FullName, nodeChild );
+	Lua::Class_Default_PushObjectWithName( L, LuaCppName_NodeA_FullName, nodeChild );
 
 	return 1;
 }
@@ -172,7 +172,7 @@ int iberbar::Xml::LuaCppFunction_NodeA_SelectNodes( lua_State* L )
 
 	Xml::CNodeListA* nodeList = nullptr;
 	node->SelectNodes( tagName, &nodeList );
-	LuaCpp::Class_Default_PushObjectWithName( L, LuaCppName_NodeListA_FullName, nodeList );
+	Lua::Class_Default_PushObjectWithName( L, LuaCppName_NodeListA_FullName, nodeList );
 
 	return 1;
 }
@@ -224,7 +224,7 @@ int iberbar::Xml::LuaCppFunction_NodeListA_GetNodeAt( lua_State* L )
 	Xml::CNodeA* node = nullptr;
 	nodeList->GetNodeAt( index, &node );
 
-	LuaCpp::Class_Default_PushObjectWithName( L, LuaCppName_NodeA_FullName, node );
+	Lua::Class_Default_PushObjectWithName( L, LuaCppName_NodeA_FullName, node );
 
 	return 1;
 }

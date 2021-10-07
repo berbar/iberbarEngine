@@ -98,7 +98,7 @@ namespace iberbar
 
         enum class UTextureFilterType : uint32
         {
-            None = 0, // 只对Mipmap有效
+            None = 0,
             Point = 1,
             Linear = 2,
             Anisotropic = 3,
@@ -110,6 +110,7 @@ namespace iberbar
             Mirror = 2,
             Clamp = 3,
             Border = 4,
+            MirrorOnce = 5,
         };
 
 
@@ -129,13 +130,15 @@ namespace iberbar
             bool operator==( const UTextureSamplerState& other ) const;
             bool operator!=( const UTextureSamplerState& other ) const;
 
-            UTextureFilterType nMipFilter;// Mipmap
-            UTextureFilterType nMinFilter;// Minification 缩小
-            UTextureFilterType nMagFilter;// Magnification 放大
+            UTextureFilterType nMipFilter;
+            UTextureFilterType nMinFilter;
+            UTextureFilterType nMagFilter;
 
             UTextureAddress nAddressU;
             UTextureAddress nAddressV;
             UTextureAddress nAddressW;
+
+            __iberbarRHIApi__ static UTextureSamplerState s_Default;
         };
 
         enum class UShaderType
@@ -150,9 +153,90 @@ namespace iberbar
             VT_Boolean,
             VT_Int,
             VT_Float,
-            VT_Vector4,
-            VT_Matrix44,
-            VT_Sampler2D
+            VT_Void,
+            VT_Texture,
+            VT_Sampler2D,
+            //VT_Struct,
+        };
+
+        enum class UShaderVariableClass
+        {
+            SVC_Scalar,
+            SVC_Vector,
+            SVC_Matrix,
+            SVC_Struct,
+        };
+
+        enum class UStateBlockType
+        {
+            All,
+            PixelState,
+            VertexState,
+        };
+
+
+        enum class EShaderType
+        {
+            VertexShader = 0,
+            PixelShader,
+            HullShader,
+            GeometryShader,
+            DomainShader,
+            ComputeShader,
+            __Count
+        };
+
+
+        enum class EBlendOP
+            : uint8
+        {
+            Add = 1,
+            Subtract = 2,
+            RevSubtract = 3,
+            Min = 4,
+            Max = 5
+        };
+
+
+        enum class EBlend
+            : uint8
+        {
+            Zero = 1,
+            One = 2,
+            SrcColor = 3,
+            InvSrcColor = 4,
+            SrcAlpha = 5,
+            InvSrcAlpha = 6,
+            DestAlpha = 7,
+            InvDestAlpha = 8,
+            DestColor = 9,
+            InvDestColor = 10,
+            SrcAlphaSat = 11,
+            BlendFactor = 14,
+            InvBlendFactor = 15,
+            Src1Color = 16,
+            InvSrc1Color = 17,
+            Src1Alpha = 18,
+            InvSrc1Alpha = 19
+        };
+
+
+        struct URenderTargetBlendDesc
+        {
+            bool BlendEnable;
+            EBlend SrcBlend;
+            EBlend DestBlend;
+            EBlendOP BlendOp;
+            EBlend SrcBlendAlpha;
+            EBlend DestBlendAlpha;
+            EBlendOP BlendOpAlpha;
+        };
+
+        struct UBlendDesc
+        {
+            bool AlphaToCoverageEnable;
+            bool IndependentBlendEnable;
+            URenderTargetBlendDesc RenderTargets[ 8 ];
         };
     }
 }

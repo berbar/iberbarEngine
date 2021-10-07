@@ -3,19 +3,19 @@
 
 
 // Class 类名，如 CFoo
-extern const char iberbar::LuaCpp::uClassReflection_ClassName[] = "__cpp_classname";
+extern const char iberbar::Lua::uClassReflection_ClassName[] = "__cpp_classname";
 
 // Class 所属的模块名，如 iberbar.Test
-extern const char iberbar::LuaCpp::uClassReflection_ModuleName[] = "__cpp_modulename";
+extern const char iberbar::Lua::uClassReflection_ModuleName[] = "__cpp_modulename";
 
 // Class 全名，如 iberbar.Test.CFoo
-extern const char iberbar::LuaCpp::uClassReflection_FullName[] = "__cpp_fullname";
+extern const char iberbar::Lua::uClassReflection_FullName[] = "__cpp_fullname";
 
 // Class 定义来源，1=C++，2=Lua
-extern const char iberbar::LuaCpp::uClassReflection_CType[] = "__ctype";
+extern const char iberbar::Lua::uClassReflection_CType[] = "__ctype";
 
 
-extern const char iberbar::LuaCpp::uWeakTable_ForUserData[] = "__cpp_userdata";
+extern const char iberbar::Lua::uWeakTable_ForUserData[] = "__cpp_userdata";
 
 
 

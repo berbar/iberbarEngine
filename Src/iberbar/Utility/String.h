@@ -3,6 +3,7 @@
 
 
 #include <iberbar/Utility/Platform.h>
+#include <iberbar/Utility/Math.h>
 
 #ifdef _WIN32
 #else
@@ -243,6 +244,7 @@ namespace iberbar
 //	}
 
 	std::wstring Utf8ToUnicode( const char* str );
+	int Utf8ToUnicode( const char* str, wchar_t* pBuf, int nBufSize );
 	std::u32string Utf8ToUtf32( const char* str );
 	std::wstring AsciiToUnicode( const char* str );
 
@@ -261,6 +263,12 @@ namespace iberbar
 	{
 	public:
 		typedef char _Buffer[ nBufferSize ];
+
+		CStringEasySplitHelper()
+			: Buffers()
+		{
+			memset( Buffers, 0, sizeof( Buffers ) );
+		}
 
 		int Split( const Ch* strText, Ch nChar )
 		{
@@ -376,6 +384,11 @@ namespace iberbar
 	__iberbarUtilityApi__ std::string StdStringToUpper( std::string& str );
 	std::string StdStringGetExt( const std::string& str );
 	std::string StdStringGetExtLowerCase( const std::string& str );
+
+	__iberbarUtilityApi__ std::wstring StdWStringToLower( std::wstring& str );
+	__iberbarUtilityApi__ std::wstring StdWStringToUpper( std::wstring& str );
+	std::wstring StdWStringGetExt( const std::wstring& str );
+	std::wstring StdWStringGetExtLowerCase( const std::wstring& str );
 }
 
 
@@ -394,6 +407,20 @@ inline std::wstring iberbar::Utf8ToUnicode( const char* str )
 	return cvtUTF8.from_bytes( str );
 #endif
 }
+
+
+inline int iberbar::Utf8ToUnicode( const char* str, wchar_t* pBuf, int nBufSize )
+{
+#ifdef _WIN32
+	int nWcharCount = MultiByteToWideChar( CP_UTF8, 0, str, -1, nullptr, 0 );
+	nWcharCount = tMin( nWcharCount, nBufSize - 1 );
+	MultiByteToWideChar( CP_UTF8, 0, str, -1, pBuf, nWcharCount + 1 );
+	pBuf[nWcharCount] = 0;
+	return nWcharCount;
+#else
+#endif
+}
+
 
 inline std::string iberbar::UnicodeToUtf8( const wchar_t* str )
 {
@@ -487,5 +514,21 @@ inline std::string iberbar::StdStringGetExtLowerCase( const std::string& str )
 {
 	std::string strExt = StdStringGetExt( str );
 	return StdStringToLower( strExt );
+}
+
+
+inline std::wstring iberbar::StdWStringGetExt( const std::wstring& str )
+{
+	int nPos = str.find_last_of( L'.' );
+	if ( nPos == std::string::npos )
+		return L"";
+	return str.substr( nPos );
+}
+
+
+inline std::wstring iberbar::StdWStringGetExtLowerCase( const std::wstring& str )
+{
+	std::wstring strExt = StdWStringGetExt( str );
+	return StdWStringToLower( strExt );
 }
 

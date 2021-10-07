@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="D3D9">
+      <UniqueIdentifier>{210eff39-eaf1-4100-9f44-5c479b85ea36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D">
+      <UniqueIdentifier>{91a45661-0b17-46c7-9bb9-08cd714e2d80}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="D3D9\VertexShader.hlsl">
+      <Filter>D3D9</Filter>
+    </FxCompile>
+    <FxCompile Include="D3D\VertexShader.hlsl">
+      <Filter>D3D</Filter>
+    </FxCompile>
+    <FxCompile Include="D3D\PixelShader.hlsl">
+      <Filter>D3D</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>

@@ -1,7 +1,7 @@
 
 
 
---- @class iberbar.Network.CSocketClient
+--- @class iberbar.IO.CSocketClient
 local m = {};
 
 

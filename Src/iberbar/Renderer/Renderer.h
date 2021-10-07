@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iberbar/Renderer/Headers.h>
+#include <iberbar/Utility/Result.h>
+#include <stack>
 
 namespace iberbar
 {
@@ -17,6 +19,8 @@ namespace iberbar
 	{
 		class CRenderCommand;
 		class CTrianglesCommand;
+		class CRenderGroupCommand;
+		class CRenderGroupCommandManager;
 		class CRenderer2dState;
 
 		typedef std::vector<CRenderCommand*> URenderCommandList;
@@ -50,15 +54,22 @@ namespace iberbar
 
 		public:
 			void Init( RHI::IDevice* pDevice );
-			void AddCommand( CRenderCommand* pCommand ) { AddCommand( pCommand, 0 ); }
+			void AddCommand( CRenderCommand* pCommand );
 			void AddCommand( CRenderCommand* pCommand, int nQueueId );
 			void CleanupCommands();
 			int CreateRenderQueue();
+			void PushRenderQueue( int nRenderQueueId );
+			void PopRenderQueue();
+
 			inline RHI::IDevice* GetRHIDevice() { return m_pDevice; }
+			inline RHI::ICommandContext* GetRHIContext() { return m_pCommandContext; }
+			inline CRenderGroupCommandManager* GetRenderGroupCommandManager() { return m_pRenderGroupCommandManager; }
 
 		public:
 			void Render();
 			void Clear();
+			void OnRhiLost();
+			CResult OnRhiReset();
 			
 		protected:
 			void VisitQueue( CRenderQueue& queue );
@@ -67,15 +78,18 @@ namespace iberbar
 			void DrawBatchTriangles();
 			void DrawOneTriangles( CTrianglesCommand* pCommand );
 			void Flush();
+			void ProcessGroupCommand( CRenderGroupCommand* pCommand );
 
 		protected:
 			std::vector<CRenderQueue> m_RenderQueue;
+			std::stack<int> m_CommandGroupStack;
 			bool m_bIsRendering;
 			RHI::IDevice* m_pDevice;
 			RHI::ICommandContext* m_pCommandContext;
 			RHI::IVertexBuffer* m_pVertexBuffer;
 			RHI::IIndexBuffer* m_pIndexBuffer;
 			CRenderer2dState* m_pState;
+			CRenderGroupCommandManager* m_pRenderGroupCommandManager;
 			//std::function<void()> m_CallbackFinish;
 		};
 	}

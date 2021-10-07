@@ -52,6 +52,33 @@
     <ClInclude Include="..\..\..\Src\iberbar\Utility\Log\OutputDeviceFile.h">
       <Filter>Logging</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Log\Logger.h">
+      <Filter>Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\MultiEventWaiter.h">
+      <Filter>OS\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\MultiEventWaiter.h">
+      <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\DynamicLibrary.h">
+      <Filter>OS\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\DynamicLibrary.h">
+      <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\Error.h">
+      <Filter>OS\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\WndMessage.h">
+      <Filter>OS\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\DpiHelper.h">
+      <Filter>OS\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\DpiHelper.h">
+      <Filter>OS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Utility\Color.cpp" />
@@ -83,6 +110,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\Utility\DateTime.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Utility\Variant.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Log\Logger.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\OS\Windows\DynamicLibrary.cpp">
+      <Filter>OS\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\OS\Windows\WndMessage.cpp">
+      <Filter>OS\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\OS\Windows\DpiHelper.cpp">
+      <Filter>OS\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Src\iberbar\Utility\Color.inl" />
@@ -103,6 +142,12 @@
     </Filter>
     <Filter Include="Logging">
       <UniqueIdentifier>{8c76bcb2-e7e7-4d3a-ab12-acd4b0fa6ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS">
+      <UniqueIdentifier>{3774d265-191f-4c9f-8944-f966b4596f48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS\Windows">
+      <UniqueIdentifier>{04a29f6f-b3a3-4655-90a2-02dbc10cb4ef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

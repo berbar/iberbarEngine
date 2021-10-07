@@ -13,6 +13,7 @@ namespace iberbar
 		{
 		public:
 			static void sExecuteFunction( lua_State* pLuaState, int nArgs );
+			static int  sExecuteFunction( lua_State* pLuaState, int nArgs, int nReturns );
 			//void ExecuteFunction( int nArgs, int nReturns, std::function<void()> funcGetReturns );
 			static void sExecuteGlobalFunction( lua_State* pLuaState, const char* strFunctionName );
 		};

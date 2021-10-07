@@ -4,7 +4,6 @@
 #include <iberbar/Renderer/Renderer.h>
 #include <iberbar/Renderer/RendererSprite.h>
 #include <iberbar/RHI/ShaderState.h>
-#include <iberbar/RHI/ShaderVariables.h>
 
 
 
@@ -12,7 +11,7 @@
 iberbar::Gui::CRenderElement::CRenderElement( void )
 	: m_nZOrder( 0 )
 	, m_pShaderState( nullptr )
-	, m_pShaderVariableTable( nullptr )
+	, m_pShaderVariableTables()
 	, m_ChildElements()
 	, m_nState( 0 )
 {
@@ -22,7 +21,7 @@ iberbar::Gui::CRenderElement::CRenderElement( const CRenderElement& elem )
 	: CObject( elem )
 	, m_nZOrder( elem.m_nZOrder )
 	, m_pShaderState( nullptr )
-	, m_pShaderVariableTable( nullptr )
+	, m_pShaderVariableTables()
 	, m_ChildElements()
 	, m_nState( 0 )
 {
@@ -31,7 +30,6 @@ iberbar::Gui::CRenderElement::CRenderElement( const CRenderElement& elem )
 iberbar::Gui::CRenderElement::~CRenderElement()
 {
 	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderVariableTable );
 	m_ChildElements.clear();
 }
 
@@ -189,15 +187,13 @@ void iberbar::Gui::CRenderElement::SetState( int nState )
 void iberbar::Gui::CRenderElement::Init()
 {
 	CEngine::sGetInstance()->GetRendererSprite()->GetDefaultShaderState( &m_pShaderState );
-	CEngine::sGetInstance()->GetRendererSprite()->CreateDefaultShaderVariableTable( &m_pShaderVariableTable );
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Vertex, Renderer::s_strShaderVarName_RHW, true );
+	CEngine::sGetInstance()->GetRendererSprite()->CreateDefaultShaderVariableTableUnion( &m_pShaderVariableTables );
+	m_pShaderVariableTables.GetVariableTableForVertexShader()->SetBool( Renderer::s_strShaderVarName_RHW, true );
 }
 
 
 void iberbar::Gui::CRenderElement::UpdateRect()
 {
-	CObject::UpdateRect();
-
 	if ( m_ChildElements.empty() == true )
 		return;
 
@@ -234,9 +230,11 @@ void iberbar::Gui::CRenderElement::Render()
 	if ( m_ChildElements.empty() == true )
 		return;
 
-	for ( uint32 lc_i = 0; lc_i < m_ChildElements.size(); lc_i++ )
+	for ( int i = 0, s = (int)m_ChildElements.size(); i < s; i++ )
 	{
-		m_ChildElements[ lc_i ]->Render();
+		if ( m_ChildElements[i]->GetVisible() == false )
+			continue;
+		m_ChildElements[ i ]->Render();
 	}
 }
 

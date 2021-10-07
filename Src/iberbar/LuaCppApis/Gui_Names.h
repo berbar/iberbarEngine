@@ -32,6 +32,9 @@ namespace iberbar
 			static const char s_ClassName_WidgetEditBox[] = "CEditBox";
 			static const char s_ClassName_WidgetEditBox_FullName[] = "iberbar.Gui.CEditBox";
 
+			static const char s_ClassName_WidgetProgressBar[] = "CProgressBar";
+			static const char s_ClassName_WidgetProgressBar_FullName[] = "iberbar.Gui.CProgressBar";
+
 			static const char s_ClassName_Element[] = "CRenderElement";
 			static const char s_ClassName_Element_FullName[] = "iberbar.Gui.CRenderElement";
 

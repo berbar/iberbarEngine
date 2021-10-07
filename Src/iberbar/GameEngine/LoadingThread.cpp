@@ -140,7 +140,7 @@ void iberbar::Game::CLoadingThread::AddStepResult( CLoadingStepResult* pStepResu
 
 void iberbar::Game::CLoadingThread::LoopStepResults()
 {
-	assert( std::this_thread::get_id() == GetApp()->GetMainThreadId() );
+	assert( std::this_thread::get_id() == CApplication::sGetApp()->GetMainThreadId() );
 
 	if ( m_StepResultQueue.empty() == true )
 		return;
@@ -304,7 +304,7 @@ int iberbar::Game::CLoadingTask_Textures::Execute( CLoadingThread* pThread )
 	int nIndex = m_nLoadedCount;
 	std::string& strName = m_TextureList[ nIndex ];
 	_StepResult* pStepResult = new _StepResult( strName, m_TextureList.size(), nIndex, m_CallbackOnStep );
-	if ( GetApp()->GetTextureManager()->GetTextureA( strName.c_str() ) == false )
+	if ( CApplication::sGetApp()->GetTextureManager()->GetTextureA( strName.c_str() ) == false )
 	{
 		std::string strFilePath = CResourceFileSystem::GetResoucePath( strName );
 		CFileHelper FileHelper;
@@ -375,7 +375,7 @@ void iberbar::Game::CLoadingTask_Textures::_StepResult::Execute()
 	if ( m_Bytes.empty() == false )
 	{
 		std::printf( "loadtexture in memory, filename=%s", m_strName.c_str() );
-		CResult ret = GetApp()->GetTextureManager()->AddTexture( m_strName.c_str(), m_Bytes.c_str(), m_Bytes.size() );
+		CResult ret = CApplication::sGetApp()->GetTextureManager()->AddTexture( m_strName.c_str(), m_Bytes.c_str(), m_Bytes.size() );
 		if ( ret.IsOK() == false )
 		{
 			SetFailure( ret.data );

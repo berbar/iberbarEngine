@@ -15,6 +15,14 @@
     <ClInclude Include="..\..\..\Src\iberbar\Network\Private\Socket.h">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\SocketClient.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\ApiTypeDef.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Network\LuaCppApi\Network.h">
+      <Filter>LuaCppApi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Network\LuaCppApi\Network_Names.h">
+      <Filter>LuaCppApi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Network\IO.cpp" />
@@ -30,10 +38,16 @@
     <ClCompile Include="..\..\..\Src\iberbar\Network\Private\Socket.cpp">
       <Filter>Private</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Network\LuaCppApi\Network.cpp">
+      <Filter>LuaCppApi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Private">
       <UniqueIdentifier>{89caba25-427f-4a63-97f9-41c6fe4f9717}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaCppApi">
+      <UniqueIdentifier>{b2e3c797-08fe-4695-951b-5a05f6537c82}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

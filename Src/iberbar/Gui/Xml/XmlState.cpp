@@ -5,6 +5,9 @@
 #include <iberbar/Gui/RenderElement.h>
 #include <iberbar/Gui/Dialog.h>
 #include <iberbar/Utility/Xml/RapidXml.h>
+#include <iberbar/Utility/Log/OutputDevice.h>
+
+#include <stack>
 
 
 
@@ -26,6 +29,9 @@ namespace iberbar
 		class CXmlState
 		{
 		public:
+			CXmlState();
+
+		public:
 			void SetDialog( CDialog* pDialog ) { m_pDialog = pDialog; }
 			void BuildContext();
 			//void SetWidget( CWidget* pWidget ) { m_pWidget = pWidget; }
@@ -34,23 +40,25 @@ namespace iberbar
 			void ReadWidgetList( Xml::CNodeListA* pXmlNodeList );
 			void ReadElementList( Xml::CNodeListA* pXmlNodeList, CRenderElement* pElement );
 			//void ReadStyles( Xml::CNodeListA* pXmlNodeList, CRenderElement* pRenderElement );
+			void PushWidget( CWidget* pWidget ) { m_WidgetStack.push( pWidget ); }
+			void PopWidget() { m_WidgetStack.pop(); }
 
 		private:
 			PTR_CWidget CreateWidget( const char* strType );
 
 		public:
+			Logging::CLogger* m_pLogger;
 			std::vector<TXmlStateProcNode<UCallbackReadProc_Widget>> m_ReadProcList_Widget;
 			std::vector<TXmlStateProcNode<UCallbackReadProc_Element>> m_ReadProcList_Element;
 			std::vector<TXmlStateProcNode<UCallbackCreateProc_Widget>> m_CreateProcList_Widget;
 			std::vector<TXmlStateProcNode<UCallbackCreateProc_Element>> m_CreateProcList_Element;
 			std::function<UCallbackXmlGetTexture> m_GetTexture;
 			std::function<UCallbackXmlGetFont> m_GetFont;
-			std::vector<PTR_CWidget> m_WidgetStack;
+			std::stack<PTR_CWidget> m_WidgetStack;
 			UXmlParserContext m_Context;
 
 		private:
 			CDialog* m_pDialog;
-			CWidget* m_pWidget;
 
 
 		public:
@@ -74,7 +82,7 @@ namespace iberbar
 
 iberbar::Gui::CXmlParser::CXmlParser()
 	: m_pState( new CXmlState() )
-	, m_strBaseDir( "" )
+	, m_Logger( nullptr )
 {
 }
 
@@ -92,8 +100,7 @@ iberbar::CResult iberbar::Gui::CXmlParser::ReadFile( const char* strFile, CDialo
 
 	Xml::PTR_CDocumentA pDoc = Xml::CreateRapidXmlDocumentA();
 
-	std::string strFileFull = (m_strBaseDir + strFile);
-	CResult ret = pDoc->LoadFromFile( strFileFull.c_str() );
+	CResult ret = pDoc->LoadFromFile( strFile );
 	if ( ret.IsOK() == false )
 		return ret;
 
@@ -107,9 +114,10 @@ iberbar::CResult iberbar::Gui::CXmlParser::ReadFile( const char* strFile, CDialo
 	pNode_Root->SelectNodes( "Widget", &pNodeList_Widgets );
 	if ( pNodeList_Widgets != nullptr )
 	{
-		m_pState->SetDialog( pDialog );
+		m_pState->PushWidget( pDialog->GetWidgetRoot() );
 		m_pState->BuildContext();
 		m_pState->ReadWidgetList( pNodeList_Widgets );
+		m_pState->PopWidget();
 	}
 
 	return CResult();
@@ -135,6 +143,14 @@ iberbar::CResult iberbar::Gui::CXmlParser::ReadFile( const char* strFile, CDialo
 //{
 //	m_pState->m_WidgetStack.clear();
 //}
+
+
+void iberbar::Gui::CXmlParser::SetLogOutputDevice( Logging::COutputDevice* pLogOutputDevice )
+{
+	m_Logger = Logging::CLogger( pLogOutputDevice );
+
+	m_pState->m_pLogger = &m_Logger;
+}
 
 
 void iberbar::Gui::CXmlParser::RegisterReadProc_Widget( const char* strType, std::function<UCallbackReadProc_Widget> func )
@@ -179,8 +195,31 @@ void iberbar::Gui::CXmlParser::RegisterGetFont( std::function<UCallbackXmlGetFon
 
 
 
+
+
+
+
+
+
+iberbar::Gui::CXmlState::CXmlState()
+	: m_pLogger( nullptr )
+	, m_ReadProcList_Widget()
+	, m_ReadProcList_Element()
+	, m_CreateProcList_Widget()
+	, m_CreateProcList_Element()
+	, m_GetTexture()
+	, m_GetFont()
+	, m_WidgetStack()
+	, m_Context()
+	, m_pDialog( nullptr )
+{
+
+}
+
+
 void iberbar::Gui::CXmlState::BuildContext()
 {
+	m_Context.pLogger = m_pLogger;
 	m_Context.GetTexture = m_GetTexture;
 	m_Context.GetFont = m_GetFont;
 }
@@ -213,6 +252,16 @@ void iberbar::Gui::CXmlState::ReadWidget( Xml::CNodeA* pXmlNode, CWidget* pWidge
 	auto pReadProcNode = FindFunc( m_ReadProcList_Widget, strType );
 	if ( pReadProcNode != nullptr )
 		pReadProcNode->func( &m_Context, pXmlNode, pWidget, pElement );
+
+	Xml::PTR_CNodeListA pNodeList_ChildWidgets;
+	pXmlNode->SelectNodes( "Widget", &pNodeList_ChildWidgets );
+	if ( pNodeList_ChildWidgets != nullptr )
+	{
+		PushWidget( pWidget );
+		ReadWidgetList( pNodeList_ChildWidgets );
+		PopWidget();
+	}
+
 }
 
 
@@ -265,7 +314,7 @@ void iberbar::Gui::CXmlState::ReadWidgetList( Xml::CNodeListA* pXmlNodeList )
 		if ( pWidget == nullptr )
 			continue;
 
-		m_pDialog->AddWidget( pWidget );
+		m_WidgetStack.top()->AddWidget( pWidget );
 
 		ReadWidget( pNode, pWidget );
 	}

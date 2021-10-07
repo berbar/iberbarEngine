@@ -184,19 +184,19 @@ namespace iberbar
 		int LuaCFunction_GetScene( lua_State* pLuaState );
 
 
-		void LuaCppClassBuilder_Node( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_Camera( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_Scene( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_Image( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_GridTerrain( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_AnimationController( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_Component( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_ComponentCustomAttributes( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_ComponentUpdatable( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_ComponentHandleMouseInput( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_ComponentHandleKeyboardInput( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_ComponentTransform( const char*, LuaCpp::CClassBuilder* cb );
-		void LuaCppClassBuilder_ComponentBoundingBox( const char*, LuaCpp::CClassBuilder* cb );
+		void LuaCppClassBuilder_Node( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_Camera( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_Scene( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_Image( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_GridTerrain( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_AnimationController( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_Component( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_ComponentCustomAttributes( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_ComponentUpdatable( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_ComponentHandleMouseInput( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_ComponentHandleKeyboardInput( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_ComponentTransform( const char*, Lua::CClassBuilder* cb );
+		void LuaCppClassBuilder_ComponentBoundingBox( const char*, Lua::CClassBuilder* cb );
 
 
 
@@ -266,8 +266,8 @@ extern const char iberbar::Paper2d::LuaCppNames::ComponentBoundingBox_FullName[]
 
 void iberbar::Paper2d::RegisterLuaCpp( lua_State* pLuaState )
 {
-	LuaCpp::CBuilder builder( pLuaState );
-	builder.ResolveScope( []( LuaCpp::CScopeBuilder* scope )
+	Lua::CBuilder builder( pLuaState );
+	builder.ResolveScope( []( Lua::CScopeBuilder* scope )
 		{
 			scope->AddClass( LuaCppNames::Node, &LuaCppClassBuilder_Node );
 			scope->AddClass( LuaCppNames::Camera, &LuaCppClassBuilder_Camera );
@@ -739,7 +739,7 @@ int iberbar::Paper2d::LuaCppFunction_Node_FindChild( lua_State* pLuaState )
 
 	if ( lua_istable( pLuaState, 3 ) == true )
 	{
-		LuaCpp::Class_Ref_PushObject( pLuaState, 3, pNodeFind );
+		Lua::Class_Ref_PushObject( pLuaState, 3, pNodeFind );
 		//lua_pushcppref( pLuaState, LuaCppNames::Node_FullName, pNodeFind );
 	}
 	else
@@ -1745,7 +1745,7 @@ int iberbar::Paper2d::LuaCFunction_GetScene( lua_State* pLuaState )
 
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_Node( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_Node( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "Init", &LuaCppFunction_Node_Init );
 	cb->AddMemberMethod( "SetId", &LuaCppFunction_Node_SetId );
@@ -1775,55 +1775,55 @@ void iberbar::Paper2d::LuaCppClassBuilder_Node( const char*, LuaCpp::CClassBuild
 	cb->AddMemberMethod( "GetComponent", &LuaCppFunction_Node_GetComponent );
 	cb->AddMemberMethod( "GetComponentDefaultCustomAttributes", &LuaCppFunction_Node_GetComponentDefaultCustomAttributes );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CNode> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CNode> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CNode> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CNode> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_Camera( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_Camera( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "SetPosition", &LuaCppFunction_Camera_SetPosition );
 	cb->AddMemberMethod( "SetOrthographicProjection", &LuaCppFunction_Camera_SetOrthographicProjection );
 	cb->AddMemberMethod( "Build", &LuaCppFunction_Camera_Build );
 
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CCamera> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CCamera> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_Scene( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_Scene( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "GetCamera", &LuaCppFunction_Scene_GetCamera );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CScene> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CScene> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CScene> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CScene> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_Image( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_Image( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "SetTexture", &LuaCppFunction_Image_SetTexture );
 	cb->AddMemberMethod( "SetColor", &LuaCppFunction_Image_SetColor );
 	cb->AddMemberMethod( "SetUV", &LuaCppFunction_Image_SetUV );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CImage> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CImage> );
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CImage> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CImage> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CImage> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CImage> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_GridTerrain( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_GridTerrain( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "SetGridSize", &LuaCppFunction_GridTerrain_SetGridSize );
 	cb->AddMemberMethod( "GetGridRow", &LuaCppFunction_GridTerrain_GetGridRow );
 	cb->AddMemberMethod( "GetGridCol", &LuaCppFunction_GridTerrain_GetGridCol );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CGridTerrain> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CGridTerrain> );
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CGridTerrain> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CGridTerrain> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CGridTerrain> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CGridTerrain> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_AnimationController( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_AnimationController( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "BindCallback", &LuaCppFunction_AnimationController_BindCallback );
 	cb->AddMemberMethod( "Play", &LuaCppFunction_AnimationController_Play );
@@ -1834,22 +1834,22 @@ void iberbar::Paper2d::LuaCppClassBuilder_AnimationController( const char*, LuaC
 	cb->AddMemberMethod( "GetCurrentUV", &LuaCppFunction_AnimationController_GetCurrentUV );
 	cb->AddMemberMethod( "GetName", &LuaCppFunction_AnimationController_GetName );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CAnimationController> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CAnimationController> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CAnimationController> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CAnimationController> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_Component( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_Component( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "GetOwner", &LuaCppFunction_Component_GetOwner );
 	cb->AddMemberMethod( "SetName", &LuaCppFunction_Component_SetName );
 	cb->AddMemberMethod( "GetName", &LuaCppFunction_Component_GetName );
 	
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_ComponentCustomAttributes( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_ComponentCustomAttributes( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "AddAttribute", &LuaCppFunction_ComponentCustomAttributes_AddAttribute );
 	cb->AddMemberMethod( "GetAttribute", &LuaCppFunction_ComponentCustomAttributes_GetAttribute );
@@ -1858,75 +1858,75 @@ void iberbar::Paper2d::LuaCppClassBuilder_ComponentCustomAttributes( const char*
 	cb->AddMemberMethod( "GetAttributeInt", &LuaCppFunction_ComponentCustomAttributes_GetAttributeInt );
 	cb->AddMemberMethod( "GetAttributeFloat", &LuaCppFunction_ComponentCustomAttributes_GetAttributeFloat );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CComponent_CustomAttributes> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent_CustomAttributes> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CComponent_CustomAttributes> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent_CustomAttributes> );
 
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CComponent_CustomAttributes> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CComponent_CustomAttributes> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_ComponentUpdatable( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_ComponentUpdatable( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "BindCallback", &LuaCppFunction_Component_BindCallback<CComponent_Updatable> );
 	cb->AddMemberMethod( "BindCallbackOnAttach", &LuaCppFunction_Component_BindCallbackOnAttach<CComponent_Updatable> );
 	cb->AddMemberMethod( "BindCallbackOnRemove", &LuaCppFunction_Component_BindCallbackOnRemove<CComponent_Updatable> );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CComponent_Updatable_ForLua> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent_Updatable_ForLua> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CComponent_Updatable_ForLua> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent_Updatable_ForLua> );
 
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CComponent_Updatable_ForLua> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CComponent_Updatable_ForLua> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_ComponentHandleMouseInput( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_ComponentHandleMouseInput( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "BindCallback", &LuaCppFunction_Component_BindCallback<CComponent_HandleMouseInput> );
 	cb->AddMemberMethod( "BindCallbackOnAttach", &LuaCppFunction_Component_BindCallbackOnAttach<CComponent_HandleMouseInput> );
 	cb->AddMemberMethod( "BindCallbackOnRemove", &LuaCppFunction_Component_BindCallbackOnRemove<CComponent_HandleMouseInput> );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CComponent_HandleMouseInput_ForLua> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent_HandleMouseInput_ForLua> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CComponent_HandleMouseInput_ForLua> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent_HandleMouseInput_ForLua> );
 
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CComponent_HandleMouseInput_ForLua> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CComponent_HandleMouseInput_ForLua> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_ComponentHandleKeyboardInput( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_ComponentHandleKeyboardInput( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "BindCallback", &LuaCppFunction_Component_BindCallback<CComponent_HandleKeyboardInput> );
 	cb->AddMemberMethod( "BindCallbackOnAttach", &LuaCppFunction_Component_BindCallbackOnAttach<CComponent_HandleKeyboardInput> );
 	cb->AddMemberMethod( "BindCallbackOnRemove", &LuaCppFunction_Component_BindCallbackOnRemove<CComponent_HandleKeyboardInput> );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CComponent_HandleKeyboardInput_ForLua> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent_HandleKeyboardInput_ForLua> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CComponent_HandleKeyboardInput_ForLua> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent_HandleKeyboardInput_ForLua> );
 
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CComponent_HandleKeyboardInput_ForLua> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CComponent_HandleKeyboardInput_ForLua> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_ComponentTransform( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_ComponentTransform( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "BindCallback", &LuaCppFunction_Component_BindCallback<CComponent_Transform> );
 	cb->AddMemberMethod( "BindCallbackOnAttach", &LuaCppFunction_Component_BindCallbackOnAttach<CComponent_Transform> );
 	cb->AddMemberMethod( "BindCallbackOnRemove", &LuaCppFunction_Component_BindCallbackOnRemove<CComponent_Transform> );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CComponent_Transform_ForLua> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent_Transform_ForLua> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CComponent_Transform_ForLua> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent_Transform_ForLua> );
 
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CComponent_Transform_ForLua> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CComponent_Transform_ForLua> );
 }
 
 
-void iberbar::Paper2d::LuaCppClassBuilder_ComponentBoundingBox( const char*, LuaCpp::CClassBuilder* cb )
+void iberbar::Paper2d::LuaCppClassBuilder_ComponentBoundingBox( const char*, Lua::CClassBuilder* cb )
 {
 	cb->AddMemberMethod( "Contains", &LuaCppFunction_ComponentBoundingBox_Contains );
 	cb->AddMemberMethod( "ContainsPoint", &LuaCppFunction_ComponentBoundingBox_ContainsPoint );
 	cb->AddMemberMethod( "GetBox", &LuaCppFunction_ComponentBoundingBox_GetBox );
 
-	cb->AddConstructor( &LuaCpp::Class_Unknown_Constructor_New<CComponent_BoundingBox> );
-	cb->AddDistructor( &LuaCpp::Class_Unknown_Distructor_Release<CComponent_BoundingBox> );
+	cb->AddConstructor( &Lua::Class_Unknown_Constructor_New<CComponent_BoundingBox> );
+	cb->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CComponent_BoundingBox> );
 
-	cb->AddStaticMethod( "dynamic_cast", &LuaCpp::Class_Unknown_Dynamic_Cast<CComponent_BoundingBox> );
+	cb->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CComponent_BoundingBox> );
 }
 
 

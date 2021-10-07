@@ -22,6 +22,14 @@ namespace iberbar
 		typedef void UCallbackWidgetEventProc( CWidget* pWidget, uint64 nEvent, uint64 nValueUint, const void* pValueExt );
 
 
+		enum UWidgetType
+		{
+			Unknown = 0,
+			Container,
+			UserType = 0xff,
+		};
+
+
 
 		class __iberbarGuiApi__ CWidget
 			: public CObject
@@ -29,6 +37,8 @@ namespace iberbar
 		private:
 			struct UWidgetEventListener
 			{
+				bool bDefer;
+				int nHandle;
 				uint64 nEvent;
 				std::function<UCallbackWidgetEventProc> callback;
 			};
@@ -41,8 +51,10 @@ namespace iberbar
 			CWidget( const CWidget& widget );
 
 		public:
-			void SetParent( CDialog* pDialog );
-			CDialog* GetParent() const { return m_pDialog; }
+			void SetDialog( CDialog* pDialog );
+			CDialog* GetDialog() const { return m_pDialog; }
+			
+			CWidget* GetWidgetParent() const { return m_pWidgetParent; }
 
 			void SetRenderElement( CRenderElement* pRenderElement );
 			bool FindElement( const char* strName, CRenderElement** ppOutElement );
@@ -64,7 +76,8 @@ namespace iberbar
 
 			void SetNeedClip( bool bNeedClip ) { m_bNeedClip = bNeedClip; }
 
-			void AddEventCallback( std::function<UCallbackWidgetEventProc> callback, uint64 nEvent = 0 );
+			int AddEventCallback( std::function<UCallbackWidgetEventProc> callback, uint64 nEvent = 0, bool bDefer = true );
+			void RemoveEventCallback( int nHandle );
 			void RemoveEventCallbacksAll();
 			void SendEvent( uint64 nEvent, uint64 nValueUint = 0, const void* pValueExt = nullptr );
 			
@@ -83,9 +96,24 @@ namespace iberbar
 			virtual void Update( float nElapsedTime ) override;
 			virtual void Render() override;
 
-		protected:
-			CDialog* m_pDialog;
+		public:
+			virtual int AddWidget( CWidget* pWidget );
+			virtual int RemoveWidget( CWidget* pWidget );
+			virtual void RemoveWidgetsAll();
+			CWidget* FindWidget( const char* strId );
+			int GetWidgetCount() const { return (int)m_Widgets.size(); }
+			CWidget* GetWidgetAt( int nIndex ) { return m_Widgets[nIndex]; }
+			void ForeachWidgets( std::function<void( CWidget* )> Func, int nDepth = -1 );
 
+		private:
+
+			void SetWidgetParent( CWidget* pWidgetParent );
+
+		private:
+			CDialog* m_pDialog;
+			CWidget* m_pWidgetParent;
+
+		protected:
 			bool m_bCanFocus;  // default value is true
 			bool m_bFocus;
 			bool m_bMouseOver;
@@ -98,6 +126,8 @@ namespace iberbar
 
 			CRenderElement* m_pRenderElementDefault;
 
+			std::vector<CWidget*> m_Widgets;
+			int m_nEventListenerHandleAlloc;
 			std::vector<UWidgetEventListener> m_EventListeners;
 
 
@@ -118,6 +148,7 @@ namespace iberbar
 			static const uint64 nFocusOut = iberbar::Ascii_6Bit::atom_uint( "FocusOut" );
 			static const uint64 nValueChanged = iberbar::Ascii_6Bit::atom_uint( "ValChanged" );
 			static const uint64 nClicked = iberbar::Ascii_6Bit::atom_uint( "Clicked" );
+			static const uint64 nContextMenu = iberbar::Ascii_6Bit::atom_uint( "CtxMenu" );
 		};
 	}
 }

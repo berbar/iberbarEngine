@@ -121,50 +121,5 @@ namespace iberbar
 	//}
 
 
-#ifdef WIN32
-	inline void ConvertHResultA( std::string& str, HRESULT hr )
-	{
-		HLOCAL lpMsgBuf;
-		FormatMessageA(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS |
-			FORMAT_MESSAGE_MAX_WIDTH_MASK,
-			NULL,
-			hr,
-			MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-			(LPSTR)&lpMsgBuf,
-			0, NULL );
-		str = (LPSTR)lpMsgBuf;
-		LocalFree( lpMsgBuf );
-	}
-
-	inline void ConvertHResultW( std::wstring& str, HRESULT hr )
-	{
-		HLOCAL lpMsgBuf;
-		FormatMessageW(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM |
-			FORMAT_MESSAGE_IGNORE_INSERTS |
-			FORMAT_MESSAGE_MAX_WIDTH_MASK,
-			NULL,
-			hr,
-			MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ),
-			(LPWSTR)&lpMsgBuf,
-			0, NULL );
-		str = (LPWSTR)lpMsgBuf;
-		LocalFree( lpMsgBuf );
-	}
-
-//	inline void ConvertHResult( std::tstring& str, HRESULT hr )
-//	{
-//#ifdef UNICODE
-//		ConvertHResultW( str, hr );
-//#else
-//		ConvertHResultA( str, hr );
-//#endif
-//	}
-
-#endif
 
 }

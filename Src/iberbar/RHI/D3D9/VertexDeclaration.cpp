@@ -15,6 +15,7 @@ iberbar::RHI::D3D9::CVertexDeclaration::CVertexDeclaration( CDevice* pDevice, co
 	{
 
 	}
+	m_bIsManaged = true;
 }
 
 

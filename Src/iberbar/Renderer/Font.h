@@ -29,12 +29,21 @@ namespace iberbar
 		};
 
 
+		
+
+
 		struct UFontCharBitmap
 		{
+			static const int sTextureIndex_UnInitialized = -1;
+			static const int sTextureIndex_JustNoTexture = -2;
+
+
 			UFontCharBitmap()
 				: nChar( 0 )
 				, nCharWidth( 0 )
-				, nTextureIndex( -1 )
+				, nTextureIndex( sTextureIndex_UnInitialized )
+				, nDeltaX( 0 )
+				, nDeltaY( 0 )
 				, TextureSize( 0, 0 )
 				, rcTexCoord( 0, 0, 0, 0 )
 			{
@@ -43,6 +52,8 @@ namespace iberbar
 				: nChar( Bitmap.nChar )
 				, nCharWidth( Bitmap.nCharWidth )
 				, nTextureIndex( Bitmap.nTextureIndex )
+				, nDeltaX( Bitmap.nDeltaX )
+				, nDeltaY( Bitmap.nDeltaY )
 				, TextureSize( Bitmap.TextureSize )
 				, rcTexCoord( Bitmap.rcTexCoord )
 			{
@@ -51,6 +62,8 @@ namespace iberbar
 			wchar_t nChar;
 			int nCharWidth;
 			int nTextureIndex;
+			int nDeltaX;
+			int nDeltaY;
 			CSize2i TextureSize;
 			CRect2f rcTexCoord;
 
@@ -80,7 +93,13 @@ namespace iberbar
 			int LoadText( wchar_t nCharFirst, wchar_t nCharLast );
 
 			FORCEINLINE const UFontDesc& GetFontDesc() const { return m_FontDesc; }
-			FORCEINLINE const UFontCharBitmap* GetCharBitmap( wchar_t nChar ) const { return m_pCharMapper->Get( nChar ); }
+			FORCEINLINE const UFontCharBitmap* GetCharBitmap( wchar_t nChar ) const
+			{
+				UFontCharBitmap* pBitmap = m_pCharMapper->Get( nChar );
+				if ( pBitmap == nullptr || pBitmap->nTextureIndex == UFontCharBitmap::sTextureIndex_UnInitialized )
+					return nullptr;
+				return pBitmap;
+			}
 			RHI::ITexture* GetTexture( int nIndex );
 
 		private:

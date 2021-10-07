@@ -190,3 +190,27 @@ std::string iberbar::StdStringToUpper( std::string& str )
 	}
 	return str;
 }
+
+
+std::wstring iberbar::StdWStringToLower( std::wstring& str )
+{
+	wchar_t* ptr = &str.front();
+	while ( *ptr != 0 )
+	{
+		ptr[ 0 ] = towlower( *ptr );
+		ptr++;
+	}
+	return str;
+}
+
+
+std::wstring iberbar::StdWStringToUpper( std::wstring& str )
+{
+	wchar_t* ptr = &str.front();
+	while ( *ptr != 0 )
+	{
+		ptr[ 0 ] = towupper( *ptr );
+		ptr++;
+	}
+	return str;
+}

@@ -1,4 +1,4 @@
-
+iberbar.Game = iberbar.Game or {};
 
 --- @class iberbar.Game.CTimer
 local m = {};

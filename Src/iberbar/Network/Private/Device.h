@@ -2,6 +2,7 @@
 
 
 #include "../IO.h"
+#include <iberbar/Utility/OS/MultiEventWaiter.h>
 #include <thread>
 #include <memory_resource>
 
@@ -47,7 +48,7 @@ namespace iberbar
 
         private:
             event_base* m_base;
-            event* signal_event;
+            event* m_pEv2_SignalExit;
             event* m_pEvent_SocketWrite;
             event* m_pEvent_LoggerWrite;
             std::thread m_thread;
@@ -59,10 +60,10 @@ namespace iberbar
             // ÄÚ´æ³Ø
             std::pmr::synchronized_pool_resource m_Pool;
 
-#ifdef _WINDOWS
-            HANDLE m_hEventsForThread[ (int)UEventIdForThread::__Count ];
-#endif
-
+//#ifdef _WINDOWS
+//            HANDLE m_hEventsForThread[ (int)UEventIdForThread::__Count ];
+//#endif
+            OS::TMultiEventWaiter<(int)UEventIdForThread::__Count> m_EventWaiter;
 		};
 
         extern CDevice_UseLibevent* g_pDevice;

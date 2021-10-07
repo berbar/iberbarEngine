@@ -1,11 +1,13 @@
 #pragma once
 
 #include <iberbar/Lua/LuaBase.h>
+#include <iberbar/Lua/LuaCppCommon.h>
 #include <iberbar/Utility/Result.h>
+#include <functional>
 
 namespace iberbar
 {
-	namespace LuaCpp
+	namespace Lua
 	{
 		class CClassBuilder;
 		class CEnumBuilder;
@@ -13,7 +15,7 @@ namespace iberbar
 		class CBuilder;
 		class CScopeBuilder;
 
-		typedef void (*PHowToBuildClass)(const char* moduleName, CClassBuilder* classBuilder);
+		typedef void (PHowToBuildClass)(const char* moduleName, CClassBuilder* classBuilder);
 		typedef void (*PHowToBuildVariable)(const char* moduleName, CVariableBuilder* classBuilder);
 		typedef void (*PHowToBuildEnum)( CEnumBuilder* pEnum );
 		typedef void (*PHowToBuildScope)(CScopeBuilder* scope);
@@ -25,27 +27,31 @@ namespace iberbar
 			OperatorAdd
 		};
 
-		//extern const char ClassStandardMethod_ToString[] = "__tostring";
-		//// 运算符 '+'
-		//extern const char ClassStandardMethod_Operator_Add[] = "__add";
-		//// 运算符 '-'
-		//extern const char ClassStandardMethod_Operator_Sub[] = "__sub";
-		//// 运算符 '*'
-		//extern const char ClassStandardMethod_Operator_Mul[] = "__mul";
-		//// 运算符 '/'
-		//extern const char ClassStandardMethod_Operator_Div[] = "__div";
-		//// 运算符 '%'
-		//extern const char ClassStandardMethod_Operator_Mod[] = "__mod";
-		//// 运算符 '-'，取反
-		//extern const char ClassStandardMethod_Operator_Unm[] = "__unm";
-		//// 运算符 '..'
-		//extern const char ClassStandardMethod_Operator_Concat[] = "__concat";
-		//// 运算符 '=='
-		//extern const char ClassStandardMethod_Operator_Eq[] = "__eq";
-		//// 运算符 '<'
-		//extern const char ClassStandardMethod_Operator_Lt[] = "__lt";
-		//// 运算符 '<='
-		//extern const char ClassStandardMethod_Operator_Le[] = "__le";
+
+
+
+
+		struct UClassDefinition
+		{
+			const char* classname;
+			const char* classnamefull;
+			const char* classname_extends;
+			lua_CFunction __constructor;
+			lua_CFunction __distructor;
+			const luaL_Reg* __methods;
+			//lua_CFunction __tostring;
+			//lua_CFunction __add;
+			//lua_CFunction __sub;
+			//lua_CFunction __mul;
+			//lua_CFunction __div;
+			//lua_CFunction __mod;
+			//lua_CFunction __unm;
+			//lua_CFunction __concat;
+			//lua_CFunction __eq;
+			//lua_CFunction __lt;
+			//lua_CFunction __le;
+		};
+
 
 		class __iberbarLuaApi__ CClassBuilder
 		{
@@ -73,7 +79,7 @@ namespace iberbar
 			};
 
 		public:
-			CClassBuilder( lua_State* pLuaState, const char* classNameFull, const char* className, int metatable, int methods );
+			CClassBuilder( lua_State* pLuaState, const char* classNameFull, const char* strClassNameExtends, int metatable );
 
 		public:
 			// 添加构造函数
@@ -91,14 +97,17 @@ namespace iberbar
 			// 重载标准方法，方法对应的字段参考 ClassStandardMethod_xxx
 			CClassBuilder* AddStandardMethod( const char* name, lua_CFunction func );
 
-			const char* ClassName() { return m_className.c_str(); }
+			const char* ClassName() { return m_classNameFull.c_str(); }
+			const char* ClassName_Extends() { return m_strClassName_Extends.c_str(); }
 
 		private:
 			lua_State* m_pLuaState;
 			std::string m_classNameFull;
-			std::string m_className;
-			int m_methods;
+			std::string m_strClassName_Extends;
 			int m_metatable;
+			int m_methods;
+			//int m_nLuaMetatable_Extends;
+			//int m_nLuaMethods_Extends;
 		};
 
 
@@ -116,38 +125,28 @@ namespace iberbar
 		};
 
 
-		//class __iberbarLuaApi__ CVariableBuilder
-		//{
-		//public:
-		//	void AddInteger( const char* name, lua_Integer value );
-		//	void SetNumber( const char* name, lua_Number value );
-		//	void SetString( const char* name, const char* value );
-		//	void SetTable( const char* name, lua_Integer value );
-		//};
-
-		class __iberbarLuaApi__ CScopeBuilder abstract
+		class __iberbarLuaApi__ CScopeBuilder
 		{
-		protected:
-			CScopeBuilder( lua_State* pLuaState, const char* moduleName );
+		public:
+			CScopeBuilder( lua_State* pLuaState );
+			CScopeBuilder( lua_State* pLuaState, const char* strModuleName, int nLuaModule );
 
 		public:
 			// 注册class类型
 			// @extends 继承的父类
-			virtual void AddClass( const char* className, PHowToBuildClass pHowToAddClass, const char* extends = nullptr ) = 0;
-
-			virtual void AddEnum( const char* strEnumTypeName, PHowToBuildEnum pHow, int nCount = -1 ) = 0;
-
-			virtual void AddFunctionOne( const char* functionName, lua_CFunction pFunction ) = 0;
-
-			virtual void AddFunctions( const luaL_Reg* pFunctionRegs ) = 0;
-			//virtual void AddVariables( PHowToBuildVariable pHowToBuildVars );
-
+			void AddClass( const char* strClassName, std::function<PHowToBuildClass> pHowToAddClass, const char* extends = nullptr );
+			void AddClass( const char* strClassName, const char* strClassNameFull, std::function<PHowToBuildClass> pHowToAddClass, const char* extends = nullptr );
+			void AddClass( const UClassDefinition& Definition );
+			void AddEnum( const char* strEnumTypeName, PHowToBuildEnum pHow, int nCount = -1 );
+			void AddFunctionOne( const char* functionName, lua_CFunction pFunction );
+			void AddFunctions( const luaL_Reg* pFunctionRegs );
 			const std::string& GetModuleName() const { return m_name; }
 
 		protected:
 			lua_State* m_pLuaState;
 			// 域名，空字符串为全局，不然为table路径名称
 			std::string m_name;
+			int m_nLuaModule;
 		};
 
 		class __iberbarLuaApi__ CBuilder

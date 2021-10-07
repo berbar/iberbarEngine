@@ -42,6 +42,7 @@ iberbar::CResult iberbar::RHI::D3D9::CTexture::CreateEmpty( int w, int h )
 	}
 
 	m_Size = CSize2i( w, h );
+	m_bIsManaged = true;
 
 	return CResult();
 }
@@ -88,6 +89,7 @@ iberbar::CResult iberbar::RHI::D3D9::CTexture::CreateFromFileInMemory( const voi
 	pSurface->GetDesc( &SurfaceDesc );
 
 	m_Size = CSize2i( SurfaceDesc.Width, SurfaceDesc.Height );
+	m_bIsManaged = true;
 
 	pSurface->Release();
 	pSurface = nullptr;
@@ -135,6 +137,7 @@ iberbar::CResult iberbar::RHI::D3D9::CTexture::CreateFromFileA( const char* strF
 	pSurface->GetDesc( &SurfaceDesc );
 
 	m_Size = CSize2i( SurfaceDesc.Width, SurfaceDesc.Height );
+	m_bIsManaged = true;
 
 	pSurface->Release();
 	pSurface = nullptr;
@@ -162,6 +165,7 @@ iberbar::CResult iberbar::RHI::D3D9::CTexture::CreateFromFileW( const wchar_t* s
 	pSurface->GetDesc( &SurfaceDesc );
 
 	m_Size = CSize2i( SurfaceDesc.Width, SurfaceDesc.Height );
+	m_bIsManaged = true;
 
 	pSurface->Release();
 	pSurface = nullptr;
@@ -200,6 +204,7 @@ iberbar::CResult iberbar::RHI::D3D9::CTexture::CreateFromPixels( int w, int h, v
 	m_pD3DTexture->UnlockRect( 0 );
 
 	m_Size = CSize2i( w, h );
+	m_bIsManaged = true;
 
 	return CResult();
 }

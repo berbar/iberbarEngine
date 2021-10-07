@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../IO.h"
+
+#include "../SocketClient.h"
+#include <iberbar/Utility/Result.h>
 
 struct addrinfo;
 struct event_base;

@@ -19,7 +19,7 @@
 
 
 
-iberbar::CResult iberbar::IO::Initial()
+iberbar::CResult iberbar::IO::iberbarNetworkInitial()
 {
     assert( g_pDevice == nullptr );
     assert( g_pMsgQueues == nullptr );
@@ -29,7 +29,7 @@ iberbar::CResult iberbar::IO::Initial()
 }
 
 
-void iberbar::IO::Destroy()
+void iberbar::IO::iberbarNetworkDestroy()
 {
     if ( g_pDevice != nullptr )
     {
@@ -41,7 +41,7 @@ void iberbar::IO::Destroy()
 }
 
 
-void iberbar::IO::Read()
+void iberbar::IO::iberbarNetworkRead()
 {
     if ( g_pMsgQueues == nullptr )
         return;
@@ -69,15 +69,15 @@ void iberbar::IO::Read()
 }
 
 
-iberbar::CResult iberbar::IO::CreateSocketClient( ISocketClient** ppOutClient, const std::string& strUrl, const USocketOptions& Options )
+iberbar::CResult iberbar::IO::CreateSocketClient( ISocketClient** ppOutClient, const char* strUrl, const USocketOptions* Options )
 {
-    if ( Options.pHead == nullptr || Options.nHeadLen == 0 )
+    if ( Options->pHead == nullptr || Options->nHeadLen == 0 )
         return MakeResult( ResultCode::Bad, "protocol must have head" );
 
-    if ( Options.pTail == nullptr || Options.nTailLen == 0 )
+    if ( Options->pTail == nullptr || Options->nTailLen == 0 )
         return MakeResult( ResultCode::Bad, "protocol must have tail" );
 
-    return g_pDevice->CreateClient( ppOutClient, strUrl, Options );
+    return g_pDevice->CreateClient( ppOutClient, strUrl, *Options );
 }
 
 //

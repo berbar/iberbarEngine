@@ -395,6 +395,7 @@ iberbar::Gui::CEditBoxTextElementBase::CEditBoxTextElementBase()
     : m_strText( L"" )
     , m_strTextSelected( L"" )
     , m_nCaretAtCharIndex( -1 )
+    , m_bCaretVisible( false )
 {
 }
 
@@ -403,6 +404,7 @@ iberbar::Gui::CEditBoxTextElementBase::CEditBoxTextElementBase( const CEditBoxTe
     : m_strText( L"" )
     , m_strTextSelected( L"" )
     , m_nCaretAtCharIndex( -1 )
+    , m_bCaretVisible( false )
 {
 }
 
@@ -431,6 +433,9 @@ iberbar::Gui::CEditBoxTextElement::CEditBoxTextElement()
     , m_nSelectCount( 0 )
     , m_SelectBounding()
 
+    , m_nTabStyle( 0 )
+    , m_nTabOfWhiteSpace( 2 )
+
     , m_pUniBuffer( new CEditBoxTextUniBuffer() )
 {
 }
@@ -454,6 +459,9 @@ iberbar::Gui::CEditBoxTextElement::CEditBoxTextElement( const CEditBoxTextElemen
     , m_nSelectStart( 0 )
     , m_nSelectCount( 0 )
     , m_SelectBounding()
+
+    , m_nTabStyle( Element.m_nTabStyle )
+    , m_nTabOfWhiteSpace( Element.m_nTabOfWhiteSpace )
 
     , m_pUniBuffer( new CEditBoxTextUniBuffer() )
 {
@@ -492,6 +500,9 @@ void iberbar::Gui::CEditBoxTextElement::SetFont( Renderer::CFont* pFont )
         m_pFont->AddRef();
         m_pFont->LoadText( m_strText.c_str() );
     }
+
+    UpdateUniBuffer();
+    SetCaret( m_nCaretAtCharIndex );
 }
 
 
@@ -529,6 +540,27 @@ void iberbar::Gui::CEditBoxTextElement::InsertChar( wchar_t nChar )
     if ( m_pFont == nullptr )
         return;
 
+    if ( nChar == VK_ESCAPE )
+        return;
+
+    if ( m_bSingleLine == true && ( nChar == VK_RETURN || nChar == '\n' ) )
+        return;
+
+    if ( nChar == VK_TAB )
+    {
+        if ( m_nTabStyle == 0 )
+        {
+            if ( m_nTabOfWhiteSpace <= 0 )
+                return;
+            std::wstring strWhiteSpaces;
+            strWhiteSpaces.resize( m_nTabOfWhiteSpace + 1, L' ' );
+            strWhiteSpaces[m_nTabOfWhiteSpace] = 0;
+            InsertString( strWhiteSpaces.c_str() );
+        }
+        
+        return;
+    }
+
     if ( m_nSelectCount > 0 )
     {
         m_strText.erase( m_nSelectStart, m_nSelectCount );
@@ -553,6 +585,20 @@ void iberbar::Gui::CEditBoxTextElement::InsertString( const wchar_t* pStr )
     if ( m_pFont == nullptr )
         return;
 
+    std::wstring strInsert = pStr;
+    std::wregex Regex;
+    std::wstring strReplace;
+    if ( m_bSingleLine == true )
+    {
+        Regex = std::wregex( L"(\\\n)|(\\\r\\\n)" );
+        
+        strInsert = std::regex_replace( pStr, Regex, strReplace );
+    }
+
+    //Regex = std::wregex( L"(\\\t)" );
+    //strReplace.resize( m_nTabOfWhiteSpace, L' ' );
+    //strInsert = std::regex_replace( strInsert, Regex, strReplace );
+
     if ( m_nSelectCount > 0 )
     {
         m_strText.erase( m_nSelectStart, m_nSelectCount );
@@ -561,14 +607,14 @@ void iberbar::Gui::CEditBoxTextElement::InsertString( const wchar_t* pStr )
     int nTextLen = wcslen( m_strText.c_str() );
 
     if ( m_nCaretAtCharIndex >= nTextLen )
-        m_strText = m_strText + pStr;
+        m_strText = m_strText + strInsert;
     else
-        m_strText.insert( m_nCaretAtCharIndex + 1, pStr );
+        m_strText.insert( m_nCaretAtCharIndex + 1, strInsert );
 
-    m_pFont->LoadText( pStr );
+    m_pFont->LoadText( strInsert.c_str() );
 
     UpdateUniBuffer();
-    SetCaret( m_nCaretAtCharIndex + wcslen( pStr ) );
+    SetCaret( m_nCaretAtCharIndex + wcslen( strInsert.c_str() ) );
 }
 
 
@@ -841,14 +887,17 @@ void iberbar::Gui::CEditBoxTextElement::Update( float nDelta )
 {
     CRenderElement::Update( nDelta );
 
-    m_nCaretKick += nDelta;
-    float nKickStep = 0.3f;
-    if ( m_bCaretShowState == true )
-        nKickStep = 0.5f;
-    if ( m_nCaretKick > nKickStep )
+    if ( m_bCaretVisible == true )
     {
-        m_nCaretKick -= nKickStep;
-        m_bCaretShowState = !m_bCaretShowState;
+        m_nCaretKick += nDelta;
+        float nKickStep = 0.3f;
+        if ( m_bCaretShowState == true )
+            nKickStep = 0.5f;
+        if ( m_nCaretKick > nKickStep )
+        {
+            m_nCaretKick -= nKickStep;
+            m_bCaretShowState = !m_bCaretShowState;
+        }
     }
 }
 
@@ -895,7 +944,7 @@ void iberbar::Gui::CEditBoxTextElement::Render()
         }
     }
 
-    if ( m_bCaretShowState == true )
+    if ( m_bCaretVisible == true && m_bCaretShowState == true )
     {
         CEngine::sGetInstance()->GetRendererSprite()->DrawRect( m_nBgZOrder, m_CaretBounding, m_CaretColor );
     }
@@ -979,6 +1028,11 @@ void iberbar::Gui::CEditBox::UpdateRect()
 void iberbar::Gui::CEditBox::OnFocusIn()
 {
     CWidget::OnFocusIn();
+
+    if ( m_pTextElementRef )
+    {
+        m_pTextElementRef->SetCaretVisible( true );
+    }
 }
 
 
@@ -987,7 +1041,11 @@ void iberbar::Gui::CEditBox::OnFocusOut()
     CWidget::OnFocusOut();
 
     if ( m_pTextElementRef )
+    {
         m_pTextElementRef->ClearSelectedText();
+        m_pTextElementRef->SetCaretVisible( false );
+    }
+        
 }
 
 
@@ -1096,6 +1154,9 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CEditBox::HandleKeyboard( const
                     PasteFromClipboard();
                     break;
                 }
+
+                case VK_ESCAPE:
+                    break;
 
                 default:
                 {

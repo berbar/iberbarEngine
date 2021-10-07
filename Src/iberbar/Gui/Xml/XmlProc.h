@@ -20,6 +20,7 @@ namespace iberbar
 		__iberbarGuiApi__ void XmlReadProc_Widget_RadioBox( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CWidget* pWidget, CRenderElement* pRenderElement );
 		__iberbarGuiApi__ void XmlReadProc_Widget_ListBox( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CWidget* pWidget, CRenderElement* pRenderElement );
 		__iberbarGuiApi__ void XmlReadProc_Widget_EditBox( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CWidget* pWidget, CRenderElement* pRenderElement );
+		__iberbarGuiApi__ void XmlReadProc_Widget_ProgressBar( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CWidget* pWidget, CRenderElement* pRenderElement );
 
 		__iberbarGuiApi__ CWidget* XmlCreateProc_Widget( const char* strType );
 		__iberbarGuiApi__ CWidget* XmlCreateProc_Widget_Button( const char* strType );
@@ -27,6 +28,7 @@ namespace iberbar
 		__iberbarGuiApi__ CWidget* XmlCreateProc_Widget_RadioBox( const char* strType );
 		__iberbarGuiApi__ CWidget* XmlCreateProc_Widget_ListBox( const char* strType );
 		__iberbarGuiApi__ CWidget* XmlCreateProc_Widget_EditBox( const char* strType );
+		__iberbarGuiApi__ CWidget* XmlCreateProc_Widget_ProgressBar( const char* strType );
 
 		__iberbarGuiApi__ void XmlReadProc_Element( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CRenderElement* pElement );
 		__iberbarGuiApi__ void XmlReadProc_Element_ColorRect( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CRenderElement* pElement );

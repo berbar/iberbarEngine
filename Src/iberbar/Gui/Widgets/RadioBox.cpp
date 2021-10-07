@@ -132,7 +132,7 @@ void iberbar::Gui::CRadioBox::SetCheckedInternal( UCheckState nState, bool bInte
 void iberbar::Gui::CRadioBox::ResetRadioGroupChecked()
 {
 	int nGroup = GetGroup();
-	m_pDialog->ForeachWidgets(
+	GetDialog()->GetWidgetRoot()->ForeachWidgets(
 		[nGroup]( CWidget* pWidget )
 		{
 			if ( pWidget->GetGroup() == nGroup && strcmp( pWidget->GetWidgetType(), "RadioBox" ) == 0 )

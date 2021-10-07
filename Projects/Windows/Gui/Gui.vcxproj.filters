@@ -10,9 +10,6 @@
     <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\Button.cpp">
       <Filter>Widget</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\Container.cpp">
-      <Filter>Widget</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\CheckBox.cpp">
       <Filter>Widget</Filter>
     </ClCompile>
@@ -46,6 +43,9 @@
     <ClCompile Include="..\..\..\Src\iberbar\Gui\Xml\XmlProcHelper.cpp">
       <Filter>Xml</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Gui\Widgets\ProgressBar.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\iberbar\Gui\BaseTypes.h" />
@@ -60,9 +60,6 @@
       <Filter>Element</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\Button.h">
-      <Filter>Widget</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\Container.h">
       <Filter>Widget</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\CheckBox.h">
@@ -98,6 +95,12 @@
     <ClInclude Include="..\..\..\Src\iberbar\Gui\Xml\XmlProcHelper.h">
       <Filter>Xml</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\ProgressBar.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Gui\Widgets\TreeView.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Element">
@@ -108,9 +111,6 @@
     </Filter>
     <Filter Include="Xml">
       <UniqueIdentifier>{941f32a6-aad7-470d-b87a-e88a9b5241d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Lua">
-      <UniqueIdentifier>{33ae0287-1ca8-4092-830c-550277ad19e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -18,5 +18,4 @@ function m.new() end
 function m:SetText( text ) end
 
 
---- export
 iberbar.Gui.CElementStateLabel = m;

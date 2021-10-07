@@ -52,9 +52,10 @@ void iberbar::Paper2d::CGridTerrain::Init()
 {
 	CNode::Init();
 
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Pixel, Renderer::s_strShaderVarName_UseTexture, true );
+	m_pShaderVariableTableUnion.GetVariableTableForPixelShader()->SetBool( Renderer::s_strShaderVarName_UseTexture, true );
 	m_pRenderCommand->SetShaderState( m_pShaderState );
-	m_pRenderCommand->SetShaderVariableTable( m_pShaderVariableTable );
+	m_pRenderCommand->SetShaderVariableTable( RHI::EShaderType::VertexShader, m_pShaderVariableTableUnion.GetVariableTableForVertexShader() );
+	m_pRenderCommand->SetShaderVariableTable( RHI::EShaderType::PixelShader, m_pShaderVariableTableUnion.GetVariableTableForPixelShader() );
 }
 
 
@@ -79,10 +80,9 @@ void iberbar::Paper2d::CGridTerrain::DrawSelf( CDrawContext* pContext )
 {
 	if ( m_pVertices != nullptr &&
 		m_pIndices != nullptr &&
-		m_pShaderState != nullptr &&
-		m_pShaderVariableTable != nullptr )
+		m_pShaderState != nullptr )
 	{
-		m_pShaderVariableTable->SetMatrix( RHI::UShaderType::Vertex, Renderer::s_strShaderVarName_MatViewProjection, pContext->GetMatViewProjection() );
+		m_pShaderVariableTableUnion.GetVariableTableForVertexShader()->SetMatrix( Renderer::s_strShaderVarName_MatViewProjection, pContext->GetMatViewProjection() );
 		m_pRenderCommand->SetZOrder( m_nZOrder );
 		pContext->GetRenderer()->AddCommand( m_pRenderCommand );
 	}
@@ -125,8 +125,8 @@ void iberbar::Paper2d::CGridTerrain::SetTexture( RHI::ITexture* pTexture )
 		UNKNOWN_SAFE_RELEASE_NULL( m_pTexture );
 		m_pTexture = pTexture;
 		UNKNOWN_SAFE_ADDREF( m_pTexture );
-		if ( m_pShaderVariableTable != nullptr )
-			m_pShaderVariableTable->SetSampler( Renderer::s_strShaderVarName_TextureSampler, m_pTexture, RHI::UTextureSamplerState() );
+		m_pShaderVariableTableUnion.GetVariableTableForPixelShader()->SetTexture( Renderer::s_strShaderVarName_Texture, m_pTexture );
+		m_pShaderVariableTableUnion.GetVariableTableForPixelShader()->SetSamplerState( Renderer::s_strShaderVarName_TextureSampler, RHI::UTextureSamplerState() );
 	}
 }
 

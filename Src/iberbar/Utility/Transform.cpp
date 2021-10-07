@@ -8,6 +8,7 @@ iberbar::CTransform2D::CTransform2D( void )
 	, m_bPercentY( false )
 	, m_bPercentW( false )
 	, m_bPercentH( false )
+	, m_bLockChildTransforms( false )
 	, m_alignStyle( UAlignStyle::Inner )
 	, m_alignHorizental( UAlignHorizental::Left )
 	, m_alignVertical( UAlignVertical::Top )
@@ -27,6 +28,7 @@ iberbar::CTransform2D::CTransform2D(const CTransform2D& trans )
 	, m_bPercentY( trans.m_bPercentY )
 	, m_bPercentW( trans.m_bPercentW )
 	, m_bPercentH( trans.m_bPercentH )
+	, m_bLockChildTransforms( false )
 	, m_alignHorizental( trans.m_alignHorizental )
 	, m_alignVertical( trans.m_alignVertical )
 	, m_Position( trans.m_Position )
@@ -60,7 +62,7 @@ void iberbar::CTransform2D::UpdateTransform()
 {
 	if ( m_ParentTransform )
 	{
-		const CRect2i& rectParent = m_ParentTransform->GetBounding();
+		CRect2i rectParent = m_ParentTransform->GetBounding();
 		CPoint2i position = m_Position;
 		CSize2i size = m_Size;
 		if ( m_bPercentX )
@@ -73,7 +75,13 @@ void iberbar::CTransform2D::UpdateTransform()
 			size.h = rectParent.Height() * size.h / 100;
 
 		if ( m_alignStyle == UAlignStyle::Inner )
+		{
+			rectParent.l += m_Paddings.l;
+			rectParent.t += m_Paddings.t;
+			rectParent.r -= m_Paddings.r;
+			rectParent.b -= m_Paddings.b;
 			RectAlignWith( &m_rcBounding, position, size, m_alignHorizental, m_alignVertical, &rectParent );
+		}
 		else
 			RectAlignWith( &m_rcBounding, position, size, m_alignHorizental, m_alignVertical, &rectParent );
 	}
@@ -82,7 +90,7 @@ void iberbar::CTransform2D::UpdateTransform()
 		m_rcBounding = CRect2i( m_Position, m_Size );
 	}
 
-	if ( m_ChildTransformArray.empty() == false )
+	if ( m_ChildTransformArray.empty() == false && m_bLockChildTransforms == false )
 	{
 		Array_Transfrom2D::iterator lc_iter = m_ChildTransformArray.begin();
 		Array_Transfrom2D::iterator lc_end  = m_ChildTransformArray.end();

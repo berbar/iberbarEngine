@@ -22,16 +22,17 @@ namespace iberbar
 
 		public:
 			void SetRootDir( const char* strRootDir ) { m_strRootDir = strRootDir; }
-			CResult GetOrCreateShader( const char* strName, RHI::IShader** ppOutShader );
-			bool FindShader( const char* strName, RHI::IShader** ppOutShader );
+			CResult GetOrCreateShader( RHI::EShaderType eShaderType, const char* strName, RHI::IShader** ppOutShader );
+			bool FindShader( RHI::EShaderType eShaderType, const char* strName, RHI::IShader** ppOutShader );
 
 		private:
 			struct _ShaderNode
 			{
-				std::string strName;
+				RHI::EShaderType eShaderType;
 				RHI::IShader* pShader;
+				std::string strName;
 			};
-			void CombineShaderFilePath( const char* strRootDir, std::string& strVS, std::string& strPS );
+			std::string CombineShaderFilePath( RHI::EShaderType eShaderType, const char* strName );
 
 		private:
 			RHI::IDevice* m_pRHIDevice;

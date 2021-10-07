@@ -2,6 +2,7 @@
 
 #include <iberbar/Paper2d/Headers.h>
 #include <iberbar/Paper2d/Transform.h>
+#include <iberbar/RHI/ShaderVariables.h>
 #include <iberbar/Utility/Rect.h>
 #include <iberbar/Utility/Clonable.h>
 #include <DirectXMath.h>
@@ -103,7 +104,7 @@ namespace iberbar
 			bool m_bEnable; // 主要控制鼠标、键盘输入和updatable
 
 			RHI::IShaderState* m_pShaderState;
-			RHI::IShaderVariableTable* m_pShaderVariableTable;
+			RHI::CShaderVariableTableUnion m_pShaderVariableTableUnion;
 			int m_nZOrder;
 			std::string m_strId;
 			std::list<CNode*> m_Prepare;

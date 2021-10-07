@@ -18,7 +18,8 @@ namespace iberbar
 		{
 		public:
 			UVector3f position;
-			CColor4B color;
+			//CColor4B color;
+			CColor4F color;
 			UVector2f texcoord;
 		};
 

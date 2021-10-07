@@ -15,6 +15,10 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\VertexDeclaration.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\RenderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderVariables.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\StateBlock.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\Trace.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\Effect.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderReflection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\CommandContext.cpp" />
@@ -27,5 +31,10 @@
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Shader.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Vertex.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderVariables.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\StateBlock.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\Trace.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderReflection.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\RenderState.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\Types.cpp" />
   </ItemGroup>
 </Project>

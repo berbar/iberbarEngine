@@ -17,21 +17,29 @@ namespace iberbar
 				virtual ~CDevice();
 
 			public:
+				virtual CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight ) override;
 				virtual void LostDevice() override;
 				virtual CResult ResetDevice( int nBackBufferWidth, int nBackBufferHeight, bool bIsWindow ) override;
 				virtual void CreateTexture( ITexture** ppTexture ) override;
 				virtual CResult CreateVertexBuffer( uint32 nInSize, uint32 nUsage, IVertexBuffer** ppOutBuffer ) override;
 				virtual CResult CreateIndexBuffer( uint32 nStride, uint32 nInSize, uint32 nUsage, IIndexBuffer** ppOutBuffer ) override;
-				virtual CResult CreateShader( IShader** ppOutShader );
+				virtual CResult CreateVertexShader( IShader** ppOutShader ) override;
+				virtual CResult CreatePixelShader( IShader** ppOutShader ) override;
+				virtual CResult CreateHullShader( IShader** ppOutShader ) override;
+				virtual CResult CreateGeometryShader( IShader** ppOutShader ) override;
+				virtual CResult CreateDomainShader( IShader** ppOutShader ) override;
+				virtual CResult CreateComputeShader( IShader** ppOutShader ) override;
 				virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride ) override;
-				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IShader* pShader, IVertexDeclaration* pVertexDeclaration ) override;
+				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) override;
 				virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) override;
+				virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) override;
+				virtual CResult CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc ) override;
 				virtual void CreateCommandContext( ICommandContext** ppOutContext ) override;
-				virtual void Begin() override;
+				virtual CResult Begin() override;
 				virtual void End() override;
 
 			public:
-				CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight );
+				
 
 				void BindVertexBuffer( IDirect3DVertexBuffer9* pD3DVertexBuffer, uint32 stride );
 				void BindIndexBuffer( IDirect3DIndexBuffer9* pD3DIndexBuffer );

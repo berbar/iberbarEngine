@@ -197,26 +197,19 @@
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Json.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\MsgPack.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Network.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Network_Names.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d_Names.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility_Names.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Xml.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Xml_Names.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application_Android.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application_Windows.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\FontManager.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\LoadingThread.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.cpp" />
@@ -228,16 +221,11 @@
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Gui.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Json.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\MsgPack.cpp" />
-    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Network.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Xml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Font\Font.vcxproj">
@@ -258,11 +246,11 @@
     <ProjectReference Include="..\Renderer\Renderer.vcxproj">
       <Project>{72a811b7-083c-43b3-9dac-e161fc97d8c8}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\RHI.D3D\RHI.D3D.vcxproj">
-      <Project>{78f105b7-d338-42f2-845c-c8899265ff45}</Project>
+    <ProjectReference Include="..\RHI.D3D11\RHI.D3D11.vcxproj">
+      <Project>{ab50ab76-d14e-44a8-9b8e-94a0c30102c5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\RHI.OpenGL\RHI.OpenGL.vcxproj">
-      <Project>{99d7e711-e3be-4705-9459-462c46366add}</Project>
+    <ProjectReference Include="..\RHI.D3D9\RHI.D3D9.vcxproj">
+      <Project>{2ae06cbb-7b0a-4f70-9017-7bc9f19b6f6a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RHI\RHI.vcxproj">
       <Project>{46598424-3772-4387-ba03-3e3ed3aeca79}</Project>

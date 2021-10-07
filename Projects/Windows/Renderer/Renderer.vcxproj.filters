@@ -5,22 +5,41 @@
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RenderCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Renderer.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RendererSprite.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Font.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\FontDrawState.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\CallbackCommand.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\GroupCommand.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RenderCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Renderer.cpp" />
-    <ClCompile Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RendererSprite.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Font.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\FontDrawState.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\CallbackCommand.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\GroupCommand.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Font">
       <UniqueIdentifier>{6bc6da60-661e-4225-bbfb-a728cd3de725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Commands">
+      <UniqueIdentifier>{c1cb5abc-0171-4076-bf58-0b6779fc44f4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

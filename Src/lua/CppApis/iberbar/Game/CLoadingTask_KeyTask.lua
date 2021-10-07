@@ -1,4 +1,5 @@
 
+iberbar.Game = iberbar.Game or {};
 
 --- 关键任务，本身不做任何加载处理，只是作为任务列表中的一个关键节点
 --- @class iberbar.Game.CLoadingTask_KeyTask : iberbar.Game.CLoadingTask

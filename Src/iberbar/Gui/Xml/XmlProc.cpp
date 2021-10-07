@@ -2,14 +2,14 @@
 #include <iberbar/Gui/Xml/XmlProc.h>
 #include <iberbar/Gui/Xml/XmlState.h>
 #include <iberbar/Gui/Xml/XmlProcHelper.h>
-#include <iberbar/Utility/String.h>
-#include <iberbar/Utility/StringConvert.h>
+
 
 #include <iberbar/Gui/Widgets/Button.h>
 #include <iberbar/Gui/Widgets/CheckBox.h>
 #include <iberbar/Gui/Widgets/RadioBox.h>
 #include <iberbar/Gui/Widgets/ListBox.h>
 #include <iberbar/Gui/Widgets/EditBox.h>
+#include <iberbar/Gui/Widgets/ProgressBar.h>
 
 #include <iberbar/Gui/Element/ElemColorRect.h>
 #include <iberbar/Gui/Element/ElemStateTexture.h>
@@ -17,6 +17,10 @@
 
 #include <iberbar/RHI/Texture.h>
 #include <iberbar/Renderer/Font.h>
+
+#include <iberbar/Utility/String.h>
+#include <iberbar/Utility/StringConvert.h>
+#include <iberbar/Utility/Log/OutputDevice.h>
 
 
 void iberbar::Gui::XmlReadProc_Object( Xml::CNodeA* pXmlNode, CObject* pObject )
@@ -188,13 +192,15 @@ void iberbar::Gui::XmlReadProc_Widget_ListBox( const UXmlParserContext* pContext
 			pListBox->SetItemDirection( UListBoxDirection::Horizental );
 	}
 	
-	strAttrValue = pXmlNode->GetAttribute( "EnableDrag" );
+	strAttrValue = pXmlNode->GetAttribute( "DragStyle" );
 	if ( StringIsNullOrEmpty( strAttrValue ) == false )
 	{
-		if ( strcmp( strAttrValue, "True" ) == 0 )
-			pListBox->SetEnableDrag( true );
+		if ( strcmp( strAttrValue, "DragView" ) == 0 )
+			pListBox->SetDragStyle( EListBoxDragStyle::DragView );
+		else if ( strcmp( strAttrValue, "DragItem" ) == 0 )
+			pListBox->SetDragStyle( EListBoxDragStyle::DragItem );
 		else
-			pListBox->SetEnableDrag( false );
+			pListBox->SetDragStyle( EListBoxDragStyle::None );
 	}
 
 	strAttrValue = pXmlNode->GetAttribute( "SelectType" );
@@ -218,9 +224,39 @@ void iberbar::Gui::XmlReadProc_Widget_EditBox( const UXmlParserContext* pContext
 	const char* strElementName = nullptr;
 
 	strElementName = pXmlNode->GetAttribute( "Element-TextField" );
-	if ( pEditBox->FindElement( strElementName, &pElementTemp ) == true )
+	if ( StringIsNullOrEmpty( strElementName ) == false && pEditBox->FindElement( strElementName, &pElementTemp ) == true )
 	{
 		pEditBox->SetTextElementRef( (CEditBoxTextElementBase*)(CRenderElement*)pElementTemp );
+	}
+}
+
+
+void iberbar::Gui::XmlReadProc_Widget_ProgressBar( const UXmlParserContext* pContext, Xml::CNodeA* pXmlNode, CWidget* pWidget, CRenderElement* pRenderElement )
+{
+	XmlReadProc_Widget( pContext, pXmlNode, pWidget, pRenderElement );
+
+	CProgressBar* pProgressBar = (CProgressBar*)pWidget;
+
+	
+	const char* strAttrValue = nullptr;
+
+	PTR_CRenderElement pElementTemp = nullptr;
+	strAttrValue = pXmlNode->GetAttribute( "Element-Progress" );
+	if ( StringIsNullOrEmpty( strAttrValue ) == false && pProgressBar->FindElement( strAttrValue, &pElementTemp ) == true )
+	{
+		pProgressBar->SetProgressRenderElementRef( (CRenderElement*)pElementTemp );
+	}
+
+	strAttrValue = pXmlNode->GetAttribute( "ProgressValueMax" );
+	if ( StringIsNullOrEmpty( strAttrValue ) == false )
+	{
+		pProgressBar->SetProgressValueMax( strtol( strAttrValue, nullptr, 10 ) );
+	}
+
+	strAttrValue = pXmlNode->GetAttribute( "ProgressValue" );
+	if ( StringIsNullOrEmpty( strAttrValue ) == false )
+	{
+		pProgressBar->SetProgressValue( strtol( strAttrValue, nullptr, 10 ) );
 	}
 }
 
@@ -258,6 +294,12 @@ iberbar::Gui::CWidget* iberbar::Gui::XmlCreateProc_Widget_ListBox( const char* s
 iberbar::Gui::CWidget* iberbar::Gui::XmlCreateProc_Widget_EditBox( const char* strType )
 {
 	return new CEditBox();
+}
+
+
+iberbar::Gui::CWidget* iberbar::Gui::XmlCreateProc_Widget_ProgressBar( const char* strType )
+{
+	return new CProgressBar();
 }
 
 
@@ -375,7 +417,29 @@ void iberbar::Gui::XmlReadProc_Element_StateLabel( const UXmlParserContext* pCon
 					FontDesc.Weight = 500;
 			}
 			TSmartRefPtr<Renderer::CFont> pFont;
-			if ( pContext->GetFont( &pFont, FontDesc ) == true )
+			CResult Ret = pContext->GetFont( &pFont, FontDesc );
+			if ( Ret.IsOK() == false )
+			{
+				pContext->pLogger->WriteFormat(
+					Logging::ULevel::Warn,
+					"GuiXmlParser",
+					"Failed to get font(family=%s,size=%d,weight=%s): %s",
+					strFontFamily,
+					FontDesc.Size,
+					strWeight,
+					Ret.data.c_str() );
+			}
+			else if ( pFont == nullptr )
+			{
+				pContext->pLogger->WriteFormat(
+					Logging::ULevel::Warn,
+					"GuiXmlParser",
+					"Failed to get font(family=%s,size=%d,weight=%s): no match",
+					strFontFamily,
+					FontDesc.Size,
+					strWeight );
+			}
+			else
 			{
 				pElementLabel->SetFont( pFont );
 			}
@@ -501,7 +565,7 @@ void iberbar::Gui::XmlReadProc_Element_EditBoxText( const UXmlParserContext* pCo
 		if ( XmlProcHelper::XmlNodeReadFontDesc( pNode_Font, &FontDesc ) == true )
 		{
 			TSmartRefPtr<Renderer::CFont> pFont;
-			if ( pContext->GetFont( &pFont, FontDesc ) == true )
+			if ( pContext->GetFont( &pFont, FontDesc ).IsOK() )
 			{
 				pTextElement->SetFont( pFont );
 			}

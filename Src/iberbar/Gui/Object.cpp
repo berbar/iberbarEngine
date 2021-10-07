@@ -11,6 +11,7 @@ iberbar::Gui::CObject::CObject()
 	, m_bVisible( true )
 	, m_bEnable( true )
 	, m_pTransform( PTR_CTransform2D::_sNew() )
+	, m_nDebugId( 0 )
 {
 }
 
@@ -21,6 +22,7 @@ iberbar::Gui::CObject::CObject( const CObject& obj )
 	, m_bVisible( obj.m_bVisible )
 	, m_bEnable( obj.m_bEnable )
 	, m_pTransform( PTR_CTransform2D::_sNew() )
+	, m_nDebugId( 0 )
 {
 	m_pTransform->UpdateTransform();
 }

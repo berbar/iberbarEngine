@@ -626,7 +626,10 @@ int iberbar::XFontDrawText_SingleLine(
 		ContextDraw.nChar = *lc_ptr;
 		pRenderTarget->DrawCharBitmap( (const TextDraw::TContextDrawCharBitmap<TFont, TFontCharBitmap>*)(&ContextDraw) );
 
-		PointDrawAt.x += pBitmap->GetCharWidth();
+		if ( pBitmap == nullptr )
+			PointDrawAt.x += nFontHeight;
+		else
+			PointDrawAt.x += pBitmap->GetCharWidth();
 
 		nCountDrew++;
 

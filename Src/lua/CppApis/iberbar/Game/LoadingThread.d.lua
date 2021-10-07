@@ -1,4 +1,4 @@
-
+iberbar.Game = iberbar.Game or {};
 
 --- 唤醒loading线程，执行loading任务
 function iberbar.Game.WakeupLoadingThread() end

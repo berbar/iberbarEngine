@@ -16,7 +16,7 @@ namespace iberbar
 			uint32 nOffset;
 		};
 
-		class __iberbarRHIApi__ IVertexDeclaration
+		class __iberbarRHIApi__ IVertexDeclaration abstract
 			: public IResource
 		{
 		public:

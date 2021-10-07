@@ -41,7 +41,7 @@
             <Element Type="StateLabel" X="0" Y="0" Width="100%" Height="100%">
                 <Font Family="Fonts/STHUPO.TTF" Size="21" Weight="Bold" />
                 <Text>设置</Text>
-                <Color State="Normal" Value="0xff000000" />
+                <Color State="Normal" Value="0x80000000" />
                 <Color State="MouseOver" Value="0xffff0000" />
                 <Color State="Pressed" Value="0xffff0000" />
                 <Color State="Focus" Value="0xffff0000" />

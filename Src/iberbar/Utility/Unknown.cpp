@@ -2,6 +2,7 @@
 
 #include "Unknown.h"
 #include <iberbar/Utility/RefStatistics.h>
+#include <iberbar/Utility/String.h>
 
 #include <stdexcept>
 #if defined (_DEBUG_USE_UNKNOWN_POOL)
@@ -126,6 +127,25 @@ uint32 iberbar::CRef::Release()
 	}
 
 	return lc_nRef;
+}
+
+
+std::string iberbar::CRef::ToString() const
+{
+#ifdef _WINDOWS
+
+	const char* strTypeName = typeid( *this ).name();
+#ifdef _WIN64
+	std::string strText = StdFormat( "<%s, At 0x%016llx, Ref=%d>", strTypeName, (uint64)this, m_nRef );
+#else
+	std::string strText = StdFormat( "<%s, At 0x%08lx, Ref=%d>", strTypeName, (uint32)this, m_nRef );
+#endif
+	
+
+#else
+	std::string strText = StdFormat( "0x%016llx: Ref=%d\n", (uint64)this, m_nRef );
+#endif
+	return strText;
 }
 
 

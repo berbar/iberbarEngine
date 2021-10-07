@@ -18,12 +18,18 @@ namespace iberbar
 		class IShaderVariableTable;
 		class ICommandContext;
 		class IDevice;
+		class IBlendState;
+		class IDepthStencilState;
+		class ISamplerState;
+		class CTrace;
 		struct UVertexElement;
 
 		typedef CResult( UCallbackDeviceOnCreated )(IDevice* pDevice);
 		typedef void(UCallbackDeviceOnLost)( IDevice* device );
 		typedef CResult( UCallbackDeviceOnReset )(IDevice* device);
 		typedef void(UCallbackDeviceOnRender)( IDevice* device );
+
+
 
 		class __iberbarRHIApi__ IDevice abstract
 			: public CRef
@@ -32,24 +38,34 @@ namespace iberbar
 			IDevice( UApiType nApiType );
 
 		public:
+#ifdef _WINDOWS
+			virtual CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight ) = 0;
+#endif
 			virtual void LostDevice() = 0;
 			virtual CResult ResetDevice( int nBackBufferWidth, int nBackBufferHeight, bool bIsWindow ) = 0;
 			virtual void CreateTexture( ITexture** ppTexture ) = 0;
 			virtual CResult CreateVertexBuffer( uint32 nInSize, uint32 nUsage, IVertexBuffer** ppOutBuffer ) = 0;
 			virtual CResult CreateIndexBuffer( uint32 nStride, uint32 nInSize, uint32 nUsage, IIndexBuffer** ppOutBuffer ) = 0;
-			virtual CResult CreateShader( IShader** ppOutShader ) = 0;
+			virtual CResult CreateVertexShader( IShader** ppOutShader ) = 0;
+			virtual CResult CreatePixelShader( IShader** ppOutShader ) = 0;
+			virtual CResult CreateHullShader( IShader** ppOutShader ) = 0;
+			virtual CResult CreateGeometryShader( IShader** ppOutShader ) = 0;
+			virtual CResult CreateDomainShader( IShader** ppOutShader ) = 0;
+			virtual CResult CreateComputeShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride ) = 0;
-			virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IShader* pShader, IVertexDeclaration* pVertexDeclaration ) = 0;
+			virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) = 0;
 			virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) = 0;
+			virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) = 0;
+			virtual CResult CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc ) = 0;
 			virtual void CreateCommandContext( ICommandContext** ppOutContext ) = 0;
-			//virtual void Render() = 0;
-			virtual void Begin() = 0;
+			virtual CResult Begin() = 0;
 			virtual void End() = 0;
+			virtual void SetClearColor( const CColor4B& color ) { m_ClearColor = CColor4F( color ); }
 
 		public:
 			inline UApiType GetApiType() const { return m_nApiType; }
 			const CSize2i& GetContextSize() const { return m_ContextSize; }
-			void SetClearColor( const CColor4B& color ) { m_ClearColor = CColor4F( color ); }
+			
 
 		public:
 			void SetCallbackOnCreated( std::function<UCallbackDeviceOnCreated> func ) { m_CallbackCreated = func; }

@@ -11,10 +11,12 @@ iberbar::Gui::CListBoxNoData::CListBoxNoData( void )
 	: m_nSelType( UListBoxSelectType::Single )
 	, m_nItemMouseOver( -1 )
 	, m_nItemPressed( -1 )
-
+	, m_nItemContextMenu( -1 )
+	, m_nItemContextMenu_AtPointX( 0 )
+	, m_nItemContextMenu_AtPointY( 0 )
 	, m_pRenderElementItemsRoot( new CRenderElement() )
 
-	, m_bDragView( false )
+	, m_nDragStyle( EListBoxDragStyle::None )
 	, m_bPressed( false )
 	, m_bIsDragging( false )
 	, m_nDragX( 0 )
@@ -28,6 +30,9 @@ iberbar::Gui::CListBoxNoData::CListBoxNoData( void )
 	, m_nItemVirtualSize( 0 )
 	, m_nShowX( 0 )
 	, m_nShowY( 0 )
+
+	, m_Callback_ItemElementAllocate()
+	, m_Callback_ItemElementRelease()
 {
 	m_bCanFocus = true;
 	SetNeedClip( true );
@@ -42,10 +47,12 @@ iberbar::Gui::CListBoxNoData::CListBoxNoData( const CListBoxNoData& listBox )
 	, m_nSelType( listBox.m_nSelType )
 	, m_nItemMouseOver( -1 )
 	, m_nItemPressed( -1 )
-
+	, m_nItemContextMenu( -1 )
+	, m_nItemContextMenu_AtPointX( 0 )
+	, m_nItemContextMenu_AtPointY( 0 )
 	, m_pRenderElementItemsRoot( new CRenderElement() )
 
-	, m_bDragView( false )
+	, m_nDragStyle( listBox.m_nDragStyle )
 	, m_bPressed( false )
 	, m_bIsDragging( false )
 	, m_nDragX( 0 )
@@ -59,6 +66,9 @@ iberbar::Gui::CListBoxNoData::CListBoxNoData( const CListBoxNoData& listBox )
 	, m_nItemVirtualSize( listBox.m_nItemVirtualSize )
 	, m_nShowX( 0 )
 	, m_nShowY( 0 )
+
+	, m_Callback_ItemElementAllocate()
+	, m_Callback_ItemElementRelease()
 {
 	m_bCanFocus = true;
 	SetNeedClip( true );
@@ -133,7 +143,7 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CListBoxNoData::HandleMouse( co
 
 		case UMouseEvent::Move:
 		{
-			if ( m_bDragView == true )
+			if ( m_nDragStyle == EListBoxDragStyle::DragView )
 			{
 				if ( m_bPressed == true )
 					m_bIsDragging = true;
@@ -174,10 +184,28 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CListBoxNoData::HandleMouse( co
 					return UHandleMessageResult::Succeed;
 				}
 			}
+			else if ( m_nDragStyle == EListBoxDragStyle::DragItem )
+			{
+				if ( m_nItemDragging >= 0 && m_bPressed == true )
+					m_bIsDragging = true;
+
+				if ( m_bIsDragging == true )
+				{
+					int lc_cx = pEvent->MousePoint.x - m_nDragX;
+					int lc_cy = pEvent->MousePoint.y - m_nDragY;
+
+					if ( m_pRenderElementDrag != nullptr )
+					{
+						//m_pRenderElementDrag->SetPosition();
+					}
+				}
+			}
 
 			if ( HitTest( pEvent->MousePoint ) )
 			{
 				SetItemMouseOver( GetItemAtPoint( pEvent->MousePoint ) );
+
+				return UHandleMessageResult::Succeed;
 			}
 		}
 		break;
@@ -189,6 +217,10 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CListBoxNoData::HandleMouse( co
 				m_bPressed = true;
 
 				SetItemPressed( GetItemAtPoint( pEvent->MousePoint ) );
+				if ( m_nDragStyle == EListBoxDragStyle::DragItem && m_nItemPressed >= 0 )
+				{
+					m_nItemDragging = m_nItemPressed;
+				}
 
 				m_nDragX = pEvent->MousePoint.x;
 				m_nDragY = pEvent->MousePoint.y;
@@ -238,6 +270,45 @@ iberbar::Gui::UHandleMessageResult iberbar::Gui::CListBoxNoData::HandleMouse( co
 		}
 		break;
 
+		case UMouseEvent::RDown:
+		{
+			if ( HitTest( pEvent->MousePoint ) )
+			{
+				m_bPressed = true;
+
+				SetItemPressed( GetItemAtPoint( pEvent->MousePoint ) );
+
+				if ( m_bFocus == false )
+					RequestFocus();
+
+				return UHandleMessageResult::Succeed;
+			}
+			break;
+		}
+
+		case UMouseEvent::RUp:
+		{
+			if ( HitTest( pEvent->MousePoint ) )
+			{
+				if ( m_bPressed == true )
+				{
+					int nHit = GetItemAtPoint( pEvent->MousePoint );
+
+					if ( nHit >= 0 && nHit == m_nItemPressed )
+					{
+						m_nItemContextMenu = nHit;
+						m_nItemContextMenu_AtPointX = pEvent->MousePoint.x;
+						m_nItemContextMenu_AtPointY = pEvent->MousePoint.y;
+						SendEvent( BaseEvent::nContextMenu, nHit, 0 );
+					}
+				}
+			}
+
+			m_bPressed = false;
+
+			break;
+		}
+
 		default:
 			break;
 	}
@@ -261,6 +332,24 @@ void iberbar::Gui::CListBoxNoData::OnMouseLeave()
 }
 
 
+void iberbar::Gui::CListBoxNoData::OnFocusOut()
+{
+	SetItemMouseOver( -1 );
+	SetItemPressed( -1 );
+
+	CWidget::OnFocusOut();
+}
+
+
+void iberbar::Gui::CListBoxNoData::Refresh()
+{
+	SetItemMouseOver( -1 );
+	SetItemPressed( -1 );
+
+	CWidget::Refresh();
+}
+
+
 void iberbar::Gui::CListBoxNoData::Update( float nDelta )
 {
 	CWidget::Update( nDelta );
@@ -271,6 +360,9 @@ void iberbar::Gui::CListBoxNoData::Update( float nDelta )
 
 void iberbar::Gui::CListBoxNoData::Render()
 {
+	if ( IsVisible() == false )
+		return;
+
 	bool bPopViewport = false;
 	if ( m_bNeedClip == true )
 	{
@@ -370,6 +462,19 @@ void iberbar::Gui::CListBoxNoData::SetSelectType( UListBoxSelectType nType )
 }
 
 
+iberbar::CRect2i iberbar::Gui::CListBoxNoData::GetItemBounding( int nIndex ) const
+{
+	if ( nIndex < 0 || nIndex >= m_pRenderElementItemsRoot->GetChildElementCount() )
+		return CRect2i();
+
+	PTR_CRenderElement pElement;
+	if ( m_pRenderElementItemsRoot->GetChildElement( nIndex, &pElement ) == false || pElement == nullptr )
+		return CRect2i();
+
+	return pElement->GetBounding();
+}
+
+
 void iberbar::Gui::CListBoxNoData::ResizeItemElements( int nOffset, int nCount )
 {
 	int nX;
@@ -389,6 +494,8 @@ void iberbar::Gui::CListBoxNoData::ResizeItemElements( int nOffset, int nCount )
 			pElement = m_pRenderElementItemsRoot->GetElement( i );
 			if ( pElement == nullptr )
 				continue;
+			if ( pElement->GetVisible() == false )
+				continue;
 			pElement->SetPosition( nX, nY + m_nItemSpacing );
 			pElement->SetSize( m_nItemWidth, m_nItemHeight );
 			nY += m_nItemVirtualSize;
@@ -403,6 +510,8 @@ void iberbar::Gui::CListBoxNoData::ResizeItemElements( int nOffset, int nCount )
 		{
 			pElement = m_pRenderElementItemsRoot->GetElement( i );
 			if ( pElement == nullptr )
+				continue;
+			if ( pElement->GetVisible() == false )
 				continue;
 			pElement->SetPosition( nX + m_nItemSpacing, nY );
 			pElement->SetSize( m_nItemWidth, m_nItemHeight );
@@ -422,10 +531,7 @@ void iberbar::Gui::CListBoxNoData::SetItemMouseOver( int nIndex )
 		auto pElement = m_pRenderElementItemsRoot->GetElement( m_nItemMouseOver );
 		if ( pElement )
 		{
-			if ( IsSelect( m_nItemMouseOver ) == true )
-			{
-			}
-			else
+			if ( IsSelect( m_nItemMouseOver ) == false && IsItemEnable( m_nItemMouseOver ) == true )
 			{
 				pElement->SetState( (int)UWidgetState::Normal );
 			}
@@ -439,11 +545,7 @@ void iberbar::Gui::CListBoxNoData::SetItemMouseOver( int nIndex )
 		auto pElement = m_pRenderElementItemsRoot->GetElement( m_nItemMouseOver );
 		if ( pElement )
 		{
-			if ( IsSelect( nIndex ) == true )
-			{
-
-			}
-			else
+			if ( IsSelect( nIndex ) == false && IsItemEnable( nIndex ) == true )
 			{
 				pElement->SetState( (int)UWidgetState::MouseOver );
 			}
@@ -462,10 +564,7 @@ void iberbar::Gui::CListBoxNoData::SetItemPressed( int nIndex )
 		auto pElement = m_pRenderElementItemsRoot->GetElement( m_nItemPressed );
 		if ( pElement )
 		{
-			if ( IsSelect( m_nItemPressed ) == true )
-			{
-			}
-			else
+			if ( IsSelect( m_nItemPressed ) == false && IsItemEnable( m_nItemPressed ) == true )
 			{
 				pElement->SetState( (int)UWidgetState::Normal );
 			}
@@ -479,10 +578,7 @@ void iberbar::Gui::CListBoxNoData::SetItemPressed( int nIndex )
 		auto pElement = m_pRenderElementItemsRoot->GetElement( m_nItemPressed );
 		if ( pElement )
 		{
-			if ( IsSelect( m_nItemPressed ) == true )
-			{
-			}
-			else
+			if ( IsSelect( nIndex ) == false && IsItemEnable( nIndex ) == true )
 			{
 				pElement->SetState( (int)UWidgetState::Pressed );
 			}
@@ -499,10 +595,15 @@ void iberbar::Gui::CListBoxNoData::SetItemFocus( int nIndex, bool bFocus )
 		auto pElement = m_pRenderElementItemsRoot->GetElement( nIndex );
 		if ( pElement )
 		{
-			if ( bFocus == true )
-				pElement->SetState( (int)UWidgetState::Focus );
-			else
-				pElement->SetState( (int)UWidgetState::Normal );
+			if ( IsItemEnable( nIndex ) == true )
+			{
+				if ( bFocus == true )
+					pElement->SetState( (int)UWidgetState::Focus );
+				else
+					pElement->SetState( (int)UWidgetState::Normal );
+			}
 		}
 	}
 }
+
+

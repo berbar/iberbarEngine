@@ -8,7 +8,6 @@ iberbar::RHI::D3D9::CVertexBuffer::CVertexBuffer( CDevice* pDevice, uint32 nInSi
 	: IVertexBuffer( nInSize, nUsage )
 	, m_pDevice( pDevice )
 	, m_pD3DVertexBuffer( nullptr )
-	, m_bD3DManaged( false )
 	, m_bLocked( false )
 {
 	m_pDevice->AddRef();
@@ -41,6 +40,7 @@ iberbar::CResult iberbar::RHI::D3D9::CVertexBuffer::Initial()
 	{
 		return MakeResult( ResultCode::Bad, DXGetErrorDescriptionA( hResult ) );
 	}
+	m_bIsLost = false;
 	return CResult();
 }
 
@@ -54,16 +54,17 @@ void iberbar::RHI::D3D9::CVertexBuffer::Destroy()
 
 void iberbar::RHI::D3D9::CVertexBuffer::OnLost()
 {
-	if ( m_bD3DManaged == true )
+	if ( m_bIsManaged == true )
 		return;
 
 	D3D_SAFE_RELEASE( m_pD3DVertexBuffer );
+	m_bIsLost = true;
 }
 
 
 iberbar::CResult iberbar::RHI::D3D9::CVertexBuffer::OnReset()
 {
-	if ( m_bD3DManaged == true )
+	if ( m_bIsManaged == true )
 		return CResult();
 
 	if ( m_pD3DVertexBuffer == nullptr )
@@ -92,7 +93,8 @@ iberbar::CResult iberbar::RHI::D3D9::CVertexBuffer::Lock( uint32 nOffset, uint32
 
 iberbar::CResult iberbar::RHI::D3D9::CVertexBuffer::Unlock()
 {
-	assert( m_bLocked == true );
+	if ( m_bLocked == false )
+		return CResult();
 
 	HRESULT hResult = m_pD3DVertexBuffer->Unlock();
 	if ( FAILED( hResult ) )
@@ -112,7 +114,6 @@ iberbar::RHI::D3D9::CIndexBuffer::CIndexBuffer( CDevice* pDevice, uint32 nInSize
 	: IIndexBuffer( 0, nInSize, nUsage )
 	, m_pDevice( pDevice )
 	, m_pD3DIndexBuffer( nullptr )
-	, m_bD3DManaged( false )
 	, m_bLocked( false )
 {
 	m_pDevice->AddRef();
@@ -139,7 +140,7 @@ iberbar::CResult iberbar::RHI::D3D9::CIndexBuffer::Initial()
 	{
 		return MakeResult( ResultCode::Bad, DXGetErrorDescriptionA( hResult ) );
 	}
-
+	m_bIsLost = false;
 	return CResult();
 }
 
@@ -153,16 +154,17 @@ void iberbar::RHI::D3D9::CIndexBuffer::Destroy()
 
 void iberbar::RHI::D3D9::CIndexBuffer::OnLost()
 {
-	if ( m_bD3DManaged == true )
+	if ( m_bIsManaged == true )
 		return;
 
 	D3D_SAFE_RELEASE( m_pD3DIndexBuffer );
+	m_bIsLost = true;
 }
 
 
 iberbar::CResult iberbar::RHI::D3D9::CIndexBuffer::OnReset()
 {
-	if ( m_bD3DManaged == true )
+	if ( m_bIsManaged == true )
 		return CResult();
 
 	if ( m_pD3DIndexBuffer == nullptr )
@@ -192,6 +194,8 @@ iberbar::CResult iberbar::RHI::D3D9::CIndexBuffer::Lock( uint32 nOffset, uint32 
 iberbar::CResult iberbar::RHI::D3D9::CIndexBuffer::Unlock()
 {
 	assert( m_bLocked == true );
+	if ( m_bLocked == false )
+		return CResult();
 
 	HRESULT hResult = m_pD3DIndexBuffer->Unlock();
 	if ( FAILED( hResult ) )

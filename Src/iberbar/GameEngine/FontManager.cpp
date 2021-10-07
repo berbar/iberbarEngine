@@ -39,6 +39,7 @@ iberbar::CResult iberbar::Game::CFontManager::Initial()
 
 iberbar::CResult iberbar::Game::CFontManager::GetOrCreateFont( Renderer::CFont** ppFont, const UFontDesc& FontDesc, Renderer::UFontCharVocabularyType nVocabularyType )
 {
+	//return MakeResult( ResultCode::Bad, "" );
 	if ( GetFont( ppFont, FontDesc ) == true )
 		return CResult();
 
@@ -75,7 +76,7 @@ iberbar::CResult iberbar::Game::CFontManager::GetOrCreateFont( Renderer::CFont**
 
 bool iberbar::Game::CFontManager::GetFont( Renderer::CFont** ppFont, const UFontDesc& FontDesc )
 {
-	Renderer::CFont* pFontTemp = nullptr;
+ 	Renderer::CFont* pFontTemp = nullptr;
 	const UFontDesc* pFontDescTemp = nullptr;
 
 	for ( size_t i = 0, s = m_FontList.size(); i < s; i++ )

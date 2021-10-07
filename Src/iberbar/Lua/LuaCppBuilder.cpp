@@ -1,52 +1,23 @@
 
 #include <iberbar/Lua/LuaCppBuilder.h>
+#include <iberbar/Lua/StackChecker.h>
+#include <iberbar/Lua/LoggingHelper.h>
 #include <iberbar/lua/LuaCppCommon.h>
 #include <iberbar/Utility/String.h>
 
-using namespace iberbar::LuaCpp;
+using namespace iberbar::Lua;
+using namespace iberbar::Lua;
 
 
 namespace iberbar
 {
-	namespace LuaCpp
+	namespace Lua
 	{
 		// 设置为弱表
 		// k  表示table.key是weak的，也就是table的keys是能够被垃圾收集器自动回收。
 		// v  表示table.value是weak的，也就是table的values能够被垃圾收集器自动回收。
 		// kv 是二者的组合，任何情况下只要key和value中的一个被垃圾收集器自动回收，那么kv键值对就被从表中移除。
 		void CreateWeakTableForInstanceCache( lua_State* pLuaState, int nMetatable, const char* strCacheName, const char* strCacheMode );
-
-		class CScopeGlobal
-			: public CScopeBuilder
-		{
-		public:
-			CScopeGlobal( lua_State* pLuaState );
-
-		public:
-			virtual void AddClass( const char* className, PHowToBuildClass pHowToAddClass, const char* extends = nullptr ) override;
-			virtual void AddEnum( const char* strEnumTypeName, PHowToBuildEnum pHow, int nCount ) override;
-			virtual void AddFunctionOne( const char* functionName, lua_CFunction pFunction ) override;
-			virtual void AddFunctions( const luaL_Reg* pFunctionRegs ) override;
-		};
-
-		class CScopeModule
-			: public CScopeBuilder
-		{
-		public:
-			CScopeModule( lua_State* pLuaState, const char* moduleName );
-
-		public:
-			virtual void AddClass( const char* className, PHowToBuildClass pHowToAddClass, const char* extends = nullptr ) override;
-			virtual void AddEnum( const char* strEnumTypeName, PHowToBuildEnum pHow, int nCount ) override;
-			virtual void AddFunctionOne( const char* functionName, lua_CFunction pFunction ) override;
-			virtual void AddFunctions( const luaL_Reg* pFunctionRegs ) override;
-
-		public:
-			CResult Build( PHowToBuildScope pHowToBuild );
-
-		private:
-			int m_table;
-		};
 
 		class CTableScope
 		{
@@ -77,7 +48,7 @@ namespace iberbar
 
 
 
-void iberbar::LuaCpp::CreateWeakTableForInstanceCache( lua_State* pLuaState, int nMetatable, const char* strCacheName, const char* strCacheMode )
+void iberbar::Lua::CreateWeakTableForInstanceCache( lua_State* pLuaState, int nMetatable, const char* strCacheName, const char* strCacheMode )
 {
 	lua_pushstring( pLuaState, strCacheName );
 	lua_gettable( pLuaState, nMetatable );
@@ -111,330 +82,280 @@ void iberbar::LuaCpp::CreateWeakTableForInstanceCache( lua_State* pLuaState, int
 
 
 
-iberbar::LuaCpp::CScopeBuilder::CScopeBuilder( lua_State* pLuaState, const char* moduleName )
+
+
+iberbar::Lua::CScopeBuilder::CScopeBuilder( lua_State* pLuaState )
 	: m_pLuaState( pLuaState )
-	, m_name( moduleName )
+	, m_name( "" )
+	, m_nLuaModule( 0 )
 {
 }
 
 
-iberbar::LuaCpp::CBuilder::CBuilder( lua_State* pLuaState )
+iberbar::Lua::CScopeBuilder::CScopeBuilder( lua_State* pLuaState, const char* moduleName, int nLuaModule )
 	: m_pLuaState( pLuaState )
+	, m_name( moduleName == nullptr ? "" : moduleName )
+	, m_nLuaModule( nLuaModule )
 {
 }
 
-void iberbar::LuaCpp::CBuilder::ResolveScope( PHowToBuildScope pHowToBuildScope, const char* moduleName )
+
+void iberbar::Lua::CScopeBuilder::AddClass( const char* className, std::function<PHowToBuildClass> pHowToAddClass, const char* extends )
 {
-	if ( moduleName == nullptr )
+	AddClass( className, nullptr, pHowToAddClass, extends );
+}
+
+
+void iberbar::Lua::CScopeBuilder::AddClass( const char* className, const char* strClassNameFull, std::function<PHowToBuildClass> pHowToAddClass, const char* extends )
+{
+	assert( m_pLuaState );
+	assert( className );
+
+	CStackSnapshot StackSS( m_pLuaState );
+
+	lua_State* L = m_pLuaState;
+	int metatable;
+
+	std::string strClassNameFullNew;
+	if ( m_nLuaModule == 0 )
 	{
-		CScopeGlobal scope( m_pLuaState );
-		pHowToBuildScope( &scope );
+		strClassNameFullNew = className;
 	}
 	else
 	{
-		CScopeModule scope( m_pLuaState, moduleName );
-		scope.Build( pHowToBuildScope );
+		if ( strClassNameFull == nullptr )
+		{
+			strClassNameFullNew = m_name;
+			strClassNameFullNew += ".";
+			strClassNameFullNew += className;
+		}
+		else
+		{
+			strClassNameFullNew = strClassNameFull;
+		}
 	}
-}
+	
 
-
-
-iberbar::LuaCpp::CScopeGlobal::CScopeGlobal( lua_State* pLuaState )
-	: CScopeBuilder( pLuaState, "" )
-{
-}
-
-void iberbar::LuaCpp::CScopeGlobal::AddClass( const char* className, PHowToBuildClass pHowToAddClass, const char* extends )
-{
-	assert( m_pLuaState );
-	assert( className );
-
-	lua_State* L = m_pLuaState;
-	int methods;
-	int metatable;
-
-	// 创建method table方法表
-	lua_newtable( L );
-	methods = lua_gettop( L );
-
-	// 创建meta元表
-	// 说明：luaL_newmetatable函数创建一个新表(此表将被用作metatable), 将新表放
-	// 到栈顶并建立表和registry中T::className的联系。
-	luaL_newmetatable( L, className );
+	luaL_newmetatable( L, strClassNameFullNew.c_str() );
 	metatable = lua_gettop( L );
 
-	// store method table in globals so that
-	// scripts can add functions written in Lua.
-	// 将method table拷贝压入栈顶，然后设置到全局索引中，名称为T::className
-	lua_pushvalue( L, methods );
-
-	// set函数的功能：如果set(A,B,C),
-	// 那么，将当前栈顶的元素作为值,C作为key，添加到索引为B的表中.
-	// 当B为负数时，-1，-2，被值、key占用，-3是压入值之前的元素......
-	// 所以这行代码读作：在LUA_GLOBALSINDEX表中添加T::className为key的值。
-	//                   值就是那个栈顶元素。
-	// =========调用set后，栈回到压入值之前的状态，因为lua_settable弹出值和key。======
-	//set( L, LUA_GLOBALSINDEX, m_strClassName.c_str() );
-	lua_setglobal( L, className );
-
-	// hide metatable from Lua getmetatable()
-	// 设置meta table的__metatable域
-	lua_pushvalue( L, methods );
-	SetTable( L, metatable, "__metatable" );
+	if ( m_nLuaModule == 0 )
+	{
+		lua_setglobal( L, className );
+	}
+	else
+	{
+		// 将metatable放入模块的table中
+		lua_pushstring( L, className );
+		lua_pushvalue( L, metatable );
+		lua_settable( L, m_nLuaModule );
+	}
 
 	// 创建弱表缓存，v模式
 	CreateWeakTableForInstanceCache( L, metatable, uWeakTable_ForUserData, "v" );
 
-	//
 	// 继承父类
 	if ( StringIsNullOrEmpty( extends ) == false )
 	{
-		lua_pushvalue( L, methods );
-		luaL_getmetatable( L, extends );  // lookup metatable in Lua registry
-		//if ( lua_isnil( L, -1 ) )
-		//{
-		//	luaL_error( L, "%s missing metatable", classFullName );
-		//}
-		lua_setmetatable( L, -2 );
-		lua_pop( L, 1 );
+		lua_pushvalue( m_pLuaState, metatable );
+		luaL_getmetatable( m_pLuaState, extends );  // lookup metatable in Lua registry
+		if ( lua_isnil( L, -1 ) )
+		{
+			luaL_error( L, "can't extends because %s is missing", strClassNameFullNew.c_str() );
+		}
+
+		lua_pushstring( m_pLuaState, "__tostring" );
+		lua_gettable( m_pLuaState, -2 );
+		if ( !lua_isnil( m_pLuaState, -1 ) && lua_iscfunction( m_pLuaState, -1 ) )
+		{
+			lua_pushstring( m_pLuaState, "__tostring" );
+			lua_rotate( m_pLuaState, -2, 1 );
+			lua_settable( m_pLuaState, metatable );
+		}
+		else
+		{
+			lua_pop( m_pLuaState, 1 );
+		}
+		
+		lua_setmetatable( m_pLuaState, -2 );
+		lua_pop( m_pLuaState, 1 );
 	}
 
-	// 设置meta table的__index域
-	// 说明：__index域可以是一个函数，也可以是一个表
-	// 当它是一个函数的时候，Lua将table和缺少的域作为
-	// 参数调用这个函数；当它是一个表的时候，Lua将在这
-	// 个表中看是否有缺少的域。
-	lua_pushvalue( L, methods );
-	SetTable( L, metatable, "__index" );
+	// 设置metatable的__index域
+	lua_pushstring( m_pLuaState, "__index" );
+	lua_pushvalue( m_pLuaState, metatable );
+	lua_settable( L, metatable );
 
-	// 反射Class的模块名和类名
-	lua_pushstring( L, className );
-	SetTable( L, methods, uClassReflection_ClassName );
-	lua_pushstring( L, "" );
-	SetTable( L, methods, uClassReflection_ModuleName );
-	lua_pushstring( L, className );
-	SetTable( L, methods, uClassReflection_FullName );
+	// 设置Class的类名
+	lua_pushstring( m_pLuaState, uClassReflection_FullName );
+	lua_pushstring( L, strClassNameFullNew.c_str() );
+	lua_settable( m_pLuaState, metatable );
+
+	// 设置Cpp类型
+	lua_pushstring( m_pLuaState, uClassReflection_CType );
 	lua_pushinteger( L, (lua_Integer)UClassReflectionCType::Cpp );
-	SetTable( L, methods, uClassReflection_CType );
+	lua_settable( m_pLuaState, metatable );
 
 	// 构建class
-	CClassBuilder classBuilder( m_pLuaState, className, className, metatable, methods );
+	CClassBuilder classBuilder( m_pLuaState, strClassNameFullNew.c_str(), extends, metatable );
 	pHowToAddClass( nullptr, &classBuilder );
 
-	// 弹出 metatable and method 两个table
-	lua_pop( L, 2 );
+	// 弹出 metatable 两个table
+	lua_pop( L, 1 );
+
+	iberbar_Lua_StackSnapshot_DiffError_Format( StackSS, 0, "when register class<%s>", strClassNameFullNew.c_str() );
 }
 
 
-void iberbar::LuaCpp::CScopeGlobal::AddEnum( const char* strName, PHowToBuildEnum pHow, int nCount )
+void iberbar::Lua::CScopeBuilder::AddClass( const UClassDefinition& Definition )
+{
+	AddClass( Definition.classname, Definition.classnamefull, [&Definition]( const char*, CClassBuilder* pClass )
+		{
+			int nTestMethodCount = 0;
+			while ( true )
+			{
+				if ( Definition.__methods[nTestMethodCount].name == nullptr || Definition.__methods[nTestMethodCount].func == nullptr )
+					break;
+				if ( nTestMethodCount >= 100 )
+				{
+					assert( "too many method to register, just less than 100" );
+				}
+				pClass->AddMemberMethod( Definition.__methods[nTestMethodCount].name, Definition.__methods[nTestMethodCount].func );
+				nTestMethodCount++;
+			}
+			//pClass->AddStandardMethod( "__tostring", Definition.__tostring );
+			//pClass->AddStandardMethod( "__add", Definition.__add );
+			//pClass->AddStandardMethod( "__sub", Definition.__sub );
+			//pClass->AddStandardMethod( "__mul", Definition.__mul );
+			//pClass->AddStandardMethod( "__div", Definition.__div );
+			//pClass->AddStandardMethod( "__mod", Definition.__mod );
+			//pClass->AddStandardMethod( "__unm", Definition.__unm );
+			//pClass->AddStandardMethod( "__concat", Definition.__concat );
+			//pClass->AddStandardMethod( "__eq", Definition.__eq );
+			//pClass->AddStandardMethod( "__lt", Definition.__lt );
+			//pClass->AddStandardMethod( "__le", Definition.__le );
+			if ( Definition.__constructor )
+				pClass->AddConstructor( Definition.__constructor );
+			if ( Definition.__distructor )
+				pClass->AddDistructor( Definition.__distructor );
+		}, Definition.classname_extends );
+}
+
+
+void iberbar::Lua::CScopeBuilder::AddEnum( const char* strName, PHowToBuildEnum pHow, int nCount )
 {
 	CEnumBuilder EnumBuilder( m_pLuaState, nCount );
 	pHow( &EnumBuilder );
-	lua_setglobal( m_pLuaState, strName );
-}
-
-
-void iberbar::LuaCpp::CScopeGlobal::AddFunctionOne( const char* functionName, lua_CFunction pFunction )
-{
-	lua_register( m_pLuaState, functionName, pFunction );
-}
-
-void iberbar::LuaCpp::CScopeGlobal::AddFunctions( const luaL_Reg* pFunctionRegs )
-{
-	const luaL_Reg* pNode = pFunctionRegs;
-	while ( pNode->name != nullptr )
+	if ( m_nLuaModule == 0 )
 	{
-		lua_register( m_pLuaState, pNode->name, pNode->func );
-		pNode ++;
+		lua_setglobal( m_pLuaState, strName );
+	}
+	else
+	{
+		lua_pushstring( m_pLuaState, strName );
+		lua_rotate( m_pLuaState, -2, 1 );
+		lua_settable( m_pLuaState, m_nLuaModule );
 	}
 }
 
 
-
-iberbar::LuaCpp::CScopeModule::CScopeModule( lua_State* pLuaState, const char* moduleName )
-	: CScopeBuilder( pLuaState, moduleName )
-	, m_table( 0 )
+void iberbar::Lua::CScopeBuilder::AddFunctionOne( const char* strName, lua_CFunction pFunction )
 {
-}
-
-void iberbar::LuaCpp::CScopeModule::AddClass( const char* className, PHowToBuildClass pHowToAddClass, const char* extends )
-{
-	assert( m_pLuaState );
-	assert( className );
-
-	lua_State* L = m_pLuaState;
-	int methods;
-	int metatable;
-
-	// 创建method table方法表
-	lua_newtable( L );
-	methods = lua_gettop( L );
-
-	std::string classNameFull = m_name + "." + className;
-
-	// 创建meta元表
-	// 说明：luaL_newmetatable函数创建一个新表(此表将被用作metatable), 将新表放
-	// 到栈顶并建立表和registry中T::className的联系。
-	luaL_newmetatable( L, classNameFull.c_str() );
-	metatable = lua_gettop( L );
-
-	// 将methods放入模块的table中
-	lua_pushstring( L, className );
-	lua_pushvalue( L, metatable );
-	lua_settable( L, m_table );
-
-	// hide metatable from Lua getmetatable()
-	// 设置meta table的__metatable域
-	//lua_pushvalue( L, methods );
-	//SetTable( L, metatable, "__metatable" );
-
-	// 创建弱表缓存，v模式
-	CreateWeakTableForInstanceCache( L, metatable, uWeakTable_ForUserData, "v" );
-
-	
-	//
-	// 继承父类
-	if ( StringIsNullOrEmpty( extends ) == false )
+	if ( m_nLuaModule == 0 )
 	{
-		lua_pushvalue( L, metatable );
-		luaL_getmetatable( L, extends );  // lookup metatable in Lua registry
-		//if ( lua_isnil( L, -1 ) )
-		//{
-		//	luaL_error( L, "%s missing metatable", classFullName );
-		//}
-		lua_setmetatable( L, -2 );
-		lua_pop( L, 1 );
+		lua_register( m_pLuaState, strName, pFunction );
 	}
-
-	// 设置meta table的__index域
-	// 说明：__index域可以是一个函数，也可以是一个表
-	// 当它是一个函数的时候，Lua将table和缺少的域作为
-	// 参数调用这个函数；当它是一个表的时候，Lua将在这
-	// 个表中看是否有缺少的域。
-	lua_pushvalue( L, metatable );
-	SetTable( L, metatable, "__index" );
-
-	// 反射Class的模块名和类名
-	lua_pushstring( L, className );
-	SetTable( L, metatable, uClassReflection_ClassName );
-	lua_pushstring( L, m_name.c_str() );
-	SetTable( L, metatable, uClassReflection_ModuleName );
-	lua_pushstring( L, classNameFull.c_str() );
-	SetTable( L, metatable, uClassReflection_FullName );
-	lua_pushinteger( L, (lua_Integer)UClassReflectionCType::Cpp );
-	SetTable( L, metatable, uClassReflection_CType );
-
-	// 构建class
-	CClassBuilder classBuilder( m_pLuaState, classNameFull.c_str(), className, metatable, metatable );
-	pHowToAddClass( m_name.c_str(), &classBuilder );
-
-	// 弹出 metatable and method 两个table
-	lua_pop( L, 2 );
-}
-
-
-void iberbar::LuaCpp::CScopeModule::AddEnum( const char* strName, PHowToBuildEnum pHow, int nCount )
-{
-	lua_pushstring( m_pLuaState, strName );
-	CEnumBuilder EnumBuilder( m_pLuaState, nCount );
-	pHow( &EnumBuilder );
-	lua_rawset( m_pLuaState, m_table );
-}
-
-
-void iberbar::LuaCpp::CScopeModule::AddFunctionOne( const char* functionName, lua_CFunction pFunction )
-{
-	lua_pushstring( m_pLuaState, functionName );
-	lua_pushcclosure( m_pLuaState, pFunction, 0 );
-	lua_settable( m_pLuaState, m_table );
-}
-
-void iberbar::LuaCpp::CScopeModule::AddFunctions( const luaL_Reg* pFunctionRegs )
-{
-	const luaL_Reg* pNode = pFunctionRegs;
-	while ( pNode->name != nullptr )
+	else
 	{
-		lua_pushstring( m_pLuaState, pNode->name );
-		lua_pushcclosure( m_pLuaState, pNode->func, 0 );
-		lua_settable( m_pLuaState, m_table );
-		pNode++;
+		lua_pushstring( m_pLuaState, strName );
+		lua_pushcclosure( m_pLuaState, pFunction, 0 );
+		lua_settable( m_pLuaState, m_nLuaModule );
 	}
 }
 
-iberbar::CResult iberbar::LuaCpp::CScopeModule::Build( PHowToBuildScope pHowToBuildScope )
+void iberbar::Lua::CScopeBuilder::AddFunctions( const luaL_Reg* pFunctionRegs )
 {
-	std::vector<std::string> namespaces;
-	static const int s_maxNamespaceLength = 127;
-	char name[s_maxNamespaceLength + 1];
-	int n = 0;
-	const char* ptr_iter = m_name.c_str();
-	const char* ptr_last = m_name.c_str();
-	while ( true )
+	if ( m_nLuaModule == 0 )
 	{
-		if ( ptr_iter[0] == '.' )
+		const luaL_Reg* pNode = pFunctionRegs;
+		while ( pNode->name != nullptr )
 		{
-			if ( n == 0 )
-				return MakeResult( ResultCode::Bad, "unexpect namesapce<%s>", m_name.c_str() );
-
-			if ( n > s_maxNamespaceLength )
-				return MakeResult( ResultCode::Bad, "namesapce<%s> is too long, must be %d", m_name.c_str(), s_maxNamespaceLength );
-
-			memcpy_s( name, s_maxNamespaceLength, ptr_last, n );
-			name[n] = 0;
-
-			namespaces.push_back( name );
-
-			n = 0;
-			ptr_last = ptr_iter + 1;
+			lua_register( m_pLuaState, pNode->name, pNode->func );
+			pNode++;
 		}
-		else if ( ptr_iter[0] == 0 )
-		{
-			if ( n == 0 )
-				return MakeResult( ResultCode::Bad, "unexpect namesapce<%s>", m_name.c_str() );
-
-			if ( n > s_maxNamespaceLength )
-				return MakeResult( ResultCode::Bad, "namesapce<%s> is too long, must be %d", m_name.c_str(), s_maxNamespaceLength );
-
-			memcpy_s( name, s_maxNamespaceLength, ptr_last, n );
-			name[n] = 0;
-			namespaces.push_back( name );
-
-			break;
-		}
-		ptr_iter++;
-		n++;
 	}
-
-	int top = lua_gettop( m_pLuaState );
-	CTableScope tableScope( m_pLuaState );
-	auto namespaceIter = namespaces.begin();
-	auto namespaceEnd = namespaces.end();
-	for ( ; namespaceIter != namespaceEnd; namespaceIter++ )
+	else
 	{
-		tableScope.Next( namespaceIter->c_str() );
+		const luaL_Reg* pNode = pFunctionRegs;
+		while ( pNode->name != nullptr )
+		{
+			lua_pushstring( m_pLuaState, pNode->name );
+			lua_pushcclosure( m_pLuaState, pNode->func, 0 );
+			lua_settable( m_pLuaState, m_nLuaModule );
+			pNode++;
+		}
 	}
-	m_table = tableScope.Table();
-	top = lua_gettop( m_pLuaState );
-
-	pHowToBuildScope( this );
-
-	top = lua_gettop( m_pLuaState );
-
-	tableScope.Pop();
-	top = lua_gettop( m_pLuaState );
-
-	return CResult();
 }
 
 
-iberbar::LuaCpp::CTableScope::CTableScope( lua_State* pLuaState )
+
+
+
+
+
+
+
+
+
+iberbar::Lua::CBuilder::CBuilder( lua_State* pLuaState )
+	: m_pLuaState( pLuaState )
+{
+}
+
+void iberbar::Lua::CBuilder::ResolveScope( PHowToBuildScope pHowToBuildScope, const char* moduleName )
+{
+	if ( StringIsNullOrEmpty( moduleName ) == true )
+	{
+		CScopeBuilder Scope( m_pLuaState );
+		pHowToBuildScope( &Scope );
+	}
+	else
+	{
+		CStringEasySplitHelper<char, 128, 8 > SpiltHelper;
+		int nSpiltCount = SpiltHelper.Split( moduleName, '.' );
+		CTableScope TableScope( m_pLuaState );
+		for ( int i = 0; i < nSpiltCount; i++ )
+		{
+			if ( SpiltHelper[i][0] == 0 )
+			{
+				luaL_error( m_pLuaState, "error namespace<%s>", moduleName );
+				return;
+			}
+			TableScope.Next( SpiltHelper[i] );
+		}
+		CScopeBuilder ScopeBuilder( m_pLuaState, moduleName, TableScope.Table() );
+		pHowToBuildScope( &ScopeBuilder );
+		TableScope.Pop();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+iberbar::Lua::CTableScope::CTableScope( lua_State* pLuaState )
 	: m_pLuaState( pLuaState )
 	, m_table( 0 )
 	, m_depth( 0 )
 {
 }
 
-iberbar::CResult iberbar::LuaCpp::CTableScope::Next( const char* name )
+iberbar::CResult iberbar::Lua::CTableScope::Next( const char* name )
 {
 	if ( m_depth == 0 )
 	{
@@ -485,7 +406,7 @@ iberbar::CResult iberbar::LuaCpp::CTableScope::Next( const char* name )
 	return CResult();
 }
 
-void iberbar::LuaCpp::CTableScope::Pop()
+void iberbar::Lua::CTableScope::Pop()
 {
 	if ( m_depth > 0 )
 	{
@@ -497,16 +418,20 @@ void iberbar::LuaCpp::CTableScope::Pop()
 
 
 
-iberbar::LuaCpp::CClassBuilder::CClassBuilder( lua_State* pLuaState, const char* classNameFull, const char* className, int metatable, int methods )
+iberbar::Lua::CClassBuilder::CClassBuilder(
+	lua_State* pLuaState,
+	const char* classNameFull,
+	const char* strClassName_Extends,
+	int metatable )
 	: m_pLuaState( pLuaState )
 	, m_classNameFull( classNameFull )
-	, m_className( className )
+	, m_strClassName_Extends( strClassName_Extends == nullptr ? "" : strClassName_Extends )
 	, m_metatable( metatable )
-	, m_methods( methods )
+	, m_methods( metatable )
 {
 }
 
-CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddConstructor( lua_CFunction func )
+CClassBuilder* iberbar::Lua::CClassBuilder::AddConstructor( lua_CFunction func )
 {
 	//lua_State* L = m_pLuaState;
 
@@ -527,14 +452,14 @@ CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddConstructor( lua_CFunction fun
 	return this;
 }
 
-CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddDistructor( lua_CFunction func )
+CClassBuilder* iberbar::Lua::CClassBuilder::AddDistructor( lua_CFunction func )
 {
 	AddStandardMethod( "__gc", func );
 
 	return this;
 }
 
-CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddMemberMethod( const char* name, lua_CFunction func, UpValue* upvalues, int upvaluesCount )
+CClassBuilder* iberbar::Lua::CClassBuilder::AddMemberMethod( const char* name, lua_CFunction func, UpValue* upvalues, int upvaluesCount )
 {
 	assert( upvaluesCount >= 0 );
 
@@ -582,21 +507,48 @@ CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddMemberMethod( const char* name
 	return this;
 }
 
-CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddStaticMethod( const char* name, lua_CFunction func )
+CClassBuilder* iberbar::Lua::CClassBuilder::AddStaticMethod( const char* name, lua_CFunction func )
 {
 	lua_pushstring( m_pLuaState, name );
-	lua_pushstring( m_pLuaState, m_classNameFull.c_str() );
-	lua_pushcclosure( m_pLuaState, func, 1 );
+	//lua_pushstring( m_pLuaState, m_classNameFull.c_str() );
+	//lua_pushcclosure( m_pLuaState, func, 1 );
+	lua_pushcclosure( m_pLuaState, func, 0 );
 	lua_settable( m_pLuaState, m_methods );
 	//SetTable( m_pLuaState, m_metatable, name );
 
 	return this;
 }
 
-CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddStandardMethod( const char* name, lua_CFunction func )
+CClassBuilder* iberbar::Lua::CClassBuilder::AddStandardMethod( const char* name, lua_CFunction func )
 {
+	if ( StringIsNullOrEmpty( name ) || func == nullptr )
+		return this;
+
 	lua_pushcfunction( m_pLuaState, func );
 	SetTable( m_pLuaState, m_metatable, name );
+
+	//if ( func == nullptr )
+	//{
+	//	luaL_getmetatable( m_pLuaState, m_strClassName_Extends.c_str() );
+	//	if ( !lua_isnil( m_pLuaState, -1 ) )
+	//	{
+	//		lua_pushstring( m_pLuaState, name );
+	//		lua_gettable( m_pLuaState, -2 );
+	//		if ( !lua_isnil( m_pLuaState, -1 ) && lua_isfunction( m_pLuaState, -1 ) )
+	//		{
+	//			SetTable( m_pLuaState, m_metatable, name );
+	//		}
+	//		else
+	//		{
+	//			lua_pop( m_pLuaState, 1 );
+	//		}
+	//	}
+	//	lua_pop( m_pLuaState, 1 );
+	//}
+	//else
+	//{
+
+	//}
 
 	return this;
 }
@@ -608,7 +560,7 @@ CClassBuilder* iberbar::LuaCpp::CClassBuilder::AddStandardMethod( const char* na
 
 
 
-iberbar::LuaCpp::CEnumBuilder::CEnumBuilder( lua_State* pLuaState, int nValueCount )
+iberbar::Lua::CEnumBuilder::CEnumBuilder( lua_State* pLuaState, int nValueCount )
 	: m_pLuaState( pLuaState )
 	, m_nTable( 0 )
 {
@@ -617,7 +569,7 @@ iberbar::LuaCpp::CEnumBuilder::CEnumBuilder( lua_State* pLuaState, int nValueCou
 }
 
 
-void iberbar::LuaCpp::CEnumBuilder::AddValueInt( const char* strKey, lua_Integer Value )
+void iberbar::Lua::CEnumBuilder::AddValueInt( const char* strKey, lua_Integer Value )
 {
 	lua_pushstring( m_pLuaState, strKey );
 	lua_pushinteger( m_pLuaState, Value );
@@ -625,7 +577,7 @@ void iberbar::LuaCpp::CEnumBuilder::AddValueInt( const char* strKey, lua_Integer
 }
 
 
-void iberbar::LuaCpp::CEnumBuilder::AddValueString( const char* strKey, const char* Value )
+void iberbar::Lua::CEnumBuilder::AddValueString( const char* strKey, const char* Value )
 {
 	lua_pushstring( m_pLuaState, strKey );
 	lua_pushstring( m_pLuaState, Value );

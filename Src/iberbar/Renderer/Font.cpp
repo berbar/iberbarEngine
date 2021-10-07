@@ -40,7 +40,6 @@ namespace iberbar
 			int m_nCharH;
 			int m_nTextureOffsetX;
 			int m_nTextureOffsetY;
-			float m_nFix;
 			RHI::IDevice* m_pDevice;
 			std::vector< RHI::ITexture* > m_pTextures;
 
@@ -56,14 +55,13 @@ iberbar::Renderer::CFontTextureCache::CFontTextureCache( RHI::IDevice* pDevice, 
 	: m_nCharH( nCharHeight )
 	, m_nTextureOffsetX( 0 )
 	, m_nTextureOffsetY( 0 )
-	, m_nFix( 0.0f )
 	, m_pDevice( pDevice )
 	, m_pTextures()
 {
 	m_pDevice->AddRef();
 	if ( m_pDevice->GetApiType() == RHI::UApiType::D3D9 )
 	{
-		m_nFix = 0.5f;
+		//m_nFix = 0.5f;
 	}
 }
 
@@ -108,10 +106,10 @@ void iberbar::Renderer::CFontTextureCache::AllocRect( int nBitmapWidth, int nBit
 
 	(*pOutTextureIndex) = nTextureIndex;
 	(*pOutTextureCoord) = CRect2f(
-		(float)nOffsetX + m_nFix,
-		(float)nOffsetY + m_nFix,
-		(float)(nOffsetX + nBitmapWidth) + m_nFix,
-		(float)(nOffsetY + nBitmapHeight) + m_nFix );
+		(float)nOffsetX,
+		(float)nOffsetY,
+		(float)(nOffsetX + nBitmapWidth),
+		(float)(nOffsetY + nBitmapHeight) );
 	(*pOutTextureCoord) = (*pOutTextureCoord) / (float)sm_nTextureMaxSize;
 
 	m_nTextureOffsetX = nOffsetX + nBitmapWidth;
@@ -255,7 +253,7 @@ iberbar::RHI::ITexture* iberbar::Renderer::CFont::GetTexture( int nIndex )
 
 bool iberbar::Renderer::CFont::AddCharBitmap( wchar_t nChar )
 {
-	int nTextureIndex = -1;
+	int nTextureIndex = UFontCharBitmap::sTextureIndex_UnInitialized;
 	CRect2f rcTextureCoord;
 	CResult ret;
 	UFontCharBitmapDesc BitmapDesc;
@@ -263,12 +261,21 @@ bool iberbar::Renderer::CFont::AddCharBitmap( wchar_t nChar )
 	ret = m_pFace->CreateCharBitmap( nChar, &BitmapDesc, UFontBitsFormat::ARGB );
 	if ( ret.IsOK() == true )
 	{
-		// ·ÖÅä×Ö·û
-		m_pTextureCache->AllocRect( BitmapDesc.nBmpWidth, BitmapDesc.nBmpHeight, BitmapDesc.pBitsFill, &nTextureIndex, &rcTextureCoord );
+		if ( BitmapDesc.nBmpWidth > 0 && BitmapDesc.nBmpHeight > 0 && BitmapDesc.pBitsFill != nullptr )
+		{
+			// ·ÖÅä×Ö·û
+			m_pTextureCache->AllocRect( BitmapDesc.nBmpWidth, BitmapDesc.nBmpHeight, BitmapDesc.pBitsFill, &nTextureIndex, &rcTextureCoord );
+		}
+		else
+		{
+			nTextureIndex = UFontCharBitmap::sTextureIndex_JustNoTexture;
+		}
 
 		UFontCharBitmap Bitmap;
 		Bitmap.nChar = nChar;
 		Bitmap.nCharWidth = BitmapDesc.nCharWidth;
+		Bitmap.nDeltaX = BitmapDesc.nDeltaX;
+		Bitmap.nDeltaY = BitmapDesc.nDeltaY;
 		Bitmap.nTextureIndex = nTextureIndex;
 		Bitmap.TextureSize = CSize2i( BitmapDesc.nBmpWidth, BitmapDesc.nBmpHeight );
 		Bitmap.rcTexCoord = rcTextureCoord;

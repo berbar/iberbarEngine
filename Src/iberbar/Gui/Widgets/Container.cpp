@@ -1,11 +1,14 @@
 
 
 #include <iberbar/Gui/Widgets/Container.h>
+#include <iberbar/Gui/Engine.h>
 #include <iberbar/Utility/Input.h>
+#include <iberbar/Utility/String.h>
 
 
 
 iberbar::Gui::CContainer::CContainer()
+	: m_Widgets()
 {
 	m_bCanFocus = false;
 }
@@ -13,8 +16,15 @@ iberbar::Gui::CContainer::CContainer()
 
 iberbar::Gui::CContainer::CContainer( const CContainer& container )
 	: CWidget( container )
+	, m_Widgets()
 {
 	m_bCanFocus = false;
+}
+
+
+iberbar::Gui::CContainer::~CContainer()
+{
+	RemoveWidgetsAll();
 }
 
 
@@ -24,130 +34,116 @@ iberbar::Gui::CContainer* iberbar::Gui::CContainer::Clone() const
 }
 
 
-iberbar::Gui::UHandleMessageResult iberbar::Gui::CContainer::HandleMouse( const UMouseEventData* EventData )
+void iberbar::Gui::CContainer::SetDialog( CDialog* pDialog )
 {
-	if ( IsVisible() == false ||
-		IsEnable() == false )
-		return UHandleMessageResult::Ignore;
+	CWidget::SetDialog( pDialog );
 
-	//--------------------------------------
-	// handle child widgets
-	//--------------------------------------
-	if ( GetLastChild() == nullptr )
-		return UHandleMessageResult::Ignore;
-
-	// 2. Handle Mouse Message
-	if ( m_bMouseInput == false )
-		return UHandleMessageResult::Ignore;
-
-	// 1. Handle focus control first
-	if ( sGetFocus() != NULL &&
-		sGetFocus()->IsEnable() &&
-		sGetFocus()->IsVisible() &&
-		sGetFocus()->GetParent() == this )
+	for ( CWidget* pWidget : m_Widgets )
 	{
-		if ( sGetFocus()->HandleMouse( EventData ) == UHandleMessageResult::Succeed )
-			return UHandleMessageResult::Succeed;
+		pWidget->SetDialog( pDialog );
 	}
-
-	//  hit test
-	CWidget* lc_pWidget = GetActiveWidgetAtPoint( EventData->MousePoint );
-	if ( lc_pWidget )
-	{
-		if ( lc_pWidget->HandleMouse( EventData ) == UHandleMessageResult::Succeed )
-			return UHandleMessageResult::Succeed;
-	}
-	else
-	{
-		// Mouse not over any controls in this dialog, if there was a control
-		// which had focus it just lost it
-		if ( EventData->nMouseEvent == UMouseEvent::LDown )
-		{
-			if ( sGetFocus() != NULL &&
-				sGetFocus()->GetParent() == this )
-			{
-				sClearFocus();
-			}
-		}
-	}
-
-
-	if ( EventData->nMouseEvent == UMouseEvent::Move )
-	{
-		// If the mouse is still over the same control, nothing needs to be done
-		if ( lc_pWidget != m_pWidgetMouseOver )
-		{
-			// Handle mouse leaving the old control
-			if ( m_pWidgetMouseOver )
-				m_pWidgetMouseOver->OnMouseLeave();
-
-			// Handle mouse entering the new control
-			m_pWidgetMouseOver = lc_pWidget;
-			if ( lc_pWidget != NULL )
-				m_pWidgetMouseOver->OnMouseEnter();
-		}
-	}
-
-	return UHandleMessageResult::Ignore;
 }
 
 
-//
-//void iberbar::Gui::CContainer::Refresh()
-//{
-//	CWidget::Refresh();
-//
-//	CWidget* pWidget = GetFirstChild();
-//	while ( pWidget != nullptr )
-//	{
-//		pWidget->Refresh();
-//		pWidget = pWidget->GetNextBrother();
-//	}
-//}
-//
-//
-//void iberbar::Gui::CContainer::Update( float nElapsedTime )
-//{
-//	CWidget* pWidget = GetFirstChild();
-//	while ( pWidget != nullptr )
-//	{
-//		pWidget->Update( nElapsedTime );
-//		pWidget = pWidget->GetNextBrother();
-//	}
-//}
-//
-//
-//void iberbar::Gui::CContainer::Render()
-//{
-//	if ( m_bNeedClip == true )
-//	{
-//		m_pEngine->GetViewportState()->AddViewport( m_pTransform->GetBounding() );
-//	}
-//
-//	CWidget* pWidget = GetFirstChild();
-//	while ( pWidget != nullptr )
-//	{
-//		pWidget->Render();
-//		pWidget = pWidget->GetNextBrother();
-//	}
-//}
-
-
-iberbar::Gui::CWidget* iberbar::Gui::CContainer::GetActiveWidgetAtPoint( const CPoint2i& point )
+void iberbar::Gui::CContainer::AddWidget( CWidget* pWidget )
 {
-	CWidget* lc_pTemp = GetLastChild();
-	while ( lc_pTemp )
-	{
-		if ( lc_pTemp->IsEnable() == true &&
-			lc_pTemp->IsVisible() == true &&
-			//lc_pTemp->GetCanFocus() == true &&
-			lc_pTemp->HitTest( point ) == true )
-		{
-			return lc_pTemp;
-		}
+	if ( pWidget == nullptr )
+		return;
 
-		lc_pTemp = lc_pTemp->GetPrevBrother();
+	if ( pWidget->GetDialog() != nullptr )
+		return;
+
+	for ( auto& pWidgetTemp : m_Widgets )
+	{
+		if ( pWidgetTemp == pWidget )
+			return;
+	}
+
+	m_Widgets.push_back( pWidget );
+	pWidget->SetWidgetParent( this );
+	pWidget->AddRef();
+}
+
+
+iberbar::Gui::CWidget* iberbar::Gui::CContainer::FindWidget( const char* strId )
+{
+	if ( StringIsNullOrEmpty( strId ) == true )
+		return nullptr;
+
+	for ( auto& pWidget : m_Widgets )
+	{
+		if ( strcmp( pWidget->GetId().c_str(), strId ) == 0 )
+			return pWidget;
 	}
 
 	return nullptr;
 }
+
+
+void iberbar::Gui::CContainer::RemoveWidget( CWidget* pWidget )
+{
+	if ( pWidget == nullptr )
+		return;
+
+	auto iter = m_Widgets.begin();
+	auto end = m_Widgets.end();
+	for ( ; iter != end; iter++ )
+	{
+		if ( ( *iter ) == pWidget )
+		{
+			if ( CEngine::sGetInstance()->GetFocus() == pWidget )
+			{
+				CEngine::sGetInstance()->ClearFocus( true );
+			}
+
+			pWidget->SetWidgetParent( nullptr );
+			pWidget->Release();
+
+			m_Widgets.erase( iter );
+
+			return;
+		}
+	}
+}
+
+
+void iberbar::Gui::CContainer::RemoveWidgetsAll()
+{
+	if ( m_Widgets.empty() == false )
+	{
+		auto iter = m_Widgets.begin();
+		auto end = m_Widgets.end();
+		for ( ; iter != end; iter++ )
+		{
+			if ( ( *iter ) == CEngine::sGetInstance()->GetFocus() )
+			{
+				CEngine::sGetInstance()->ClearFocus( false );
+			}
+
+			( *iter )->SetWidgetParent( nullptr );
+			( *iter )->Release();
+			( *iter ) = nullptr;
+		}
+		m_Widgets.clear();
+	}
+}
+
+
+void iberbar::Gui::CContainer::ForeachWidgets( std::function<void( CWidget* )> Func, int nDepth )
+{
+	if ( m_Widgets.empty() )
+		return;
+
+	if ( nDepth == 0 )
+		return;
+
+	for ( CWidget* pWidget : m_Widgets )
+	{
+		Func( pWidget );
+		if ( pWidget->IsContainer() )
+		{
+			( (CContainer*)pWidget )->ForeachWidgets( Func, nDepth - 1 );
+		}
+	}
+}
+

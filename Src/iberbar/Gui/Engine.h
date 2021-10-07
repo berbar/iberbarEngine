@@ -18,6 +18,9 @@ namespace iberbar
 		class CRenderer2d;
 		class CRendererSprite;
 		class CRenderCommand;
+		class CRenderCallbackCommand;
+		class CRenderGroupCommandManager;
+		class CRenderGroupCommand;
 	}
 
 	namespace Gui
@@ -56,17 +59,17 @@ namespace iberbar
 			void HandleKeyboard( const UKeyboardEventData* pEventData );
 
 		private:
-			// 更新窗口的ZOrder排序
-			void UpdateZOrder();
-
-		private:
 			Renderer::CRenderer2d* m_pRenderer;
 			Renderer::CRendererSprite* m_pSprite;
+			Renderer::CRenderGroupCommandManager* m_pRenderGroupCommandManager;
+			Renderer::CRenderCallbackCommand* m_pRenderCommand_Callback;
 			CCommandQueue* m_pCommandQueue;
 			bool m_bMemoryResAuto;
 			std::pmr::memory_resource* m_pMemoryRes;
 			CWidget* m_pWidgetFocus;
 			std::list<CDialog*> m_Dialogs;
+			std::vector<Renderer::CRenderGroupCommand*> m_RenderGroupCommandList;
+			
 			CViewportState m_ViewportState;
 			
 			

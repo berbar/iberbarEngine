@@ -71,7 +71,7 @@ void iberbar::Gui::CElementStateTexture::Init()
 {
 	CRenderElement::Init();
 
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Pixel, Renderer::s_strShaderVarName_UseTexture, true );
+	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetBool( Renderer::s_strShaderVarName_UseTexture, true );
 }
 
 
@@ -98,7 +98,9 @@ void iberbar::Gui::CElementStateTexture::Render()
 {
 	if ( GetVisible() == false )
 		return;
-	if ( m_pShaderState == nullptr || m_pShaderVariableTable == nullptr )
+	if ( m_pShaderState == nullptr ||
+		m_pShaderVariableTables.GetVariableTableForVertexShader() == nullptr ||
+		m_pShaderVariableTables.GetVariableTableForPixelShader() == nullptr )
 		return;
 
 	int nIndex = m_nState;
@@ -117,7 +119,8 @@ void iberbar::Gui::CElementStateTexture::Render()
 	if ( rectDst.IsEmpty() == true )
 		return;
 
-	m_pShaderVariableTable->SetSampler( Renderer::s_strShaderVarName_TextureSampler, m_ppTextures[ nIndex ], RHI::UTextureSamplerState() );
+	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetTexture( Renderer::s_strShaderVarName_Texture, m_ppTextures[ nIndex ] );
+	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetSamplerState( Renderer::s_strShaderVarName_TextureSampler, RHI::UTextureSamplerState() );
 
 	CEngine::sGetInstance()->GetRendererSprite()->DrawRectRhwEx(
 		m_nZOrder,
@@ -125,7 +128,8 @@ void iberbar::Gui::CElementStateTexture::Render()
 		m_BlendColor.currentColor,
 		m_nRenderUV[ nIndex ],
 		m_pShaderState,
-		m_pShaderVariableTable
+		m_pShaderVariableTables.GetVariableTableForVertexShader(),
+		m_pShaderVariableTables.GetVariableTableForPixelShader()
 	);
 
 	CRenderElement::Render();

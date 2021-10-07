@@ -35,6 +35,7 @@ namespace iberbar
 	public:
 		void SetPosition( const CPoint2i& pt ) { m_Position = pt; UpdateTransform(); }
 		void SetSize( const CSize2i& size ) { m_Size = size; UpdateTransform(); }
+		void SetPaddings( const CRect2i& Paddings ) { m_Paddings = Paddings; UpdateTransform(); }
 		void SetAlignHorizental( UAlignHorizental nAlign ) { m_alignHorizental = nAlign; UpdateTransform(); }
 		void SetAlignVertical( UAlignVertical nAlign ) { m_alignVertical = nAlign; UpdateTransform(); }
 		void SetPercentX( bool bValue ) { m_bPercentX = bValue; UpdateTransform(); }
@@ -45,6 +46,9 @@ namespace iberbar
 		void SetParentTransform( CTransform2D* parent );
 		void UpdateTransform();
 
+		void LockChildTransforms() { m_bLockChildTransforms = true; }
+		void UnlockChildTransforms() { m_bLockChildTransforms = false; }
+
 
 	public:
 		const CPoint2i& GetPosition() const { return m_Position; }
@@ -52,6 +56,7 @@ namespace iberbar
 		int GetPositionY() const { return m_Position.y; }
 
 		const CSize2i& GetSize() const { return m_Size; }
+		const CRect2i& GetPaddings() const { return m_Paddings; }
 
 		CTransform2D* GetParentTransform() const { return m_ParentTransform; }
 
@@ -68,12 +73,14 @@ namespace iberbar
 		bool m_bPercentY : 1;
 		bool m_bPercentW : 1;
 		bool m_bPercentH : 1;
+		bool m_bLockChildTransforms;
 		UAlignStyle m_alignStyle;
 		UAlignHorizental m_alignHorizental;
 		UAlignVertical m_alignVertical;
 
 		CPoint2i m_Position;
 		CSize2i m_Size;
+		CRect2i m_Paddings;
 
 		CTransform2D*    m_ParentTransform;   // do not add reference
 

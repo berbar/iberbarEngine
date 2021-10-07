@@ -10,10 +10,11 @@
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCppInstantiateDef.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaDevice.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaError.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaTable.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCallback.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LoggingHelper.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\FunctionHelper.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\StackChecker.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCppBuilder.cpp" />
@@ -23,5 +24,7 @@
     <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCallback.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Lua\LoggingHelper.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Lua\FunctionHelper.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\StackChecker.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\Util.cpp" />
   </ItemGroup>
 </Project>

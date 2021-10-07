@@ -41,7 +41,7 @@ namespace iberbar
 		CVariant( uint32 value );
 		CVariant( uint64 value );
 		CVariant( float value );
-		CVariant( const CVariant& var );
+		CVariant( const CVariant& Other );
 		~CVariant();
 
 	public:
@@ -51,11 +51,16 @@ namespace iberbar
 		std::optional<int64> ToInt() const;
 		std::optional<uint64> ToUInt() const;
 		std::optional<float> ToFloat() const;
+		CVariant& operator=( const CVariant& Other );
 	};
 
 
 	class __iberbarUtilityApi__ CVariantDictionary final
 	{
+	public:
+		CVariantDictionary();
+		CVariantDictionary( const CVariantDictionary& Other );
+
 	public:
 		const CVariant* Get( const char* strName ) const;
 		void SetString( const char* strName, const char* value );
@@ -65,6 +70,10 @@ namespace iberbar
 		void SetFloat( const char* strName, float value );
 
 		const std::unordered_map<std::string, CVariant>& GetMap() const { return m_AttrsMap; }
+
+		CVariantDictionary& operator=( const CVariantDictionary& Other );
+
+		void Merge( const CVariantDictionary& Other, int nMergeFlag = 0 );
 
 	protected:
 		std::unordered_map<std::string, CVariant> m_AttrsMap;
@@ -141,17 +150,17 @@ inline iberbar::CVariant::CVariant( float value )
 }
 
 
-inline iberbar::CVariant::CVariant( const CVariant& var )
+inline iberbar::CVariant::CVariant( const CVariant& Other )
 	: m_v()
-	, m_t( var.m_t )
+	, m_t( Other.m_t )
 {
 	if ( m_t == UVariantType::VT_String )
 	{
-		m_v._v_string = new std::string( var.m_v._v_string->c_str() );
+		m_v._v_string = new std::string( Other.m_v._v_string->c_str() );
 	}
 	else
 	{
-		memcpy_s( &m_v, sizeof( m_v ), &var.m_v, sizeof( var.m_v ) );
+		memcpy_s( &m_v, sizeof( m_v ), &Other.m_v, sizeof( Other.m_v ) );
 	}
 }
 
@@ -208,6 +217,38 @@ inline std::optional<float> iberbar::CVariant::ToFloat() const
 	if ( m_t == UVariantType::VT_Boolean )
 		return m_v._v_float;
 	return std::optional<float>();
+}
+
+
+inline iberbar::CVariant& iberbar::CVariant::operator=( const CVariant& Other )
+{
+	if ( m_t == UVariantType::VT_String && Other.m_t == UVariantType::VT_String )
+	{
+		int nStrLen = strlen( Other.m_v._v_string->c_str() );
+		m_v._v_string->resize( nStrLen + 1 );
+		memcpy_s( &m_v._v_string->front(), nStrLen + 1, Other.m_v._v_string->c_str(), nStrLen );
+		( &m_v._v_string->front() )[nStrLen] = 0;
+	}
+	else
+	{
+		if ( m_t == UVariantType::VT_String )
+		{
+			SAFE_DELETE( m_v._v_string );
+		}
+
+		m_t = Other.m_t;
+
+		if ( m_t == UVariantType::VT_String )
+		{
+			m_v._v_string = new std::string( Other.m_v._v_string->c_str() );
+		}
+		else
+		{
+			memcpy_s( &m_v, sizeof( m_v ), &Other.m_v, sizeof( Other.m_v ) );
+		}
+	}
+
+	return *this;
 }
 
 

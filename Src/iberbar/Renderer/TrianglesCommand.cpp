@@ -4,8 +4,7 @@
 
 
 iberbar::Renderer::CTrianglesCommand::CTrianglesCommand()
-	: CRenderCommand()
+	: CRenderCommand( URenderCommandType::Triangles )
 	, m_Triangles()
 {
-	m_nCommandType = URenderCommandType::Triangles;
 }

@@ -154,7 +154,7 @@ void iberbar::Game::CPaper2dLoader_Animations::LoadJson_AnimNode( const nlohmann
 		return;
 
 	TSmartRefPtr<RHI::ITexture> pTexture = nullptr;
-	CResult retLoadTexture = GetApp()->GetTextureManager()->GetOrCreateTextureA( strTextureName.c_str(), &pTexture );
+	CResult retLoadTexture = CApplication::sGetApp()->GetTextureManager()->GetOrCreateTextureA( strTextureName.c_str(), &pTexture );
 	if ( retLoadTexture.IsOK() == false )
 		return;
 
@@ -296,7 +296,7 @@ iberbar::CResult iberbar::Game::CPaper2dLoader_GridTerrian::LoadJson( const char
 	TSmartRefPtr<RHI::ITexture> pTexture = nullptr;
 	if ( StringIsNullOrEmpty( strTextureFile.c_str() ) == true )
 		return MakeResult( ResultCode::Bad, "" );
-	CResult retLoadTexture = GetApp()->GetTextureManager()->GetOrCreateTextureA( strTextureFile.c_str(), &pTexture );
+	CResult retLoadTexture = CApplication::sGetApp()->GetTextureManager()->GetOrCreateTextureA( strTextureFile.c_str(), &pTexture );
 	if ( retLoadTexture.IsOK() == false )
 		return retLoadTexture;
 	

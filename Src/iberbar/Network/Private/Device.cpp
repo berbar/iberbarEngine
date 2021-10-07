@@ -34,13 +34,18 @@ extern iberbar::IO::CDevice_UseLibevent* iberbar::IO::g_pDevice = nullptr;
 
 iberbar::IO::CDevice_UseLibevent::CDevice_UseLibevent()
     : m_base( nullptr )
+    , m_pEv2_SignalExit( nullptr )
+    , m_pEvent_SocketWrite( nullptr )
+    , m_pEvent_LoggerWrite( nullptr )
     , m_thread()
     , m_bRunThread( false )
     , m_bIsWaiting( false )
-    , m_hEventsForThread()
+    //, m_hEventsForThread()
+    
     , m_SocketClients()
+    , m_EventWaiter()
 {
-    memset( m_hEventsForThread, 0, sizeof( m_hEventsForThread ) );
+    //memset( m_hEventsForThread, 0, sizeof( m_hEventsForThread ) );
 }
 
 
@@ -57,10 +62,10 @@ iberbar::IO::CDevice_UseLibevent::~CDevice_UseLibevent()
         m_pEvent_SocketWrite = nullptr;
     }
 
-    if ( signal_event != nullptr )
+    if ( m_pEv2_SignalExit != nullptr )
     {
-        event_free( signal_event );
-        signal_event = nullptr;
+        event_free( m_pEv2_SignalExit );
+        m_pEv2_SignalExit = nullptr;
     }
 
     if ( m_base != nullptr )
@@ -71,16 +76,16 @@ iberbar::IO::CDevice_UseLibevent::~CDevice_UseLibevent()
 
     libevent_global_shutdown();
 
-#ifdef _WINDOWS
-    for ( int i = 0, s = (int)UEventIdForThread::__Count; i < s; i++ )
-    {
-        if ( m_hEventsForThread[ i ] != nullptr )
-        {
-            ::CloseHandle( m_hEventsForThread[ i ] );
-            m_hEventsForThread[ i ] = 0;
-        }
-    }
-#endif
+//#ifdef _WINDOWS
+//    for ( int i = 0, s = (int)UEventIdForThread::__Count; i < s; i++ )
+//    {
+//        if ( m_hEventsForThread[ i ] != nullptr )
+//        {
+//            ::CloseHandle( m_hEventsForThread[ i ] );
+//            m_hEventsForThread[ i ] = 0;
+//        }
+//    }
+//#endif
 }
 
 
@@ -133,8 +138,8 @@ iberbar::CResult iberbar::IO::CDevice_UseLibevent::CreateIO()
             return MakeResult( ResultCode::Bad, "Could not initialize libevent" );
         }
 
-        signal_event = evsignal_new( m_base, SIGINT, OnEvent_SignalExit, (void*)m_base );
-        if ( !signal_event || event_add( signal_event, NULL ) < 0 ) {
+        m_pEv2_SignalExit = evsignal_new( m_base, SIGINT, OnEvent_SignalExit, (void*)m_base );
+        if ( !m_pEv2_SignalExit || event_add( m_pEv2_SignalExit, NULL ) < 0 ) {
             return MakeResult( ResultCode::Bad, "Could not create/add a signal event!\n" );
         }
     }
@@ -154,7 +159,7 @@ void iberbar::IO::CDevice_UseLibevent::DestoryIO()
         raise( SIGINT );
 
         // 发送结束线程事件
-        ::SetEvent( m_hEventsForThread[ (int)UEventIdForThread::Shutdown ] );
+        m_EventWaiter.Active( (int)UEventIdForThread::Shutdown );
 
         // 调用join，IO线程结束
         if ( m_thread.joinable() )
@@ -171,40 +176,23 @@ void iberbar::IO::CDevice_UseLibevent::WakeupThread()
     {
         if ( m_bIsWaiting == true )
         {
-#ifdef _WINDOWS
-            ::SetEvent( m_hEventsForThread[ (int)UEventIdForThread::Wakeup ] );
-#endif
+            m_EventWaiter.Active( (int)UEventIdForThread::Wakeup );
         }
     }
     else
     {
-#ifdef _WINDOWS
-        for ( int i = 0, s = (int)UEventIdForThread::__Count; i < s; i++ )
-        {
-            if ( m_hEventsForThread[ i ] == nullptr )
-            {
-                m_hEventsForThread[ i ] = ::CreateEventW( NULL, FALSE, FALSE, NULL );
-            }
-        }
-
         m_thread = std::thread( &CDevice_UseLibevent::Run, this );
         m_bRunThread = true;
-        if ( m_hEventsForThread[ (int)UEventIdForThread::Wakeup ] != nullptr )
-        {
-            ::SetEvent( m_hEventsForThread[ (int)UEventIdForThread::Wakeup ] );
-        }
-#endif
+        m_EventWaiter.Active( (int)UEventIdForThread::Wakeup );
     }
 }
 
 
 void iberbar::IO::CDevice_UseLibevent::Run()
 {
-#ifdef _WINDOWS
     while ( true )
     {
-        DWORD nWaitRet = WaitForMultipleObjects( (int)UEventIdForThread::__Count, m_hEventsForThread, FALSE, INFINITE );
-        DWORD nEvent = nWaitRet - WAIT_OBJECT_0;
+        DWORD nEvent = m_EventWaiter.Wait();
 
         // Destroy命令
         if ( nEvent == (int)UEventIdForThread::Shutdown )
@@ -216,7 +204,6 @@ void iberbar::IO::CDevice_UseLibevent::Run()
 
         m_bIsWaiting = true;
     }
-#endif
 }
 
 

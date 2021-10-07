@@ -5,6 +5,7 @@
 #include <iberbar/Utility/Stack.h>
 #include <iberbar/Utility/Result.h>
 #include <iberbar/Utility/Xml/Base.h>
+#include <iberbar/Utility/Log/Logger.h>
 #include <iberbar/Font/Types.h>
 #include <functional>
 
@@ -58,11 +59,12 @@ namespace iberbar
 		typedef CWidget* UCallbackCreateProc_Widget( const char* strType );
 		typedef CRenderElement* UCallbackCreateProc_Element( const char* strType );
 		typedef CResult UCallbackXmlGetTexture( const char* strText, RHI::ITexture** ppOutTexture );
-		typedef bool UCallbackXmlGetFont( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc );
+		typedef CResult UCallbackXmlGetFont( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc );
 
 
 		struct UXmlParserContext
 		{
+			Logging::CLogger* pLogger;
 			std::function<UCallbackXmlGetTexture> GetTexture;
 			std::function<UCallbackXmlGetFont> GetFont;
 		};
@@ -76,17 +78,13 @@ namespace iberbar
 			~CXmlParser();
 
 		public:
-			void SetBaseDir( const std::string& strBaseDir ) { m_strBaseDir = strBaseDir; }
 			/*
 			 * 读写之前需要压入需要配置的父级控件对象；在读写完成后，若不再需要的时候弹出
 			 */
 			CResult ReadFile( const char* strFileName, CDialog* pDialog );
 
-
 		public:
-
-
-		public:
+			void SetLogOutputDevice( Logging::COutputDevice* pLogOutputDevice );
 			void RegisterReadProc_Widget( const char* strType, std::function<UCallbackReadProc_Widget> func );
 			void RegisterReadProc_Element( const char* strType, std::function<UCallbackReadProc_Element> func);
 			void RegisterCreateProc_Widget( const char* strType, std::function<UCallbackCreateProc_Widget> func );
@@ -96,7 +94,7 @@ namespace iberbar
 
 		private:
 			CXmlState* m_pState;
-			std::string m_strBaseDir;
+			Logging::CLogger m_Logger;
 		};
 	}
 

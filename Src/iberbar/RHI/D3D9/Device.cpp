@@ -7,7 +7,10 @@
 #include <iberbar/RHI/D3D9/ShaderState.h>
 #include <iberbar/RHI/D3D9/ShaderVariables.h>
 #include <iberbar/RHI/D3D9/Texture.h>
+#include <iberbar/RHI/D3D9/RenderState.h>
 #include <iberbar/RHI/D3D9/Types.h>
+#include <iberbar/Utility/OS/Windows/Error.h>
+#include <DxErr.h>
 
 
 iberbar::RHI::D3D9::CDevice::CDevice()
@@ -50,6 +53,15 @@ void iberbar::RHI::D3D9::CDevice::LostDevice()
 {
 	m_bHasLostDevice = true;
 
+	BindVertexBuffer( nullptr, 0 );
+	BindIndexBuffer( nullptr );
+	SetVertexShader( nullptr );
+	SetPixelShader( nullptr );
+	for ( int i = 0; i < 8; i++ )
+	{
+		SetTexture( i, nullptr );
+	}
+
 	if ( m_CallbackLost )
 	{
 		m_CallbackLost( this );
@@ -68,7 +80,9 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::ResetDevice( int nBackBufferWidth,
 
 	HRESULT hResult = m_pD3DDevice->Reset( &m_D3DPresentParams );
 	if ( FAILED( hResult ) )
-		return MakeResult( ResultCode::Bad, "" );
+	{
+		return MakeResult( ResultCode::Bad, DXGetErrorStringA( hResult ) );
+	}
 
 	if ( m_CallbackReset )
 	{
@@ -119,14 +133,49 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateIndexBuffer( uint32 nStride,
 }
 
 
-iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateShader( IShader** ppOutShader )
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateVertexShader( IShader** ppOutShader )
 {
 	assert( ppOutShader );
-	TSmartRefPtr<CShader> pShader = TSmartRefPtr<CShader>::_sNew( this );
+	TSmartRefPtr<CVertexShader> pShader = TSmartRefPtr<CVertexShader>::_sNew( this );
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShader );
 	(*ppOutShader) = pShader;
 	(*ppOutShader)->AddRef();
 	return CResult();
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreatePixelShader( IShader** ppOutShader )
+{
+	assert( ppOutShader );
+	TSmartRefPtr<CPixelShader> pShader = TSmartRefPtr<CPixelShader>::_sNew( this );
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShader );
+	( *ppOutShader ) = pShader;
+	( *ppOutShader )->AddRef();
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateHullShader( IShader** ppOutShader )
+{
+	return MakeResult( ResultCode::Bad, "Not support hull shader" );
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateGeometryShader( IShader** ppOutShader )
+{
+	return MakeResult( ResultCode::Bad, "Not support geometry shader" );
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateDomainShader( IShader** ppOutShader )
+{
+	return MakeResult( ResultCode::Bad, "Not support domain shader" );
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateComputeShader( IShader** ppOutShader )
+{
+	return MakeResult( ResultCode::Bad, "Not support compute shader" );
 }
 
 
@@ -144,13 +193,17 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateVertexDeclaration( IVertexDe
 }
 
 
-iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateShaderState( IShaderState** ppOutShaderState, IShader* pShader, IVertexDeclaration* pVertexDeclaration )
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateShaderState(
+	IShaderState** ppOutShaderState,
+	IVertexDeclaration* pVertexDeclaration,
+	IShader* pVertexShader,
+	IShader* pPixelShader,
+	IShader* pHullShader,
+	IShader* pGeometryShader,
+	IShader* pDomainShader )
 {
 	assert( ppOutShaderState );
-	TSmartRefPtr<CShaderState> pShaderState = TSmartRefPtr<CShaderState>::_sNew( this, (CShader*)pShader, (CVertexDeclaration*)pVertexDeclaration );
-	CResult ret = pShaderState->GenarateConstTable();
-	if ( ret.IsOK() == false )
-		return ret;
+	TSmartRefPtr<CShaderState> pShaderState = TSmartRefPtr<CShaderState>::_sNew( this, (CVertexDeclaration*)pVertexDeclaration, (CVertexShader*)pVertexShader, (CPixelShader*)pPixelShader );
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderState );
 	(*ppOutShaderState) = pShaderState;
 	(*ppOutShaderState)->AddRef();
@@ -161,10 +214,32 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateShaderState( IShaderState** 
 void iberbar::RHI::D3D9::CDevice::CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVarTable )
 {
 	assert( ppOutShaderVarTable );
-	TSmartRefPtr<CShaderVariableTable> pShaderVarTable = TSmartRefPtr<CShaderVariableTable>::_sNew();
+	TSmartRefPtr<CShaderVariableTable> pShaderVarTable = TSmartRefPtr<CShaderVariableTable>::_sNew( this );
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderVarTable );
 	(*ppOutShaderVarTable) = pShaderVarTable;
 	(*ppOutShaderVarTable)->AddRef();
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc )
+{
+	assert( ppOutBlendState );
+	TSmartRefPtr<CBlendState> pBlendState = TSmartRefPtr<CBlendState>::_sNew( BlendDesc );
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutBlendState );
+	( *ppOutBlendState ) = pBlendState;
+	( *ppOutBlendState )->AddRef();
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc )
+{
+	assert( ppOutSamplerState );
+	TSmartRefPtr<CSamplerState> pBlendState = TSmartRefPtr<CSamplerState>::_sNew( SamplerDesc );
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutSamplerState );
+	( *ppOutSamplerState ) = pBlendState;
+	( *ppOutSamplerState )->AddRef();
+	return CResult();
 }
 
 
@@ -178,7 +253,7 @@ void iberbar::RHI::D3D9::CDevice::CreateCommandContext( ICommandContext** ppOutC
 }
 
 
-void iberbar::RHI::D3D9::CDevice::Begin()
+iberbar::CResult iberbar::RHI::D3D9::CDevice::Begin()
 {
 	HRESULT hr;
 	if ( m_bHasLostDevice == true )
@@ -190,7 +265,7 @@ void iberbar::RHI::D3D9::CDevice::Begin()
 			{
 				// request repaint and exit
 				InvalidateRect( m_hWnd, NULL, TRUE );
-				return;
+				return MakeResult( ResultCode::Bad, "device lost" );
 			}
 
 			// the device has been lost and can be reset
@@ -198,8 +273,9 @@ void iberbar::RHI::D3D9::CDevice::Begin()
 			{
 				// do lost/reset/restore cycle
 				LostDevice();
-				if ( ResetDevice().IsOK() == false )
-					return;
+				CResult RetReset = ResetDevice();
+				if ( RetReset.IsOK() == false )
+					return RetReset;
 			}
 		}
 
@@ -208,6 +284,8 @@ void iberbar::RHI::D3D9::CDevice::Begin()
 
 	m_pD3DDevice->Clear( NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, (uint32)m_ClearColor, 1.0f, 0 );
 	m_pD3DDevice->BeginScene();
+
+	return CResult();
 }
 
 
@@ -278,14 +356,14 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateDevice( HWND hWnd, bool bWin
 
 	if ( FAILED( hResult = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_hWnd, vp, &m_D3DPresentParams, &m_pD3DDevice ) ) )
 	{
-		return MakeResult( ResultCode::Bad, "" );
+		return MakeResult( ResultCode::Bad, DXGetErrorStringA( hResult ) );
 	}
 
 	D3DSURFACE_DESC SurfaceDesc;
 	IDirect3DSurface9* pD3DSurface = NULL;
 	if ( FAILED( hResult = m_pD3DDevice->GetBackBuffer( 0, 0, D3DBACKBUFFER_TYPE_MONO, &pD3DSurface ) ) )
 	{
-		return MakeResult( ResultCode::Bad, "" );
+		return MakeResult( ResultCode::Bad, DXGetErrorStringA( hResult ) );
 	}
 
 	pD3DSurface->GetDesc( &SurfaceDesc );
@@ -293,6 +371,7 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateDevice( HWND hWnd, bool bWin
 	pD3DSurface = NULL;
 
 	m_ContextSize = CSize2i( SurfaceDesc.Width, SurfaceDesc.Height );
+	m_bIsWindow = bWindowed;
 
 	if ( m_CallbackCreated )
 	{

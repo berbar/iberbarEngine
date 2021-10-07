@@ -191,7 +191,8 @@
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaDevice.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaError.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCallback.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaTable.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\Util.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\StackChecker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Lua\FunctionHelper.cpp" />
@@ -201,6 +202,8 @@
     <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCppInstantiate.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaDevice.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCallback.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\Util.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\StackChecker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utility\Utility.vcxproj">

@@ -27,7 +27,7 @@ namespace iberbar
 			virtual ~CDialog();
 
 		protected:
-			CDialog( UDialogStyle nStyle, CDialog* pDlgParent );
+			CDialog( CDialog* pDlgParent );
 			CDialog( const CDialog& dialog );
 
 		public:
@@ -49,34 +49,31 @@ namespace iberbar
 			void SetKeyBoardInput( bool bEnable = true ) { m_bKeyboardInput = bEnable; }
 			bool IsKeyboardInputEnabled() const { return m_bKeyboardInput; }
 			void SetNeedClip( bool bNeedClip ) { m_bNeedClip = bNeedClip; }
-
-			void AddWidget( CWidget* pWidget );
-			CWidget* FindWidget( const char* strId );
-			void RemoveWidget( CWidget* pWidget );
-			void RemoveWidgetsAll();
+			void SetModal( bool bModal ) { m_bModal = bModal; }
+			bool IsModal() const { return m_bModal; }
 			void RequestTop();
-			void ForeachWidgets( std::function<void(CWidget*)> Func );
+
+			void SetWidgetRoot( CWidget* pContainer );
+			CWidget* GetWidgetRoot() { return m_pContainer; }
+			const CWidget* GetWidgetRoot() const { return m_pContainer; }
 			
 		protected:
-			CWidget* GetActiveWidgetAtPoint( const CPoint2i& point );
-		private:
-			void AddDialog( CDialog* pDialog );
-			void RemoveDialogs();
+			void HandleMouseMoveInContainer( CWidget* pContainer, const UMouseEventData* pEventData );
+			bool HandleMouseInContainer( CWidget* pContainer, const UMouseEventData* pEventData );
+			bool HandleKeyboardInContainer( CWidget* pContainer, const UKeyboardEventData* pEventData );
+			void RemoveContainer();
 
 		protected:
-			UDialogStyle m_nDialogStyle;
 			CDialog* m_pDialogParent;
-			CWidget* m_pWidgetMouseOver;
+			CWidget* m_pContainer;
 			bool m_bMouseInput;
 			bool m_bKeyboardInput;
 			bool m_bNeedClip;
-			std::vector<CWidget*> m_Widgets;
-			std::vector<CDialog*> m_Dialogs;
-			std::vector<CDialog*> m_DialogsOverlapped;
+			bool m_bModal;
 
 
 		public:
-			static CResult sCreateDialog( CDialog** ppOutDialog, UDialogStyle nStyle, CDialog* pDlgParent = nullptr );
+			static CResult sCreateDialog( CDialog** ppOutDialog, CDialog* pDlgParent = nullptr );
 			static void sDestroyDialog( CDialog* pDialog );
 		};
 

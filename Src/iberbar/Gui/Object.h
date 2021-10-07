@@ -21,6 +21,7 @@ namespace iberbar
 			CObject( const CObject& );
 
 		public:
+
 			void SetId( const char* strId );
 			const std::string& GetId() const;
 			void SetName( const std::string& strName );
@@ -36,6 +37,8 @@ namespace iberbar
 			void SetSize( const CSize2i& size );
 			void SetSize( int nW, int nH );
 			const CSize2i& GetSize() const;
+			void SetPaddings( const CRect2i& Paddings );
+			const CRect2i& GetPaddings() const;
 			void SetAlignHorizental( UAlignHorizental align );
 			void SetAlignVertical( UAlignVertical align );
 			void SetPercentX( bool bValue );
@@ -47,6 +50,8 @@ namespace iberbar
 			UAlignVertical GetAlignVertical() const;
 			const CRect2i& GetBounding() const;
 			PTR_CTransform2D GetTransform() const;
+
+			void SetDebugId( int nDebugId ) { m_nDebugId = nDebugId; }
 
 		public:
 			virtual void UpdateRect() {}
@@ -68,6 +73,8 @@ namespace iberbar
 			bool m_bEnable;
 
 			PTR_CTransform2D m_pTransform;
+
+			int m_nDebugId;
 		};
 	}
 }
@@ -138,6 +145,16 @@ inline void iberbar::Gui::CObject::SetSize( int nW, int nH )
 inline const iberbar::CSize2i& iberbar::Gui::CObject::GetSize() const
 {
 	return m_pTransform->GetSize();
+}
+
+inline void iberbar::Gui::CObject::SetPaddings( const CRect2i& Paddings )
+{
+	m_pTransform->SetPaddings( Paddings );
+}
+
+inline const iberbar::CRect2i& iberbar::Gui::CObject::GetPaddings() const
+{
+	return m_pTransform->GetPaddings();
 }
 
 inline void iberbar::Gui::CObject::SetAlignHorizental( UAlignHorizental nAlign )

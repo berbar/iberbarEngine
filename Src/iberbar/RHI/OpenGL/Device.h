@@ -25,6 +25,11 @@ namespace iberbar
 				virtual ~CDevice();
 
 			public:
+#ifdef _WINDOWS
+				virtual CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight ) override;
+#else
+				CResult CreateDevice( int nSuitedWidth, int nSuitedHeight );
+#endif
 				virtual void LostDevice() override;
 				virtual CResult ResetDevice( int nBackBufferWidth, int nBackBufferHeight, bool bIsWindow ) override;
 				virtual void CreateTexture( ITexture** ppTexture ) override;
@@ -36,16 +41,10 @@ namespace iberbar
 				virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) override;
 				virtual void CreateCommandContext( ICommandContext** ppOutContext ) override;
 				//virtual void Render() override;
-				virtual void Begin() override;
+				virtual CResult Begin() override;
 				virtual void End() override;
 
 			public:
-#ifdef _WINDOWS
-				CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight );
-#else
-				CResult CreateDevice( int nSuitedWidth, int nSuitedHeight );
-#endif
-
 				void BindArrayBuffer( GLuint Buffer );
 				void BindElementArrayBuffer( GLuint Buffer );
 

@@ -20,7 +20,7 @@ iberbar::Paper2d::CNode::CNode()
 	, m_bVisible( true )
 	, m_bEnable( true )
 	, m_pShaderState( nullptr )
-	, m_pShaderVariableTable( nullptr )
+	, m_pShaderVariableTableUnion()
 	, m_nZOrder( 0 )
 	, m_Prepare()
 	, m_Children()
@@ -37,7 +37,7 @@ iberbar::Paper2d::CNode::CNode( const CNode& node )
 	, m_bVisible( node.m_bVisible )
 	, m_bEnable( node.m_bEnable )
 	, m_pShaderState( nullptr )
-	, m_pShaderVariableTable( nullptr )
+	, m_pShaderVariableTableUnion()
 	, m_nZOrder( node.m_nZOrder )
 	, m_Prepare()
 	, m_Children()
@@ -53,7 +53,6 @@ iberbar::Paper2d::CNode::~CNode()
 	SAFE_DELETE( m_pTransform );
 	SAFE_DELETE( m_pComponentContainer );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderVariableTable );
 	RemoveAllChildren();
 }
 
@@ -89,9 +88,9 @@ void iberbar::Paper2d::CNode::Init()
 {
 	Renderer::CRendererSprite* pRendererSprite = CDirector::sGetShared()->GetRendererSprite();
 	pRendererSprite->GetDefaultShaderState( &m_pShaderState );
-	pRendererSprite->CreateDefaultShaderVariableTable( &m_pShaderVariableTable );
+	pRendererSprite->CreateDefaultShaderVariableTableUnion( &m_pShaderVariableTableUnion );
 
-	m_pShaderVariableTable->SetBool( RHI::UShaderType::Vertex, Renderer::s_strShaderVarName_RHW, false );
+	m_pShaderVariableTableUnion.GetVariableTableForVertexShader()->SetBool( Renderer::s_strShaderVarName_RHW, false );
 }
 
 

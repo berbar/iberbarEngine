@@ -4,6 +4,7 @@
 #include <iberbar/Gui/Engine.h>
 #include <iberbar/Gui/Dialog.h>
 #include <iberbar/Utility/Command.h>
+#include <iberbar/Utility/String.h>
 
 
 
@@ -55,6 +56,7 @@ namespace iberbar
 
 iberbar::Gui::CWidget::CWidget( void )
 	: m_pDialog( nullptr )
+	, m_pWidgetParent( nullptr )
 	, m_bCanFocus( false )
 	, m_bFocus( false )
 	, m_bMouseOver( false )
@@ -66,6 +68,7 @@ iberbar::Gui::CWidget::CWidget( void )
 	, m_bNeedClip( false )
 
 	, m_pRenderElementDefault( nullptr )
+	, m_nEventListenerHandleAlloc( 0 )
 	, m_EventListeners()
 {
 }
@@ -73,8 +76,8 @@ iberbar::Gui::CWidget::CWidget( void )
 
 iberbar::Gui::CWidget::CWidget( const CWidget& widget )
 	: CObject( widget )
-
 	, m_pDialog( nullptr )
+	, m_pWidgetParent( nullptr )
 	, m_bCanFocus( widget.m_bCanFocus )
 	, m_bFocus( false )
 	, m_bMouseOver( false )
@@ -86,6 +89,7 @@ iberbar::Gui::CWidget::CWidget( const CWidget& widget )
 	, m_bNeedClip( widget.m_bNeedClip )
 
 	, m_pRenderElementDefault( nullptr )
+	, m_nEventListenerHandleAlloc( 0 )
 	, m_EventListeners()
 {
 	if ( widget.m_pRenderElementDefault != nullptr )
@@ -99,7 +103,18 @@ iberbar::Gui::CWidget::CWidget( const CWidget& widget )
 
 iberbar::Gui::CWidget::~CWidget()
 {
+	RemoveWidgetsAll();
 	UNKNOWN_SAFE_RELEASE_NULL( m_pRenderElementDefault );
+}
+
+
+void iberbar::Gui::CWidget::SetDialog( CDialog* pDialog )
+{
+	m_pDialog = pDialog;
+	for ( CWidget* pWidget : m_Widgets )
+	{
+		pWidget->SetDialog( pDialog );
+	}
 }
 
 
@@ -117,7 +132,7 @@ void iberbar::Gui::CWidget::SetMouseInput( bool bEnable /* = true */ )
 
 bool iberbar::Gui::CWidget::IsMouseInputEnabled() const
 {
-	if ( GetParent() && GetParent()->IsMouseInputEnabled() == false )
+	if ( GetDialog() && GetDialog()->IsMouseInputEnabled() == false )
 		return false;
 	return m_bMouseInput;
 }
@@ -129,32 +144,57 @@ void iberbar::Gui::CWidget::SetKeyBoardInput( bool bEnable /* = true */ )
 
 bool iberbar::Gui::CWidget::IsKeyboardInputEnabled() const
 {
-	if ( GetParent() && GetParent()->IsKeyboardInputEnabled() == false )
+	if ( GetDialog() && GetDialog()->IsKeyboardInputEnabled() == false )
 		return false;
 	return m_bKeyboardInput;
 }
 
 bool iberbar::Gui::CWidget::IsVisible() const
 {
-	if ( GetParent() && GetParent()->IsVisible() == false )
+	if ( m_bVisible == false )
+		return false;
+	if ( GetDialog() && GetDialog()->IsVisible() == false )
+		return false;
+	if ( GetWidgetParent() && GetWidgetParent()->IsVisible() == false )
 		return false;
 	return m_bVisible;
 }
 
 bool iberbar::Gui::CWidget::IsEnable() const
 {
-	if ( GetParent() && GetParent()->IsEnable() == false )
+	if ( m_bEnable == false )
+		return false;
+	if ( GetDialog() && GetDialog()->IsEnable() == false )
+		return false;
+	if ( GetWidgetParent() && GetWidgetParent()->IsEnable() == false )
 		return false;
 	return m_bEnable;
 }
 
 
-void iberbar::Gui::CWidget::AddEventCallback( std::function<UCallbackWidgetEventProc> callback, uint64 nEvent )
+int iberbar::Gui::CWidget::AddEventCallback( std::function<UCallbackWidgetEventProc> callback, uint64 nEvent, bool bDefer )
 {
 	if ( !callback )
-		return;
-	UWidgetEventListener listener { nEvent, callback };
+		return 0;
+	m_nEventListenerHandleAlloc++;
+	UWidgetEventListener listener { bDefer, m_nEventListenerHandleAlloc, nEvent, callback };
 	m_EventListeners.push_back( listener );
+	return m_nEventListenerHandleAlloc;
+}
+
+
+void iberbar::Gui::CWidget::RemoveEventCallback( int nHandle )
+{
+	auto iter = m_EventListeners.begin();
+	auto end = m_EventListeners.end();
+	for ( ; iter != end; iter++ )
+	{
+		if ( ( *iter ).nHandle == nHandle )
+		{
+			m_EventListeners.erase( iter );
+			return;
+		}
+	}
 }
 
 
@@ -174,12 +214,19 @@ void iberbar::Gui::CWidget::SendEvent( uint64 nEvent, uint64 nValueUint, const v
 	{
 		if ( listener.nEvent == nEvent || listener.nEvent == 0 )
 		{
-			if ( pCommand == nullptr )
+			if ( listener.bDefer == true )
 			{
-				pCommand = new CCommand_WidgetEvent( this, nEvent, nValueUint, pValueExt );
-				CEngine::sGetInstance()->AddCommand( pCommand );
+				if ( pCommand == nullptr )
+				{
+					pCommand = new CCommand_WidgetEvent( this, nEvent, nValueUint, pValueExt );
+					CEngine::sGetInstance()->AddCommand( pCommand );
+				}
+				pCommand->AddEventCallback( listener.callback );
 			}
-			pCommand->AddEventCallback( listener.callback );
+			else
+			{
+				listener.callback( this, nEvent, nValueUint, pValueExt );
+			}
 		}
 	}
 }
@@ -205,16 +252,6 @@ bool iberbar::Gui::CWidget::FindElement( const char* strName, CRenderElement** p
 	if ( m_pRenderElementDefault == nullptr )
 		return false;
 	return m_pRenderElementDefault->FindElement( strName, ppOutElement );
-}
-
-
-void iberbar::Gui::CWidget::SetParent( CDialog* pDialog )
-{
-	m_pDialog = pDialog;
-	if ( m_pDialog )
-		this->GetTransform()->SetParentTransform( m_pDialog->GetTransform() );
-	else
-		this->GetTransform()->SetParentTransform( nullptr );
 }
 
 
@@ -251,6 +288,17 @@ void iberbar::Gui::CWidget::OnMouseLeave()
 
 void iberbar::Gui::CWidget::UpdateRect()
 {
+	if ( m_Widgets.empty() == false )
+	{
+		for ( CWidget* pWidget : m_Widgets )
+		{
+			pWidget->UpdateRect();
+		}
+	}
+	if ( m_pRenderElementDefault )
+	{
+		m_pRenderElementDefault->UpdateRect();
+	}
 }
 
 
@@ -259,6 +307,11 @@ void iberbar::Gui::CWidget::Refresh()
 	m_bMouseOver = false;
 	m_bFocus = false;
 
+	for ( CWidget* pWidget : m_Widgets )
+	{
+		pWidget->Refresh();
+	}
+
 	if ( m_pRenderElementDefault )
 		m_pRenderElementDefault->Refresh();
 }
@@ -266,6 +319,14 @@ void iberbar::Gui::CWidget::Refresh()
 
 void iberbar::Gui::CWidget::Update( float nElapsedTime )
 {
+	if ( IsVisible() == false )
+		return;
+
+	for ( CWidget* pWidget : m_Widgets )
+	{
+		pWidget->Update( nElapsedTime );
+	}
+
 	if ( m_pRenderElementDefault )
 		m_pRenderElementDefault->Update( nElapsedTime );
 }
@@ -273,6 +334,9 @@ void iberbar::Gui::CWidget::Update( float nElapsedTime )
 
 void iberbar::Gui::CWidget::Render()
 {
+	if ( IsVisible() == false )
+		return;
+
 	bool bPopViewport = false;
 	if ( m_bNeedClip == true )
 	{
@@ -283,9 +347,139 @@ void iberbar::Gui::CWidget::Render()
 	if ( m_pRenderElementDefault )
 		m_pRenderElementDefault->Render();
 
+	for ( CWidget* pWidget : m_Widgets )
+	{
+		pWidget->Render();
+	}
+
 	if ( bPopViewport == true )
 	{
 		CEngine::sGetInstance()->GetViewportState()->PopViewport();
+	}
+}
+
+
+
+int iberbar::Gui::CWidget::AddWidget( CWidget* pWidget )
+{
+	if ( pWidget == nullptr )
+		return 0;
+
+	if ( pWidget->GetDialog() != nullptr )
+		return 0;
+
+	for ( auto& pWidgetTemp : m_Widgets )
+	{
+		if ( pWidgetTemp == pWidget )
+			return 0;
+	}
+
+	m_Widgets.push_back( pWidget );
+	pWidget->SetWidgetParent( this );
+	pWidget->AddRef();
+
+	return 1;
+}
+
+
+iberbar::Gui::CWidget* iberbar::Gui::CWidget::FindWidget( const char* strId )
+{
+	if ( StringIsNullOrEmpty( strId ) == true )
+		return nullptr;
+
+	CWidget* pWidgetFind = nullptr;
+	for ( auto& pWidget : m_Widgets )
+	{
+		if ( strcmp( pWidget->GetId().c_str(), strId ) == 0 )
+			return pWidget;
+
+		pWidgetFind = pWidget->FindWidget( strId );
+		if ( pWidgetFind != nullptr )
+			return pWidgetFind;
+	}
+
+	return nullptr;
+}
+
+
+int iberbar::Gui::CWidget::RemoveWidget( CWidget* pWidget )
+{
+	if ( pWidget == nullptr )
+		return 0;
+
+	auto iter = m_Widgets.begin();
+	auto end = m_Widgets.end();
+	for ( ; iter != end; iter++ )
+	{
+		if ( ( *iter ) == pWidget )
+		{
+			if ( CEngine::sGetInstance()->GetFocus() == pWidget )
+			{
+				CEngine::sGetInstance()->ClearFocus( true );
+			}
+
+			pWidget->SetWidgetParent( nullptr );
+			pWidget->Release();
+
+			m_Widgets.erase( iter );
+
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+void iberbar::Gui::CWidget::RemoveWidgetsAll()
+{
+	if ( m_Widgets.empty() == false )
+	{
+		auto iter = m_Widgets.begin();
+		auto end = m_Widgets.end();
+		for ( ; iter != end; iter++ )
+		{
+			if ( ( *iter ) == CEngine::sGetInstance()->GetFocus() )
+			{
+				CEngine::sGetInstance()->ClearFocus( false );
+			}
+
+			( *iter )->SetWidgetParent( nullptr );
+			( *iter )->Release();
+			( *iter ) = nullptr;
+		}
+		m_Widgets.clear();
+	}
+}
+
+
+void iberbar::Gui::CWidget::ForeachWidgets( std::function<void( CWidget* )> Func, int nDepth )
+{
+	if ( m_Widgets.empty() )
+		return;
+
+	if ( nDepth == 0 )
+		return;
+
+	for ( CWidget* pWidget : m_Widgets )
+	{
+		Func( pWidget );
+		pWidget->ForeachWidgets( Func, nDepth );
+	}
+}
+
+
+void iberbar::Gui::CWidget::SetWidgetParent( CWidget* pWidgetParent )
+{
+	m_pWidgetParent = pWidgetParent;
+	if ( m_pWidgetParent == nullptr )
+	{
+		SetDialog( nullptr );
+		GetTransform()->SetParentTransform( nullptr );
+	}
+	else
+	{
+		SetDialog( pWidgetParent->GetDialog() );
+		GetTransform()->SetParentTransform( m_pWidgetParent->GetTransform() );
 	}
 }
 

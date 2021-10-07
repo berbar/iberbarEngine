@@ -5,21 +5,11 @@
 local m = {};
 
 
---- 推入widget到栈顶
---- @param widget iberbar.Gui.CWidget
---- @return void
-function m:PushWidget( widget ) end
-
-
---- 弹出栈顶的widget
---- @return void
-function m:PopWidget() end
-
-
 --- 读取xml文件
 --- @param filepath string
+--- @param dlg iberbar.Gui.CDialog
 --- @return void
-function m:ReadFile( filepath ) end
+function m:ReadFile( filepath, dlg ) end
 
 
 iberbar.Gui.CXmlParser = m;
