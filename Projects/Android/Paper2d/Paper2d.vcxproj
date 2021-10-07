@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Animation.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Camera.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Director.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\DrawContext.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Image.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Node.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Paper2d\Scene.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Animation.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Camera.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Director.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\DrawContext.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Image.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Node.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Paper2d\Scene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Renderer\Renderer.vcxproj">
+      <Project>{f76aea6f-a678-4542-91cc-8dd99fc81f76}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI\RHI.vcxproj">
+      <Project>{5b8fb16a-620c-419a-abe3-3d525e6dedb0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{0a1ee270-a68c-4754-917e-866a3f69a4ca}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{900742d7-148b-48f1-b363-e6ad4ab1b6db}</ProjectGuid>
+    <Keyword>Android</Keyword>
+    <RootNamespace>Paper2d</RootNamespace>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <ApplicationType>Android</ApplicationType>
+    <ApplicationTypeRevision>3.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <PreprocessorDefinitions>__iberbarPaper2dApisExport__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Color.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\String.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Transform.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Unknown.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Platform\Android\JniHelper.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\FileHelper.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Math\Matrix.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\ViewportState.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Result.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Timer\GlobalTimer.cpp">
+      <Filter>Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Xml\RapidXml.cpp">
+      <Filter>Xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Input.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\RefStatistics.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\StringConvert.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\OS\Unix\DynamicLibrary.cpp">
+      <Filter>OS\Unix</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Circle.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Clonable.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Color.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Math.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Platform.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Point.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Rect.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Result.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Size.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\String.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Transform.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Unknown.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Platform\Android\JniHelper.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Platform\Android\JniNative.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\FileHelper.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Buffer.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\ResourceManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Math\Matrix.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\ViewportState.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Stack.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Timer\GlobalTimer.h">
+      <Filter>Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Xml\Base.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Xml\RapidXml.h">
+      <Filter>Xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Input.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\JsonConvert.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\RefStatistics.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\StdHelper_List.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\StdHelper_Vector.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\StringConvert.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Variant.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\DynamicLibrary.h">
+      <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\MultiEventWaiter.h">
+      <Filter>OS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Unix\DynamicLibrary.h">
+      <Filter>OS\Unix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Unix\MultiEventWaiter.h">
+      <Filter>OS\Unix</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Src\iberbar\Utility\Color.inl" />
+    <None Include="..\..\..\Src\iberbar\Utility\Rect.inl" />
+    <None Include="..\..\..\Src\iberbar\Utility\Math\Matrix.inl">
+      <Filter>Math</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{6e87527e-6476-4466-85fe-71b85fcd65f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{6c7436e8-b86a-4182-adf2-5a979592e77c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Timer">
+      <UniqueIdentifier>{6154238f-54c8-4b40-9e8e-46a512932122}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Xml">
+      <UniqueIdentifier>{d0ff47d1-2fa9-4491-af72-530022791ece}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS">
+      <UniqueIdentifier>{11b955b4-e0dd-4654-b9da-2e60c6b4b214}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS\Unix">
+      <UniqueIdentifier>{9282093e-fe32-4258-8971-7fb9b779b9b4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\FontManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\TextureManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Game.cpp">
+      <Filter>LuaCppApis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Gui.cpp">
+      <Filter>LuaCppApis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.cpp">
+      <Filter>LuaCppApis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Rect.cpp">
+      <Filter>LuaCppApis\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp">
+      <Filter>LuaCppApis\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.cpp">
+      <Filter>LuaCppApis</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Application.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\BaseResourceManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\FontManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\TextureManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Game.h">
+      <Filter>LuaCppApis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Gui.h">
+      <Filter>LuaCppApis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Headers.h">
+      <Filter>LuaCppApis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.h">
+      <Filter>LuaCppApis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Rect.h">
+      <Filter>LuaCppApis\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.h">
+      <Filter>LuaCppApis\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.h">
+      <Filter>LuaCppApis</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="LuaCppApis">
+      <UniqueIdentifier>{35905576-9417-4178-9a26-ed49396099ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaCppApis\Utility">
+      <UniqueIdentifier>{eb2fd81d-4935-445d-aa9e-fb7e6afb9782}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Src\iberbar\LuaCppApis\readme.md">
+      <Filter>LuaCppApis</Filter>
+    </None>
+  </ItemGroup>
+</Project>

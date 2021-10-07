@@ -1,0 +1,353 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{0a1ee270-a68c-4754-917e-866a3f69a4ca}</ProjectGuid>
+    <Keyword>Android</Keyword>
+    <RootNamespace>Utility</RootNamespace>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <ApplicationType>Android</ApplicationType>
+    <ApplicationTypeRevision>3.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_static</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_static</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_static</UseOfStl>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_static</UseOfStl>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_static</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_static</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_static</UseOfStl>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_static</UseOfStl>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <IncludePath>$(iberbarSrcDir);$(sdk_rapidxml_include);$(IncludePath)</IncludePath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Color.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\FileHelper.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Input.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Math\Matrix.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\OS\Unix\DynamicLibrary.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Platform\Android\JniHelper.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\RefStatistics.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Result.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\String.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\StringConvert.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Timer\GlobalTimer.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Transform.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Unknown.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\ViewportState.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Utility\Xml\RapidXml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Circle.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Clonable.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Color.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\FileHelper.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Input.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\JsonConvert.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Math.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Math\Matrix.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\DynamicLibrary.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\MultiEventWaiter.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Unix\DynamicLibrary.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Unix\MultiEventWaiter.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Platform.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Platform\Android\JniHelper.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Platform\Android\JniNative.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Point.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Rect.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\RefStatistics.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\ResourceManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Result.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Size.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Stack.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\StdHelper_List.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\StdHelper_Vector.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\String.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x86'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\StringConvert.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Timer\GlobalTimer.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Transform.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Unknown.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Buffer.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Variant.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\ViewportState.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Xml\Base.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Xml\RapidXml.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Src\iberbar\Utility\Color.inl" />
+    <None Include="..\..\..\Src\iberbar\Utility\Math\Matrix.inl" />
+    <None Include="..\..\..\Src\iberbar\Utility\Rect.inl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
