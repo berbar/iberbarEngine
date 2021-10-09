@@ -44,7 +44,7 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateEmpty( int w, int h )
 	TexDesc.SampleDesc.Count = 1;
 	TexDesc.Usage = D3D11_USAGE::D3D11_USAGE_DYNAMIC; // ¶¯Ì¬Ð´Èë
 	TexDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
-	TexDesc.CPUAccessFlags = 0;
+	TexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	TexDesc.MiscFlags = 0;
 	hResult = m_pDevice->GetD3DDevice()->CreateTexture2D( &TexDesc, nullptr, &pD3DTexture );
 	if ( FAILED( hResult ) )
@@ -52,7 +52,7 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateEmpty( int w, int h )
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
-	hResult = m_pDevice->GetD3DDevice()->CreateShaderResourceView( m_pD3DTexture, NULL, &pD3DShaderResourceView );
+	hResult = m_pDevice->GetD3DDevice()->CreateShaderResourceView( pD3DTexture.Get(), NULL, &pD3DShaderResourceView );
 	if ( FAILED( hResult ) )
 	{
 		return MakeResult( ResultCode::Bad, "" );
