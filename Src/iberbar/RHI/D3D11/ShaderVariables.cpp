@@ -142,14 +142,17 @@ void iberbar::RHI::D3D11::CShaderVariableTable::SetShader( IShader* pShader )
 
 			uint32 nBufferSizeTotal = pReflection->GetBufferSizeTotal();
 			int nBufferCount = pReflection->GetBufferCountInternal();
-			m_CommonMemory.resize( nBufferSizeTotal );
-			m_Buffers.resize( nBufferCount );
-
-			const CShaderReflectionBuffer* pShaderReflectionBuffer = nullptr;
-			for ( int i = 0; i < nBufferCount; i++ )
+			if ( nBufferSizeTotal > 0 && nBufferCount > 0 )
 			{
-				pShaderReflectionBuffer = pReflection->GetBufferByIndexInternal( i );
-				m_Buffers[ i ] = ( &m_CommonMemory.front() ) + pShaderReflectionBuffer->GetOffset();
+				m_CommonMemory.resize( nBufferSizeTotal );
+				m_Buffers.resize( nBufferCount );
+
+				const CShaderReflectionBuffer* pShaderReflectionBuffer = nullptr;
+				for ( int i = 0; i < nBufferCount; i++ )
+				{
+					pShaderReflectionBuffer = pReflection->GetBufferByIndexInternal( i );
+					m_Buffers[ i ] = ( &m_CommonMemory.front() ) + pShaderReflectionBuffer->GetOffset();
+				}
 			}
 
 			m_SamplerStates.resize( 8 );
@@ -161,6 +164,9 @@ void iberbar::RHI::D3D11::CShaderVariableTable::SetShader( IShader* pShader )
 
 void iberbar::RHI::D3D11::CShaderVariableTable::SetBool( const char* strName, bool value )
 {
+	if ( m_CommonMemory.empty() )
+		return;
+
 	TShaderVariableTable_SetValue<uint32, UShaderVariableType::VT_Boolean>(
 		m_pShader->GetReflectionInternal(),
 		strName,
@@ -179,6 +185,9 @@ void iberbar::RHI::D3D11::CShaderVariableTable::SetBool( const char* strName, bo
 
 void iberbar::RHI::D3D11::CShaderVariableTable::SetInt( const char* strName, int value )
 {
+	if ( m_CommonMemory.empty() )
+		return;
+
 	TShaderVariableTable_SetValue<int32, UShaderVariableType::VT_Int>(
 		m_pShader->GetReflectionInternal(),
 		strName,
@@ -197,6 +206,9 @@ void iberbar::RHI::D3D11::CShaderVariableTable::SetInt( const char* strName, int
 
 void iberbar::RHI::D3D11::CShaderVariableTable::SetFloat( const char* strName, float value )
 {
+	if ( m_CommonMemory.empty() )
+		return;
+
 	TShaderVariableTable_SetValue<float, UShaderVariableType::VT_Float>(
 		m_pShader->GetReflectionInternal(),
 		strName,
@@ -215,6 +227,9 @@ void iberbar::RHI::D3D11::CShaderVariableTable::SetFloat( const char* strName, f
 
 void iberbar::RHI::D3D11::CShaderVariableTable::SetVector( const char* strName, const DirectX::XMFLOAT4& value )
 {
+	if ( m_CommonMemory.empty() )
+		return;
+
 	TShaderVariableTable_SetValue<DirectX::XMFLOAT4, UShaderVariableType::VT_Void, UShaderVariableClass::SVC_Vector>(
 		m_pShader->GetReflectionInternal(),
 		strName,
@@ -233,6 +248,9 @@ void iberbar::RHI::D3D11::CShaderVariableTable::SetVector( const char* strName, 
 
 void iberbar::RHI::D3D11::CShaderVariableTable::SetMatrix( const char* strName, const DirectX::XMFLOAT4X4& value )
 {
+	if ( m_CommonMemory.empty() )
+		return;
+
 	TShaderVariableTable_SetValue<DirectX::XMFLOAT4X4, UShaderVariableType::VT_Float, UShaderVariableClass::SVC_Matrix>(
 		m_pShader->GetReflectionInternal(),
 		strName,
@@ -283,6 +301,8 @@ bool iberbar::RHI::D3D11::CShaderVariableTable::Compare( IShaderVariableTable* p
 	//	return false;
 	if ( m_CommonMemory.size() != pOther->m_CommonMemory.size() )
 		return false;
+	if ( m_CommonMemory.empty() || pOther->m_CommonMemory.empty() )
+		return false;
 	for ( size_t i = 0, s = m_SamplerStates.size(); i < s; i++ )
 	{
 		if ( m_SamplerStates[ i ] != pOther->m_SamplerStates[ i ] )
@@ -293,6 +313,7 @@ bool iberbar::RHI::D3D11::CShaderVariableTable::Compare( IShaderVariableTable* p
 		if ( m_Textures[ i ] != pOther->m_Textures[ i ] )
 			return false;
 	}
+
 	if ( memcmp( &m_CommonMemory.front(), &pOther->m_CommonMemory.front(), m_CommonMemory.size() ) != 0 )
 		return false;
 	return true;
