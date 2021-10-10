@@ -29,11 +29,12 @@ iberbar::RHI::D3D11::CDevice::CDevice()
 	, m_bEnableMultisampleQuality( false )
 	, m_nMultisampleQualityLevels( 0 )
 	, m_pD3DVertexBuffers()
-	, m_nVertexBufferStride( 0 )
+	, m_nVertexBufferStrides()
 	, m_pD3DIndexBuffer( nullptr )
 	, m_pD3DTextures()
 {
 	memset( m_pD3DVertexBuffers, 0, sizeof( m_pD3DVertexBuffers ) );
+	memset( m_nVertexBufferStrides, 0, sizeof( m_nVertexBufferStrides ) );
 }
 
 
@@ -263,16 +264,14 @@ void iberbar::RHI::D3D11::CDevice::CreateCommandContext( ICommandContext** ppOut
 
 iberbar::CResult iberbar::RHI::D3D11::CDevice::Begin()
 {
-	//m_pD3DDeviceContext->Begin( nullptr );
 	m_pD3DDeviceContext->ClearRenderTargetView( m_pD3DRenderTargetView.Get(), m_D3DClearColorRGBA );
-	m_pD3DDeviceContext->ClearDepthStencilView( m_pD3DDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
+	m_pD3DDeviceContext->ClearDepthStencilView( m_pD3DDepthStencilView.Get(), D3D11_CLEAR_DEPTH| D3D11_CLEAR_STENCIL, 1.0f, 0 );
 	return CResult();
 }
 
 
 void iberbar::RHI::D3D11::CDevice::End()
 {
-	//m_pD3DDeviceContext->End( nullptr );
 	if ( true )
 	{
 		m_pDXGISwapChain->Present( 1, 0 );
@@ -529,21 +528,24 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	DepthStencilViewDesc.Texture2D.MipSlice = 0;
 	HR( m_pD3DDevice->CreateDepthStencilView( m_pD3DDepthStencil.Get(), &DepthStencilViewDesc, &m_pD3DDepthStencilView ), "");
 
-	D3D11_RASTERIZER_DESC RasterizerDesc;
-	memset( &RasterizerDesc, 0, sizeof( RasterizerDesc ) );
-	RasterizerDesc.AntialiasedLineEnable = false;
-	RasterizerDesc.CullMode = D3D11_CULL_BACK;
-	RasterizerDesc.DepthBias = 0;
-	RasterizerDesc.DepthBiasClamp = 0.0f;
-	RasterizerDesc.DepthClipEnable = true;
-	RasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	RasterizerDesc.FrontCounterClockwise = false;
-	RasterizerDesc.MultisampleEnable = false;
-	RasterizerDesc.ScissorEnable = false;
-	RasterizerDesc.SlopeScaledDepthBias = 0.0f;
-	HR( m_pD3DDevice->CreateRasterizerState( &RasterizerDesc, &m_pD3DRasterizerState ), "" );
-	
-	m_pD3DDeviceContext->RSSetState( m_pD3DRasterizerState.Get() );
+	//D3D11_RASTERIZER_DESC RasterizerDesc;
+	//memset( &RasterizerDesc, 0, sizeof( RasterizerDesc ) );
+	//RasterizerDesc.AntialiasedLineEnable = false;
+	//RasterizerDesc.CullMode = D3D11_CULL_BACK;
+	//RasterizerDesc.DepthBias = 0;
+	//RasterizerDesc.DepthBiasClamp = 0.0f;
+	//RasterizerDesc.DepthClipEnable = true;
+	//RasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	//RasterizerDesc.FrontCounterClockwise = false;
+	//RasterizerDesc.MultisampleEnable = false;
+	//RasterizerDesc.ScissorEnable = false;
+	//RasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	//HR( m_pD3DDevice->CreateRasterizerState( &RasterizerDesc, &m_pD3DRasterizerState ), "" );
+	//
+	//m_pD3DDeviceContext->RSSetState( m_pD3DRasterizerState.Get() );
+
+		// 将渲染目标视图和深度/模板缓冲区结合到管线
+	m_pD3DDeviceContext->OMSetRenderTargets(1, m_pD3DRenderTargetView.GetAddressOf(), m_pD3DDepthStencilView.Get());
 
 	D3D11_VIEWPORT Viewport;
 	memset( &Viewport, 0, sizeof( Viewport ) );
@@ -565,13 +567,13 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 void iberbar::RHI::D3D11::CDevice::BindVertexBuffer( ID3D11Buffer* pD3DVertexBuffer, uint32 stride )
 {
-	if ( m_pD3DVertexBuffers[0] == pD3DVertexBuffer && stride == m_nVertexBufferStride )
+	if ( m_pD3DVertexBuffers[0] == pD3DVertexBuffer && stride == m_nVertexBufferStrides[0] )
 		return;
 
 	UNKNOWN_SAFE_RELEASE_NULL( m_pD3DVertexBuffers[ 0 ] );
 	m_pD3DVertexBuffers[ 0 ] = pD3DVertexBuffer;
 	UNKNOWN_SAFE_ADDREF( m_pD3DVertexBuffers[ 0 ] );
-	m_nVertexBufferStride = stride;
+	m_nVertexBufferStrides[0] = stride;
 	if ( m_pD3DVertexBuffers[ 0 ] == nullptr )
 	{
 		m_pD3DDeviceContext->IASetVertexBuffers( 0, 0, nullptr, nullptr, nullptr );
@@ -579,7 +581,7 @@ void iberbar::RHI::D3D11::CDevice::BindVertexBuffer( ID3D11Buffer* pD3DVertexBuf
 	else
 	{
 		UINT offsets = 0;
-		m_pD3DDeviceContext->IASetVertexBuffers( 0, 1, m_pD3DVertexBuffers, &m_nVertexBufferStride, &offsets );
+		m_pD3DDeviceContext->IASetVertexBuffers( 0, 1, &m_pD3DVertexBuffers[0], m_nVertexBufferStrides, &offsets );
 	}
 }
 
