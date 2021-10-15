@@ -58,6 +58,9 @@
     <sdk_directxtk>$(CppSdkEnv)\DirectXTK\jan2021\$(PlatformTarget)</sdk_directxtk>
     <sdk_directxtk_include>$(sdk_directxtk)\Inc</sdk_directxtk_include>
     <sdk_directxtk_lib>$(sdk_directxtk)\Lib</sdk_directxtk_lib>
+    <sdk_spine>$(CppSdkEnv)\spine\4.0\$(sdk_platform_path)\dist</sdk_spine>
+    <sdk_spine_include>$(sdk_spine)\include</sdk_spine_include>
+    <sdk_spine_lib>$(sdk_spine)\lib</sdk_spine_lib>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -229,6 +232,15 @@
     </BuildMacro>
     <BuildMacro Include="sdk_directxtk_lib">
       <Value>$(sdk_directxtk_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_spine">
+      <Value>$(sdk_spine)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_spine_include">
+      <Value>$(sdk_spine_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_spine_lib">
+      <Value>$(sdk_spine_lib)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
