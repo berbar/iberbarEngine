@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iberbar/Renderer/Headers.h>
+#include <iberbar/Renderer/ShaderVariables.h>
 
 namespace iberbar
 {
@@ -31,16 +32,16 @@ namespace iberbar
 			URenderCommandType GetCommandType() const;
 			void SetZOrder( int nZOrder );
 			int GetZOrder() const;
-			void SetShaderState( RHI::IShaderState* pEffectState );
-			void SetShaderVariableTable( RHI::EShaderType eShaderType, RHI::IShaderVariableTable* pShaderVariableTable );
-			RHI::IShaderState* GetShaderState() const;
-			RHI::IShaderVariableTable* GetShaderVariableTable( RHI::EShaderType eShaderType ) const;
+			//void SetShaderState( RHI::IShaderState* pShaderState );
+			//void SetShaderVariableTable( RHI::EShaderType eShaderType, RHI::IShaderVariableTable* pShaderVariableTable );
+			//RHI::IShaderState* GetShaderState() const;
+			//CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType eShaderType ) const;
 
 		protected:
 			URenderCommandType m_nCommandType;
 			int m_nZOrder;
-			RHI::IShaderState* m_pShaderState;
-			RHI::IShaderVariableTable* m_pShaderVariableTableArray[ (int)RHI::EShaderType::__Count ];
+			//RHI::IShaderState* m_pShaderState;
+			//CShaderVariableTable* m_pShaderVariableTableArray[ (int)RHI::EShaderType::__Count ];
 		};
 	}
 }
@@ -64,25 +65,25 @@ FORCEINLINE int iberbar::Renderer::CRenderCommand::GetZOrder() const
 }
 
 
-FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderState( RHI::IShaderState* pEffectState )
-{
-	m_pShaderState = pEffectState;
-}
+//FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderState( RHI::IShaderState* pEffectState )
+//{
+//	m_pShaderState = pEffectState;
+//}
 
 
-FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderVariableTable( RHI::EShaderType eShaderType, RHI::IShaderVariableTable* pShaderVariableTable )
-{
-	m_pShaderVariableTableArray[ (int)eShaderType ] = pShaderVariableTable;
-}
+//FORCEINLINE void iberbar::Renderer::CRenderCommand::SetShaderVariableTable( RHI::EShaderType eShaderType, RHI::IShaderVariableTable* pShaderVariableTable )
+//{
+//	m_pShaderVariableTableArray[ (int)eShaderType ] = pShaderVariableTable;
+//}
 
 
-FORCEINLINE iberbar::RHI::IShaderState* iberbar::Renderer::CRenderCommand::GetShaderState() const
-{
-	return m_pShaderState;
-}
-
-
-FORCEINLINE iberbar::RHI::IShaderVariableTable* iberbar::Renderer::CRenderCommand::GetShaderVariableTable( RHI::EShaderType eShaderType ) const
-{
-	return m_pShaderVariableTableArray[ (int)eShaderType ];
-}
+//FORCEINLINE iberbar::RHI::IShaderState* iberbar::Renderer::CRenderCommand::GetShaderState() const
+//{
+//	return m_pShaderState;
+//}
+//
+//
+//FORCEINLINE iberbar::Renderer::CShaderVariableTable* iberbar::Renderer::CRenderCommand::GetShaderVariableTable( RHI::EShaderType eShaderType ) const
+//{
+//	return m_pShaderVariableTableArray[ (int)eShaderType ];
+//}

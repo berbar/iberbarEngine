@@ -3,7 +3,7 @@
 #include <iberbar/RHI/Device.h>
 #include <iberbar/RHI/Texture.h>
 #include <iberbar/Renderer/Renderer.h>
-#include <iberbar/Renderer/RendererSprite.h>
+//#include <iberbar/Renderer/RendererSprite.h>
 #include <iberbar/Font/FreeType.h>
 #include <iberbar/Font/FontDrawText.h>
 #include <iberbar/Utility/RectClip2d.h>
@@ -183,6 +183,7 @@ iberbar::Renderer::CFont::CFont(
 
 iberbar::Renderer::CFont::~CFont()
 {
+	m_pTextureCache->SaveToFilesA( "font_cache.png" );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pFace );
 	SAFE_DELETE( m_pCharMapper );
 	SAFE_DELETE( m_pTextureCache );

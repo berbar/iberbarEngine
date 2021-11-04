@@ -80,6 +80,8 @@ namespace iberbar
 			void Flush();
 			void ProcessGroupCommand( CRenderGroupCommand* pCommand );
 
+			void SetShaderBindings();
+
 		protected:
 			std::vector<CRenderQueue> m_RenderQueue;
 			std::stack<int> m_CommandGroupStack;

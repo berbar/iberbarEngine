@@ -17,6 +17,17 @@
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\GroupCommand.h">
       <Filter>Commands</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Effect.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\MeshProcessor.h">
+      <Filter>Processor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\MeshDrawCommand.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\ShaderVariables.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Material.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Vertex.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RenderCommand.cpp" />
@@ -33,6 +44,11 @@
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\GroupCommand.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\ShaderVariables.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Material.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\MeshDrawCommand.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Font">
@@ -40,6 +56,9 @@
     </Filter>
     <Filter Include="Commands">
       <UniqueIdentifier>{c1cb5abc-0171-4076-bf58-0b6779fc44f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Processor">
+      <UniqueIdentifier>{b2f5d1cb-ff60-43d1-b0bd-1eccae2215d6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 
 #include <iberbar/Renderer/Headers.h>
 #include <iberbar/Renderer/RenderCommand.h>
+#include <iberbar/Renderer/Material.h>
 #include <iberbar/RHI/ShaderVariables.h>
 
 namespace iberbar
@@ -47,10 +48,13 @@ namespace iberbar
 
 		public:
 			inline void SetTriangles( const UTriangles& triangles ) { m_Triangles = triangles; }
+			inline void SetMaterial( CMaterial* pMaterial ) { m_pMaterial = pMaterial; }
 
 			inline const UTriangles* GetTriangles() { return &m_Triangles; }
+			inline CMaterial* GetMaterial() { return m_pMaterial; }
 
 		protected:
+			CMaterial* m_pMaterial;
 			UTriangles m_Triangles;
 		};
 	}
