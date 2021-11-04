@@ -4,7 +4,6 @@
 #include <iberbar/Gui/Widget.h>
 #include <iberbar/Gui/Dialog.h>
 #include <iberbar/Renderer/Renderer.h>
-#include <iberbar/Renderer/RendererSprite.h>
 #include <iberbar/Renderer/CallbackCommand.h>
 #include <iberbar/Renderer/GroupCommand.h>
 #include <iberbar/Utility/Command.h>
@@ -16,10 +15,9 @@
 iberbar::Gui::CEngine* iberbar::Gui::CEngine::sm_pInstance = nullptr;
 
 
-iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueue* pCommandQueue )
-	: m_pRenderer( pSprite->GetRenderer() )
-	, m_pSprite( pSprite )
-	, m_pRenderGroupCommandManager( pSprite->GetRenderer()->GetRenderGroupCommandManager() )
+iberbar::Gui::CEngine::CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue )
+	: m_pRenderer( pRenderer )
+	, m_pRenderGroupCommandManager( pRenderer->GetRenderGroupCommandManager() )
 	, m_pRenderCommand_Callback( new Renderer::CRenderCallbackCommand() )
 	, m_pCommandQueue( pCommandQueue )
 	, m_bMemoryResAuto( true )
@@ -33,10 +31,9 @@ iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueu
 }
 
 
-iberbar::Gui::CEngine::CEngine( Renderer::CRendererSprite* pSprite, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes )
-	: m_pRenderer( pSprite->GetRenderer() )
-	, m_pSprite( pSprite )
-	, m_pRenderGroupCommandManager( pSprite->GetRenderer()->GetRenderGroupCommandManager() )
+iberbar::Gui::CEngine::CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes )
+	: m_pRenderer( pRenderer )
+	, m_pRenderGroupCommandManager( pRenderer->GetRenderGroupCommandManager() )
 	, m_pRenderCommand_Callback( new Renderer::CRenderCallbackCommand() )
 	, m_pCommandQueue( pCommandQueue )
 	, m_bMemoryResAuto( pMemoryRes == nullptr ? true : false )

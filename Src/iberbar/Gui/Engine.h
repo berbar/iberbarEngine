@@ -16,7 +16,6 @@ namespace iberbar
 	namespace Renderer
 	{
 		class CRenderer2d;
-		class CRendererSprite;
 		class CRenderCommand;
 		class CRenderCallbackCommand;
 		class CRenderGroupCommandManager;
@@ -31,15 +30,14 @@ namespace iberbar
 		class __iberbarGuiApi__ CEngine final
 		{
 		public:
-			CEngine( Renderer::CRendererSprite* pSprite, CCommandQueue* pCommandQueue );
-			CEngine( Renderer::CRendererSprite* pSprite, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes );
+			CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue );
+			CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes );
 			~CEngine();
 
 		public:
 			std::pmr::memory_resource* GetMemoryPool() { return m_pMemoryRes; }
 			CViewportState* GetViewportState() { return &m_ViewportState; }
 			Renderer::CRenderer2d* GetRenderer() { return m_pRenderer; }
-			Renderer::CRendererSprite* GetRendererSprite() { return m_pSprite; }
 
 		public:
 			void AddDialog( CDialog* pDialog );
@@ -60,7 +58,6 @@ namespace iberbar
 
 		private:
 			Renderer::CRenderer2d* m_pRenderer;
-			Renderer::CRendererSprite* m_pSprite;
 			Renderer::CRenderGroupCommandManager* m_pRenderGroupCommandManager;
 			Renderer::CRenderCallbackCommand* m_pRenderCommand_Callback;
 			CCommandQueue* m_pCommandQueue;

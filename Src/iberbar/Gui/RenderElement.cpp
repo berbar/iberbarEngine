@@ -2,7 +2,6 @@
 #include <iberbar/Gui/RenderElement.h>
 #include <iberbar/Gui/Engine.h>
 #include <iberbar/Renderer/Renderer.h>
-#include <iberbar/Renderer/RendererSprite.h>
 #include <iberbar/RHI/ShaderState.h>
 
 
@@ -10,26 +9,33 @@
 
 iberbar::Gui::CRenderElement::CRenderElement( void )
 	: m_nZOrder( 0 )
-	, m_pShaderState( nullptr )
-	, m_pShaderVariableTables()
+	//, m_MeshVertices()
+	//, m_MeshIndices()
+	//, m_pMaterial( nullptr )
+	//, m_RenderCommand()
 	, m_ChildElements()
 	, m_nState( 0 )
 {
+	//memset( m_MeshVertices, 0, sizeof( m_MeshVertices ) );
+	//memset( m_MeshIndices, 0, sizeof( m_MeshIndices ) );
 }
 
 iberbar::Gui::CRenderElement::CRenderElement( const CRenderElement& elem )
 	: CObject( elem )
 	, m_nZOrder( elem.m_nZOrder )
-	, m_pShaderState( nullptr )
-	, m_pShaderVariableTables()
+	//, m_MeshVertices()
+	//, m_MeshIndices()
+	//, m_pMaterial( nullptr )
+	//, m_RenderCommand()
 	, m_ChildElements()
 	, m_nState( 0 )
 {
+	//memset( m_MeshVertices, 0, sizeof( m_MeshVertices ) );
+	//memset( m_MeshIndices, 0, sizeof( m_MeshIndices ) );
 }
 
 iberbar::Gui::CRenderElement::~CRenderElement()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
 	m_ChildElements.clear();
 }
 
@@ -184,12 +190,12 @@ void iberbar::Gui::CRenderElement::SetState( int nState )
 }
 
 
-void iberbar::Gui::CRenderElement::Init()
-{
-	CEngine::sGetInstance()->GetRendererSprite()->GetDefaultShaderState( &m_pShaderState );
-	CEngine::sGetInstance()->GetRendererSprite()->CreateDefaultShaderVariableTableUnion( &m_pShaderVariableTables );
-	m_pShaderVariableTables.GetVariableTableForVertexShader()->SetBool( Renderer::s_strShaderVarName_RHW, true );
-}
+//void iberbar::Gui::CRenderElement::Init()
+//{
+//	CEngine::sGetInstance()->GetRendererSprite()->GetDefaultShaderState( &m_pShaderState );
+//	CEngine::sGetInstance()->GetRendererSprite()->CreateDefaultShaderVariableTableUnion( &m_pShaderVariableTables );
+//	m_pShaderVariableTables.GetVariableTableForVertexShader()->SetBool( Renderer::s_strShaderVarName_RHW, true );
+//}
 
 
 void iberbar::Gui::CRenderElement::UpdateRect()
