@@ -1,13 +1,13 @@
 matrix ViewProjMatrix;
 struct VS_INPUT
 {
-    vector position : POSITION;
-    vector color : COLOR;
+    float3 position : POSITION;
+    float4 color : COLOR;
 };
 struct VS_OUTPUT
 {
-    vector position : POSITION;
-    vector diffuse : COLOR;
+    float4 position : SV_POSITION;
+    float4 diffuse : COLOR;
 };
 VS_OUTPUT Main(VS_INPUT input)
 {

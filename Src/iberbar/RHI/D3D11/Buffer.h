@@ -104,43 +104,67 @@ namespace iberbar
 			};
 
 
-			class CConstantBuffer
+
+			class CUniformBuffer
+				: public IUniformBuffer
 			{
 			public:
-				CConstantBuffer( CDevice* pDevice, uint32 nSize, uint32 nUsage );
-				~CConstantBuffer();
+				CUniformBuffer( CDevice* pDevice, uint32 nSize, bool bUseMemoryCache );
+				virtual ~CUniformBuffer();
 
 			public:
+				virtual void UpdateContents( const void* pContents, uint32 nContentSize ) override;
+
 				CResult Initial();
 				void Destroy();
 
 				FORCEINLINE ID3D11Buffer* GetD3DBuffer() { return m_pD3DBuffer.Get(); }
-				FORCEINLINE ID3D11Buffer* const* GetD3DBufferAddress() { return m_pD3DBuffer.GetAddressOf(); }
-				FORCEINLINE bool IsDynamic() const { return ( m_nUsage & UBufferUsageFlags::AnyDynamic ) != 0; }
-				FORCEINLINE D3D11_USAGE GetD3DUsage() const {
-					D3D11_USAGE nD3DUsage = D3D11_USAGE_DEFAULT;
-					if ( IsDynamic() )
-					{
-						nD3DUsage = D3D11_USAGE_DYNAMIC;
-					}
-					return nD3DUsage;
-				}
-				FORCEINLINE UINT GetD3DCpuAccess()
-				{
-					UINT nFlag = 0;
-					if ( IsDynamic() )
-					{
-						nFlag = (UINT)D3D11_CPU_ACCESS_WRITE;
-					}
-					return nFlag;
-				}
 
 			protected:
 				CDevice* m_pDevice;
 				uint32 m_nSize;
-				uint32 m_nUsage;
+				uint8* m_pMemoryCache;
 				ComPtr<ID3D11Buffer> m_pD3DBuffer;
 			};
+
+
+			//class CConstantBuffer
+			//{
+			//public:
+			//	CConstantBuffer( CDevice* pDevice, uint32 nSize, uint32 nUsage );
+			//	~CConstantBuffer();
+
+			//public:
+			//	CResult Initial();
+			//	void Destroy();
+
+			//	FORCEINLINE ID3D11Buffer* GetD3DBuffer() { return m_pD3DBuffer.Get(); }
+			//	FORCEINLINE ID3D11Buffer* const* GetD3DBufferAddress() { return m_pD3DBuffer.GetAddressOf(); }
+			//	FORCEINLINE bool IsDynamic() const { return ( m_nUsage & UBufferUsageFlags::AnyDynamic ) != 0; }
+			//	FORCEINLINE D3D11_USAGE GetD3DUsage() const {
+			//		D3D11_USAGE nD3DUsage = D3D11_USAGE_DEFAULT;
+			//		if ( IsDynamic() )
+			//		{
+			//			nD3DUsage = D3D11_USAGE_DYNAMIC;
+			//		}
+			//		return nD3DUsage;
+			//	}
+			//	FORCEINLINE UINT GetD3DCpuAccess()
+			//	{
+			//		UINT nFlag = 0;
+			//		if ( IsDynamic() )
+			//		{
+			//			nFlag = (UINT)D3D11_CPU_ACCESS_WRITE;
+			//		}
+			//		return nFlag;
+			//	}
+
+			//protected:
+			//	CDevice* m_pDevice;
+			//	uint32 m_nSize;
+			//	uint32 m_nUsage;
+			//	ComPtr<ID3D11Buffer> m_pD3DBuffer;
+			//};
 		}
 	}
 }

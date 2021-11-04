@@ -29,14 +29,19 @@ namespace iberbar
 
 				CResult CreateReflection( const void* pCodes, uint32 nCodeLen );
 				FORCEINLINE CShaderReflection* GetReflectionInternal() { return m_pReflection; }
-				FORCEINLINE const std::vector<CConstantBuffer*>& GetConstantBuffers() { return m_ConstantBuffers; }
-				FORCEINLINE const uint8* GetConstantBuffersMemory() const { return &(m_ConstBuffersData.front()); }
+				//FORCEINLINE const std::vector<CConstantBuffer*>& GetConstantBuffers() { return m_ConstantBuffers; }
+				//FORCEINLINE const uint8* GetConstantBuffersMemory() const
+				//{
+				//	if (m_ConstBuffersData.empty())
+				//		return nullptr;
+				//	return &(m_ConstBuffersData.front());
+				//}
 
 			protected:
 				CDevice* m_pDevice;
 				CShaderReflection* m_pReflection;
-				std::vector<CConstantBuffer*> m_ConstantBuffers;
-				std::vector<uint8> m_ConstBuffersData;
+				//std::vector<CConstantBuffer*> m_ConstantBuffers;
+				//std::vector<uint8> m_ConstBuffersData;
 			};
 
 

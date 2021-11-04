@@ -14,8 +14,8 @@ namespace iberbar
 				: public IVertexDeclaration
 			{
 			public:
-				CVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride )
-					: IVertexDeclaration( pVertexElements, nVertexElementsCount, nStride )
+				CVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount )
+					: IVertexDeclaration( pVertexElements, nVertexElementsCount, pStrides, nSlotCount )
 				{
 				}
 				void BuildD3DInputElementDescritions( D3D11_INPUT_ELEMENT_DESC* pRefArray );

@@ -52,12 +52,14 @@ namespace iberbar
 			virtual CResult CreateGeometryShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreateDomainShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreateComputeShader( IShader** ppOutShader ) = 0;
-			virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride ) = 0;
+			virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount ) = 0;
 			virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) = 0;
-			virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) = 0;
+			//virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) = 0;
 			virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) = 0;
+			virtual CResult CreateDepthStencilState( IDepthStencilState** ppOutDepthStencilState, const UDepthStencilDesc& DepthStencilDesc ) = 0;
 			virtual CResult CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc ) = 0;
-			virtual void CreateCommandContext( ICommandContext** ppOutContext ) = 0;
+			//virtual void CreateCommandContext( ICommandContext** ppOutContext ) = 0;
+			virtual ICommandContext* GetDefaultContext() = 0;
 			virtual CResult Begin() = 0;
 			virtual void End() = 0;
 			virtual void SetClearColor( const CColor4B& color ) { m_ClearColor = CColor4F( color ); }

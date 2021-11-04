@@ -30,9 +30,6 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.h">
-      <Filter>D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariableDeclaration.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariables.h">
       <Filter>D3D11</Filter>
@@ -58,6 +55,12 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\RenderState.h">
       <Filter>D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\StateCache.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Buffer.cpp">
@@ -70,9 +73,6 @@
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Shader.cpp">
-      <Filter>D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\EffectReflection.cpp">
@@ -97,6 +97,12 @@
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\CommonDynamic.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\StateCache.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
   </ItemGroup>

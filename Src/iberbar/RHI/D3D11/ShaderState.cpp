@@ -2,6 +2,7 @@
 #include <iberbar/RHI/D3D11/ShaderState.h>
 #include <iberbar/RHI/D3D11/Shader.h>
 #include <iberbar/RHI/D3D11/VertexDeclaration.h>
+#include <iberbar/RHI/D3D11/Buffer.h>
 #include <iberbar/RHI/D3D11/Device.h>
 
 
@@ -14,6 +15,8 @@ iberbar::RHI::D3D11::CShaderState::CShaderState(
 	CGeometryShader* pGeometryShader,
 	CDomainShader* pDomainShader )
 	: m_pDevice( pDevice )
+	, m_pShaders()
+	, m_UniformBuffers()
 {
 	assert( m_pDevice );
 	m_pDevice->AddRef();
@@ -36,6 +39,8 @@ iberbar::RHI::D3D11::CShaderState::CShaderState(
 
 	m_pDomainShader = pDomainShader;
 	UNKNOWN_SAFE_ADDREF( m_pDomainShader );
+
+	memset( m_UniformBuffers, 0, sizeof( m_UniformBuffers ) );
 }
 
 
@@ -57,6 +62,12 @@ iberbar::RHI::IShader* iberbar::RHI::D3D11::CShaderState::GetShader( EShaderType
 }
 
 
+iberbar::RHI::IUniformBuffer** iberbar::RHI::D3D11::CShaderState::GetUniformBuffers( EShaderType eShaderType )
+{
+	return (IUniformBuffer**)m_UniformBuffers[ (int)eShaderType ];
+}
+
+
 iberbar::CResult iberbar::RHI::D3D11::CShaderState::Initial()
 {
 	if ( m_pVertexShader == nullptr )
@@ -71,6 +82,30 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderState::Initial()
 		&m_pD3DInputLayout );
 	if ( FAILED( hResult ) )
 		return MakeResult( ResultCode::Bad, "" );
+
+
+	CShader* pShader = nullptr;
+	CShaderReflection* pReflection = nullptr;
+	const CShaderReflectionBuffer* pReflectionBuffer = nullptr;
+	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
+	{
+		pShader = m_pShaders[ i ];
+		if ( pShader == nullptr )
+			continue;
+
+		pReflection = pShader->GetReflectionInternal();
+		if ( pShader == nullptr )
+			continue;
+
+		for ( int nBufferIndex = 0, nBufferCount = pReflection->GetBufferCount(); nBufferIndex < nBufferCount; nBufferIndex++ )
+		{
+			pReflectionBuffer = pReflection->GetBufferByIndexInternal( nBufferIndex );
+			if ( pReflectionBuffer == nullptr || pReflectionBuffer->GetSize() == 0 )
+				continue;
+
+			m_UniformBuffers[ i ][ pReflectionBuffer->GetBindPoint() ] = new CUniformBuffer( m_pDevice, pReflectionBuffer->GetSize(), true );
+		}
+	}
 
 	return CResult();
 }

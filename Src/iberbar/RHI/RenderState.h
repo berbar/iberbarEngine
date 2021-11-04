@@ -8,8 +8,6 @@ namespace iberbar
 	namespace RHI
 	{
 
-
-
 		class __iberbarRHIApi__ IBlendState
 			: public IResource
 		{
@@ -27,8 +25,12 @@ namespace iberbar
 			: public IResource
 		{
 		public:
-			virtual ~IDepthStencilState() {}
-			virtual bool Equal( const IDepthStencilState* Other ) = 0;
+			IDepthStencilState(const UDepthStencilDesc& Desc);
+			bool Equal(const IDepthStencilState* Other) const;
+			const UDepthStencilDesc& GetDesc() const { return m_Desc; }
+
+		protected:
+			UDepthStencilDesc m_Desc;
 		};
 
 
@@ -51,6 +53,12 @@ namespace iberbar
 FORCEINLINE bool iberbar::RHI::IBlendState::Equal( const IBlendState* Other )
 {
 	return memcmp( &m_Desc, &Other->m_Desc, sizeof( UBlendDesc ) ) == 0;
+}
+
+
+FORCEINLINE bool iberbar::RHI::IDepthStencilState::Equal(const IDepthStencilState* Other) const
+{
+	return memcmp(&m_Desc, &Other->m_Desc, sizeof(UDepthStencilDesc)) == 0;
 }
 
 

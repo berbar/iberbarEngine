@@ -32,6 +32,25 @@ namespace iberbar
 
 
 
+			class CDepthStencilState
+				: public IDepthStencilState
+			{
+			public:
+				CDepthStencilState(const UDepthStencilDesc& Desc)
+					: IDepthStencilState( Desc )
+					, m_pD3DDepthStencilState( nullptr )
+				{
+				}
+
+				CResult Create( CDevice* pDevice );
+				FORCEINLINE ID3D11DepthStencilState* GetD3DDepthStencilState() { return m_pD3DDepthStencilState.Get(); }
+
+			protected:
+				ComPtr<ID3D11DepthStencilState> m_pD3DDepthStencilState;
+			};
+
+
+
 			class CSamplerState
 				: public ISamplerState
 			{

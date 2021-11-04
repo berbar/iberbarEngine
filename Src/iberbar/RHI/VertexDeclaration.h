@@ -10,6 +10,7 @@ namespace iberbar
 	{
 		struct UVertexElement
 		{
+			uint32 nSlot;
 			UVertexDeclareUsage nSemantic;
 			uint32 nSemanticIndex;
 			UVertexFormat nFormat;
@@ -20,18 +21,17 @@ namespace iberbar
 			: public IResource
 		{
 		public:
-			IVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride );
-			virtual ~IVertexDeclaration();
+			IVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount );
 
 		public:
-			inline uint32 GetStride() const { return m_nStride; }
+			inline const uint32* GetStrides() const { return m_Strides; }
 			inline const UVertexElement* GetVertexElements() const { return m_pVertexElements; }
 			inline uint32 GetVertexElementsCount() const { return m_nVertexElementsCount; }
 
 		protected:
-			uint32 m_nStride;
-			UVertexElement* m_pVertexElements;
 			uint32 m_nVertexElementsCount;
+			uint32 m_Strides[ MaxVertexElementCount ];
+			UVertexElement m_pVertexElements[ MaxVertexElementCount ];
 		};
 	}
 }

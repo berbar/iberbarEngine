@@ -206,31 +206,60 @@ void iberbar::RHI::D3D11::CIndexBuffer::Destroy()
 
 
 
-iberbar::RHI::D3D11::CConstantBuffer::CConstantBuffer( CDevice* pDevice, uint32 nSize, uint32 nUsage )
+iberbar::RHI::D3D11::CUniformBuffer::CUniformBuffer( CDevice* pDevice, uint32 nSize, bool bUseMemoryCache )
 	: m_pDevice( pDevice )
 	, m_nSize( nSize )
-	, m_nUsage( nUsage )
+	, m_pMemoryCache( nullptr )
 	, m_pD3DBuffer( nullptr )
 {
 	assert( m_pDevice );
 	m_pDevice->AddRef();
+
+	if ( bUseMemoryCache == true )
+	{
+		m_pMemoryCache = new uint8[ m_nSize ];
+	}
 }
 
 
-iberbar::RHI::D3D11::CConstantBuffer::~CConstantBuffer()
+iberbar::RHI::D3D11::CUniformBuffer::~CUniformBuffer()
 {
 	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
+	SAFE_DELETE_ARRAY( m_pMemoryCache );
 }
 
 
-iberbar::CResult iberbar::RHI::D3D11::CConstantBuffer::Initial()
+void iberbar::RHI::D3D11::CUniformBuffer::UpdateContents( const void* pContents, uint32 nContentSize )
+{
+	assert( pContents );
+
+	if ( m_pD3DBuffer == nullptr )
+		return;
+	
+	int nContentSizeCopy = tMin( nContentSize, m_nSize );
+
+	if ( m_pMemoryCache != nullptr )
+	{
+		if ( memcmp( m_pMemoryCache, pContents, nContentSizeCopy ) == 0 )
+			return;
+	}
+
+	D3D11_MAPPED_SUBRESOURCE m_D3DMappedSubResource;
+	memset( &m_D3DMappedSubResource, 0, sizeof( m_D3DMappedSubResource ) );
+	m_pDevice->GetD3DDeviceContext()->Map( m_pD3DBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &m_D3DMappedSubResource );
+	memcpy_s( m_D3DMappedSubResource.pData, m_nSize, pContents, nContentSizeCopy );
+	m_pDevice->GetD3DDeviceContext()->Unmap( m_pD3DBuffer.Get(), 0 );
+}
+
+
+iberbar::CResult iberbar::RHI::D3D11::CUniformBuffer::Initial()
 {
 	D3D11_BUFFER_DESC Desc;
 	memset( &Desc, 0, sizeof( D3D11_BUFFER_DESC ) );
-	Desc.Usage = GetD3DUsage();
+	Desc.Usage = D3D11_USAGE_DYNAMIC;
 	Desc.ByteWidth = m_nSize;
 	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = GetD3DCpuAccess();
+	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	HRESULT hResult = m_pDevice->GetD3DDevice()->CreateBuffer( &Desc, nullptr, &m_pD3DBuffer );
 	if ( FAILED( hResult ) )
 		return MakeResult( ResultCode::Bad, "" );
@@ -239,8 +268,10 @@ iberbar::CResult iberbar::RHI::D3D11::CConstantBuffer::Initial()
 }
 
 
-void iberbar::RHI::D3D11::CConstantBuffer::Destroy()
+void iberbar::RHI::D3D11::CUniformBuffer::Destroy()
 {
 	m_pD3DBuffer = nullptr;
+	m_nSize = 0;
+	SAFE_DELETE_ARRAY( m_pMemoryCache );
 }
 

@@ -11,8 +11,8 @@ iberbar::RHI::D3D11::CShader::CShader( CDevice* pDevice, EShaderType eShaderType
 	: IShader( eShaderType )
 	, m_pDevice( pDevice )
 	, m_pReflection( nullptr )
-	, m_ConstantBuffers()
-	, m_ConstBuffersData()
+	//, m_ConstantBuffers()
+	//, m_ConstBuffersData()
 {
 	assert( m_pDevice );
 	m_pDevice->AddRef();
@@ -23,12 +23,12 @@ iberbar::RHI::D3D11::CShader::~CShader()
 {
 	SAFE_DELETE(m_pReflection);
 	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
-	auto iter = m_ConstantBuffers.begin();
-	auto end = m_ConstantBuffers.end();
-	for ( ; iter != end; iter++ )
-	{
-		SAFE_DELETE( *iter );
-	}
+	//auto iter = m_ConstantBuffers.begin();
+	//auto end = m_ConstantBuffers.end();
+	//for ( ; iter != end; iter++ )
+	//{
+	//	SAFE_DELETE( *iter );
+	//}
 }
 
 
@@ -134,21 +134,21 @@ iberbar::CResult iberbar::RHI::D3D11::CShader::CreateReflection( const void* pCo
 	if ( cResult.IsOK() == false )
 		return cResult;
 
-	int nBufferCount = m_pReflection->GetBufferCountInternal();
-	if ( nBufferCount > 0 )
-	{
-		m_ConstantBuffers.resize( nBufferCount, nullptr );
-		for ( int i = 0; i < nBufferCount; i++ )
-		{
-			const CShaderReflectionBuffer* pReflectionBuffer = m_pReflection->GetBufferByIndexInternal( i );
-			m_ConstantBuffers[ i ] = new CConstantBuffer( m_pDevice, pReflectionBuffer->GetSize(), UBufferUsageFlags::Dynamic );
-			cResult = m_ConstantBuffers[ i ]->Initial();
-			if ( cResult.IsOK() == false )
-				return cResult;
-		}
-		m_ConstBuffersData.resize( m_pReflection->GetBufferSizeTotal() );
-		memset( &(m_ConstBuffersData.front()), 0, sizeof( m_pReflection->GetBufferSizeTotal() ) );
-	}
+	//int nBufferCount = m_pReflection->GetBufferCountInternal();
+	//if ( nBufferCount > 0 )
+	//{
+	//	m_ConstantBuffers.resize( nBufferCount, nullptr );
+	//	for ( int i = 0; i < nBufferCount; i++ )
+	//	{
+	//		const CShaderReflectionBuffer* pReflectionBuffer = m_pReflection->GetBufferByIndexInternal( i );
+	//		m_ConstantBuffers[ i ] = new CConstantBuffer( m_pDevice, pReflectionBuffer->GetSize(), UBufferUsageFlags::Dynamic );
+	//		cResult = m_ConstantBuffers[ i ]->Initial();
+	//		if ( cResult.IsOK() == false )
+	//			return cResult;
+	//	}
+	//	m_ConstBuffersData.resize( m_pReflection->GetBufferSizeTotal() );
+	//	memset( &(m_ConstBuffersData.front()), 0, sizeof( m_pReflection->GetBufferSizeTotal() ) );
+	//}
 
 	return CResult();
 }

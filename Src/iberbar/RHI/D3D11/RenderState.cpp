@@ -28,6 +28,37 @@ iberbar::CResult iberbar::RHI::D3D11::CBlendState::Create( CDevice* pDevice )
 }
 
 
+
+
+
+iberbar::CResult iberbar::RHI::D3D11::CDepthStencilState::Create( CDevice* pDevice )
+{
+	D3D11_DEPTH_STENCIL_DESC DepthStencilDesc;
+	memset( &DepthStencilDesc, 0, sizeof( DepthStencilDesc ) );
+	DepthStencilDesc.DepthEnable = m_Desc.DepthEnable;
+	DepthStencilDesc.DepthWriteMask = ConvertDepthWriteMask( m_Desc.DepthWriteMask );
+	DepthStencilDesc.DepthFunc = ConvertComparisonFunc( m_Desc.DepthFunc );
+	DepthStencilDesc.StencilEnable = m_Desc.StencilEnable;
+	DepthStencilDesc.StencilReadMask = m_Desc.StencilReadMask;
+	DepthStencilDesc.StencilWriteMask = m_Desc.StencilWriteMask;
+	DepthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	DepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	DepthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	DepthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	DepthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	DepthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	DepthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	DepthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	HRESULT hResult = pDevice->GetD3DDevice()->CreateDepthStencilState( &DepthStencilDesc, &m_pD3DDepthStencilState );
+	if (FAILED( hResult ))
+		return MakeResult( ResultCode::Bad, "" );
+	return CResult();
+}
+
+
+
+
+
 iberbar::CResult iberbar::RHI::D3D11::CSamplerState::Create( CDevice* pDevice )
 {
 	CD3D11_SAMPLER_DESC Desc = CD3D11_SAMPLER_DESC( CD3D11_DEFAULT() );

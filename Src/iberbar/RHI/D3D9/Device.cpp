@@ -232,6 +232,17 @@ iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateBlendState( IBlendState** pp
 }
 
 
+iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateDepthStencilState( IDepthStencilState** ppOutDepthStencilState, const UDepthStencilDesc& DepthStencilDesc )
+{
+	assert( ppOutDepthStencilState );
+	TSmartRefPtr<CDepthStencilState> pDepthStencilState = TSmartRefPtr<CDepthStencilState>::_sNew( DepthStencilDesc );
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutDepthStencilState );
+	(*ppOutDepthStencilState) = pDepthStencilState;
+	(*ppOutDepthStencilState)->AddRef();
+	return CResult();
+}
+
+
 iberbar::CResult iberbar::RHI::D3D9::CDevice::CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc )
 {
 	assert( ppOutSamplerState );
@@ -392,4 +403,28 @@ void iberbar::RHI::D3D9::CDevice::SetSamplerState( uint32 nStage, const UTexture
 	m_pD3DDevice->SetSamplerState( nStage, D3DSAMP_ADDRESSU, ConvertTextureAddress( SamplerState.nAddressU ) );
 	m_pD3DDevice->SetSamplerState( nStage, D3DSAMP_ADDRESSV, ConvertTextureAddress( SamplerState.nAddressV ) );
 	m_pD3DDevice->SetSamplerState( nStage, D3DSAMP_ADDRESSW, ConvertTextureAddress( SamplerState.nAddressW ) );
+}
+
+
+void iberbar::RHI::D3D9::CDevice::SetBlendState( IBlendState* pBlendState )
+{
+	assert( m_pBlendState );
+
+	const UBlendDesc& BlendDesc = m_pBlendState->GetDesc();
+
+	BOOL AlphaTest = BlendDesc.RenderTargets[0].BlendEnable == true ? TRUE : FALSE;
+	m_pD3DDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, AlphaTest );
+
+	m_pD3DDevice->SetRenderState( D3DRS_SRCBLEND, ConvertBlend( BlendDesc.RenderTargets[0].SrcBlend ) );
+	m_pD3DDevice->SetRenderState( D3DRS_DESTBLEND, ConvertBlend( BlendDesc.RenderTargets[0].DestBlend ) );
+	m_pD3DDevice->SetRenderState( D3DRS_ALPHATESTENABLE, AlphaTest );
+	m_pD3DDevice->SetRenderState( D3DRS_BLENDOP, ConvertBlendOP( BlendDesc.RenderTargets[0].BlendOp ) );
+
+	m_pD3DDevice->SetRenderState( D3DRS_SRCBLENDALPHA, ConvertBlend( BlendDesc.RenderTargets[0].SrcBlendAlpha ) );
+	m_pD3DDevice->SetRenderState( D3DRS_DESTBLENDALPHA, ConvertBlend( BlendDesc.RenderTargets[0].DestBlendAlpha ) );
+	m_pD3DDevice->SetRenderState( D3DRS_BLENDOPALPHA, ConvertBlendOP( BlendDesc.RenderTargets[0].BlendOpAlpha ) );
+
+	m_pD3DDevice->SetRenderState( D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_RED );
+
+	m_pD3DDevice->SetRenderState( D3DRS_BLENDFACTOR, 0 );
 }

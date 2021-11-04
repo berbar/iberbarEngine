@@ -15,7 +15,7 @@ namespace iberbar
 			Texture,
 			VertexBuffer,
 			IndexBuffer,
-			ConstBuffer,
+			UniformBuffer,
 			Shader,
 			Effect,
 			VertexDeclaration,

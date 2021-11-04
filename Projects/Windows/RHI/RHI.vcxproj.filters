@@ -19,6 +19,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Trace.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Effect.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderReflection.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderBindings.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\CommandContext.cpp" />

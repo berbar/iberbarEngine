@@ -5,19 +5,8 @@
 
 
 iberbar::RHI::D3D11::CShaderReflectionType::CShaderReflectionType()
-	: m_nVarType( UShaderVariableType::VT_Unknown )
-	, m_nVarClass( UShaderVariableClass::SVC_Scalar )
-	, m_nElementCount( 0 )
-	, m_nRowCount( 0 )
-	, m_nColumnCount( 0 )
-	, m_Members()
+	: m_Members()
 {
-}
-
-
-int iberbar::RHI::D3D11::CShaderReflectionType::GetMemberCount() const
-{
-	return (int)m_Members.size();
 }
 
 
@@ -37,18 +26,6 @@ const iberbar::RHI::IShaderReflectionMember* iberbar::RHI::D3D11::CShaderReflect
 			return m_Members[ i ];
 	}
 	return nullptr;
-}
-
-
-void iberbar::RHI::D3D11::CShaderReflectionType::GetDesc( UShaderReflectionTypeDesc* pOutDesc ) const
-{
-	assert( pOutDesc );
-	pOutDesc->nVarType = m_nVarType;
-	pOutDesc->nVarClass = m_nVarClass;
-	pOutDesc->nElements = m_nElementCount;
-	pOutDesc->nRows = m_nRowCount;
-	pOutDesc->nColumns = m_nColumnCount;
-	pOutDesc->pstrName = m_strName.c_str();
 }
 
 
@@ -85,6 +62,18 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionType::Initial( ID3D11Shad
 			break;
 		}
 
+		case D3D_SHADER_VARIABLE_TYPE::D3D_SVT_TEXTURE:
+		{
+			m_nVarType = UShaderVariableType::VT_Texture;
+			break;
+		}
+
+		case D3D_SHADER_VARIABLE_TYPE::D3D_SVT_SAMPLER:
+		{
+			m_nVarType = UShaderVariableType::VT_Sampler2D;
+			break;
+		}
+
 		default:break;
 	}
 
@@ -117,6 +106,8 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionType::Initial( ID3D11Shad
 	if ( D3DTypeDesc.Members > 0 )
 	{
 		m_Members.resize( D3DTypeDesc.Members );
+		m_nMemberCount = D3DTypeDesc.Members;
+
 		CShaderReflectionMember* pMember;
 		for ( UINT i = 0, s = D3DTypeDesc.Members; i < s; i++ )
 		{
@@ -141,14 +132,6 @@ iberbar::RHI::D3D11::CShaderReflectionMember::CShaderReflectionMember()
 }
 
 
-void iberbar::RHI::D3D11::CShaderReflectionMember::GetDesc( UShaderReflectionMemberDesc* pOutDesc ) const
-{
-	pOutDesc->nOffset = m_nOffset;
-	pOutDesc->nVarType = m_ReflectionType.GetVariableType();
-	pOutDesc->pstrName = m_strName.c_str();
-}
-
-
 iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionMember::Initial( ID3D11ShaderReflectionType* pD3DShaderReflectionType, const char* pstrName )
 {
 	D3D11_SHADER_TYPE_DESC D3DTypeDesc;
@@ -164,22 +147,8 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionMember::Initial( ID3D11Sh
 
 
 iberbar::RHI::D3D11::CShaderReflectionVariable::CShaderReflectionVariable()
-	: m_nOffsetLocal( 0 )
-	, m_nOffset( 0 )
-	, m_nRows( 0 )
-	, m_nColumns( 0 )
-	, m_nElementSize( 0 )
-	, m_nElementCount( 0 )
-	, m_nTotalSize( 0 )
-	, m_ReflectionType()
+	: m_ReflectionType()
 {
-}
-
-
-void iberbar::RHI::D3D11::CShaderReflectionVariable::GetDesc( UShaderReflectionVariableDesc* pOutDesc ) const
-{
-	pOutDesc->nOffset = m_nOffset;
-	pOutDesc->nVarType = m_ReflectionType.GetVariableType();
 }
 
 
@@ -187,7 +156,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionVariable::Initial( ID3D11
 {
 	D3D11_SHADER_VARIABLE_DESC D3DVariableDesc;
 	pD3DShaderReflectionVariable->GetDesc( &D3DVariableDesc );
-	m_nOffsetLocal = D3DVariableDesc.StartOffset;
+	m_nOffsetInBuffer = D3DVariableDesc.StartOffset;
 	m_nOffset = nCBufferBytesOffset + D3DVariableDesc.StartOffset;
 	m_nTotalSize = D3DVariableDesc.Size;
 	m_strName = D3DVariableDesc.Name;
@@ -199,10 +168,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionVariable::Initial( ID3D11
 
 
 iberbar::RHI::D3D11::CShaderReflectionBuffer::CShaderReflectionBuffer()
-	: m_nOffset( 0 )
-	, m_nSize( 0 )
-	, m_Variables()
-	, m_strName()
+	: m_Variables()
 {
 }
 
@@ -233,6 +199,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionBuffer::Initial( const D3
 	if ( D3DBufferDesc.Variables > 0 )
 	{
 		m_Variables.resize( D3DBufferDesc.Variables );
+		m_nVariableCount = D3DBufferDesc.Variables;
 
 		ID3D11ShaderReflectionVariable* pD3DShaderReflectionVariable = nullptr;
 		CShaderReflectionVariable* pReflectionVariable = nullptr;
@@ -253,10 +220,9 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionBuffer::Initial( const D3
 
 
 iberbar::RHI::D3D11::CShaderReflection::CShaderReflection()
-	: m_nBufferSizeTotal( 0 )
-	, m_ConstBuffers()
+	: m_ConstBuffers()
 	, m_Vars()
-	, m_Samplers()
+	, m_SamplerStates()
 	, m_Textures()
 {
 }
@@ -266,7 +232,7 @@ const iberbar::RHI::IShaderReflectionBuffer* iberbar::RHI::D3D11::CShaderReflect
 {
 	for ( int i = 0, s = m_ConstBuffers.size(); i < s; i++ )
 	{
-		if ( strcmp( m_ConstBuffers[ i ].GetName().c_str(), pstrName ) == 0 )
+		if ( strcmp( m_ConstBuffers[ i ].GetName(), pstrName ) == 0 )
 			return &m_ConstBuffers[ i ];
 	}
 	return nullptr;
@@ -295,6 +261,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflection::Initial( const void* pC
 		if ( D3DDesc.ConstantBuffers > 0 )
 		{
 			m_ConstBuffers.resize( D3DDesc.ConstantBuffers );
+			m_nBufferCount = D3DDesc.ConstantBuffers;
 		}
 
 		int nConstBufferIndex = 0;
@@ -306,11 +273,13 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflection::Initial( const void* pC
 			switch ( D3DInputBindDesc.Type )
 			{
 				case D3D_SHADER_INPUT_TYPE::D3D_SIT_SAMPLER:
-					m_Samplers.push_back( CShaderReflectionBindResource( UShaderVariableType::VT_Sampler2D, D3DInputBindDesc ) );
+					m_SamplerStates.push_back( CShaderReflectionBindResource( UShaderVariableType::VT_Sampler2D, D3DInputBindDesc ) );
+					m_nSamplerStateCountTotal += D3DInputBindDesc.BindCount;
 					break;
 
 				case D3D_SHADER_INPUT_TYPE::D3D_SIT_TEXTURE:
 					m_Textures.push_back( CShaderReflectionBindResource( UShaderVariableType::VT_Texture, D3DInputBindDesc ) );
+					m_nTextureCountTotal += D3DInputBindDesc.BindCount;
 					break;
 
 				case D3D_SHADER_INPUT_TYPE::D3D_SIT_CBUFFER:
@@ -320,7 +289,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflection::Initial( const void* pC
 					nConstBufferOffset += pConstBuffer->GetSize();
 					nConstBufferIndex++;
 
-					for ( int nVarIndex = 0, nVarCount = (int)pConstBuffer->GetVariableCountInternal(); nVarIndex < nVarCount; nVarIndex++ )
+					for ( int nVarIndex = 0, nVarCount = (int)pConstBuffer->GetVariableCount(); nVarIndex < nVarCount; nVarIndex++ )
 					{
 						m_Vars.push_back( pConstBuffer->GetVariableByIndexInternal( nVarIndex ) );
 					}
@@ -357,7 +326,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflection::Initial( const void* pC
 }
 
 
-const iberbar::RHI::D3D11::CShaderReflectionVariable* iberbar::RHI::D3D11::CShaderReflection::GetVariableByName( const char* pstrName ) const
+const iberbar::RHI::IShaderReflectionVariable* iberbar::RHI::D3D11::CShaderReflection::GetVariableByName( const char* pstrName ) const
 {
 	for ( int i = 0, s = (int)m_Vars.size(); i < s; i++ )
 	{
@@ -368,18 +337,18 @@ const iberbar::RHI::D3D11::CShaderReflectionVariable* iberbar::RHI::D3D11::CShad
 }
 
 
-const iberbar::RHI::D3D11::CShaderReflectionBindResource* iberbar::RHI::D3D11::CShaderReflection::GetSamplerByName( const char* pstrName ) const
+const iberbar::RHI::IShaderReflectionBindResource* iberbar::RHI::D3D11::CShaderReflection::GetSamplerStateByName( const char* pstrName ) const
 {
-	for ( int i = 0, s = (int)m_Samplers.size(); i < s; i++ )
+	for ( int i = 0, s = (int)m_SamplerStates.size(); i < s; i++ )
 	{
-		if ( strcmp( m_Samplers[ i ].GetName(), pstrName ) == 0 )
-			return &m_Samplers[ i ];
+		if ( strcmp( m_SamplerStates[ i ].GetName(), pstrName ) == 0 )
+			return &m_SamplerStates[ i ];
 	}
 	return nullptr;
 }
 
 
-const iberbar::RHI::D3D11::CShaderReflectionBindResource* iberbar::RHI::D3D11::CShaderReflection::GetTextureByName( const char* pstrName ) const
+const iberbar::RHI::IShaderReflectionBindResource* iberbar::RHI::D3D11::CShaderReflection::GetTextureByName( const char* pstrName ) const
 {
 	for ( int i = 0, s = (int)m_Textures.size(); i < s; i++ )
 	{

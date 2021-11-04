@@ -184,6 +184,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\RenderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Resource.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Shader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderBindings.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderReflection.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderVariables.h" />
