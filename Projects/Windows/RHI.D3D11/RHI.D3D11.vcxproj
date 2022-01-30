@@ -227,7 +227,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Shader.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariableDeclaration.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\StateCache.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Types.h" />

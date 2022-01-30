@@ -209,7 +209,8 @@ namespace iberbar
 
 
 iberbar::Renderer::CShaderVariableTable::CShaderVariableTable()
-	: m_pShaderReflection( nullptr )
+	: m_pShader( nullptr )
+	, m_pShaderReflection( nullptr )
 	, m_pCommonMemory( nullptr )
 	, m_Textures()
 	, m_SamplerStates()
@@ -231,18 +232,20 @@ void iberbar::Renderer::CShaderVariableTable::SetShader( RHI::IShader* pShader )
 		return;
 	}
 
-	RHI::IShaderReflection* pReflection = pShader->GetReflection();
-	if ( m_pShaderReflection != pReflection )
+	if ( m_pShader != pShader )
 	{
 		Clear();
 
-		m_pShaderReflection = pReflection;
+		m_pShader = pShader;
+		m_pShader->AddRef();
 
-		m_Textures.resize( pReflection->GetTextureCountTotal() );
-		m_SamplerStates.resize( pReflection->GetSamplerStateCountTotal() );
+		m_pShaderReflection = pShader->GetReflection();
 
-		uint32 nBufferSizeTotal = pReflection->GetBufferSizeTotal();
-		int nBufferCount = pReflection->GetBufferCount();
+		m_Textures.resize( m_pShaderReflection->GetTextureCountTotal() );
+		m_SamplerStates.resize( m_pShaderReflection->GetSamplerStateCountTotal() );
+
+		uint32 nBufferSizeTotal = m_pShaderReflection->GetBufferSizeTotal();
+		int nBufferCount = m_pShaderReflection->GetBufferCount();
 		if ( nBufferSizeTotal > 0 && nBufferCount > 0 )
 		{
 			m_pCommonMemory = new uint8[ nBufferSizeTotal ];
@@ -474,6 +477,8 @@ bool iberbar::Renderer::CShaderVariableTable::SetTexture( const char* strName, R
 	m_Textures[ nSlot ] = pTexture;
 	if ( m_Textures[ nSlot ] )
 		m_Textures[ nSlot ]->AddRef();
+
+	return true;
 }
 
 
@@ -492,6 +497,8 @@ bool iberbar::Renderer::CShaderVariableTable::SetSamplerState( const char* strNa
 	m_SamplerStates[ nSlot ] = pSamplerState;
 	if ( m_SamplerStates[ nSlot ] )
 		m_SamplerStates[ nSlot ]->AddRef();
+
+	return true;
 }
 
 
@@ -525,6 +532,7 @@ bool iberbar::Renderer::CShaderVariableTable::Compare( const CShaderVariableTabl
 void iberbar::Renderer::CShaderVariableTable::Clear()
 {
 	m_pShaderReflection = nullptr;
+	UNKNOWN_SAFE_RELEASE_NULL( m_pShader );
 	SAFE_DELETE_ARRAY( m_pCommonMemory );
 	m_nCommonMemorySize = 0;
 	for ( auto iter = m_Textures.begin(), end = m_Textures.end(); iter != end; iter++ )

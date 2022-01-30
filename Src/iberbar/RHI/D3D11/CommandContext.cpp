@@ -207,12 +207,11 @@ void iberbar::RHI::D3D11::CCommandContext::DrawPrimitive( uint32 nBaseVertexInde
 }
 
 
-void iberbar::RHI::D3D11::CCommandContext::DrawIndexedPrimitive( uint32 nStartIndex, uint32 nBaseVertexIndex, uint32 nNumPrimitives )
+void iberbar::RHI::D3D11::CCommandContext::DrawIndexed( uint32 nIndexStart, uint32 nIndexCount, uint32 nBaseVertexStart )
 {
-	uint32 nIndexCount = GetVertexCountForPrimitiveCount( nNumPrimitives, m_nPrimitiveType );
 	if ( nIndexCount == 0 )
 		return;
-	m_pD3DDeviceContext->DrawIndexed( nIndexCount, nStartIndex, nBaseVertexIndex );
+	m_pD3DDeviceContext->DrawIndexed( nIndexCount, nIndexStart, nBaseVertexStart );
 }
 
 //

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iberbar/Renderer/Headers.h>
+
 
 namespace iberbar
 {
@@ -17,5 +19,8 @@ namespace iberbar
 			RHI::IVertexBuffer* m_pVertexBuffer;
 			RHI::IIndexBuffer* m_pIndexBuffer;
 		};
+
+
+
 	}
 }

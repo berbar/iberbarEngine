@@ -203,14 +203,19 @@
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\GroupCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Material.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Mesh.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\MeshDrawCommand.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\MeshProcessor.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\MeshRendererComponent.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Processor\BaseRendererProcessor.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Processor\DefaultRendererProcessor.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RenderCommand.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\RenderCommandQueue.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Renderer.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RendererSprite.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -218,6 +223,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Resource.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\ShaderVariables.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Sprite.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.h" />
@@ -234,12 +240,16 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\GroupCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Material.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Mesh.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\MeshDrawCommand.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\MeshRendererComponent.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Processor\BaseRendererProcessor.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Processor\DefaultRendererProcessor.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RenderCommand.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Renderer.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RendererSprite.cpp">

@@ -93,7 +93,6 @@ namespace iberbar
             Color,
             Normal,
             TexCoord,
-            Sample
         };
 
 
@@ -271,6 +270,23 @@ namespace iberbar
         enum
         {
             MaxVertexElementCount = 16
+        };
+
+        struct UVertexElement
+        {
+            uint32 nSlot;
+            UVertexDeclareUsage nSemantic;
+            uint32 nSemanticIndex;
+            UVertexFormat nFormat;
+            uint32 nOffset;
+        };
+
+        struct UVertexDeclarationDesc
+        {
+            uint32 nVertexElementsCount;
+            uint32 nSlotCount;
+            uint32 Strides[ MaxVertexElementCount ];
+            UVertexElement VertexElements[ MaxVertexElementCount ];
         };
     }
 }

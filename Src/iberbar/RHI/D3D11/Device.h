@@ -36,7 +36,8 @@ namespace iberbar
 				virtual CResult CreateDomainShader( IShader** ppOutShader ) override;
 				virtual CResult CreateComputeShader( IShader** ppOutShader ) override;
 				virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount ) override;
-				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) override;
+				virtual CResult CreateShaderProgram( IShaderProgram** ppOutShaderProgram, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) override;
+				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShaderProgram* pShaderProgram ) override;
 				//virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) override;
 				virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) override;
 				virtual CResult CreateDepthStencilState( IDepthStencilState** ppOutDepthStencilState, const UDepthStencilDesc& DepthStencilDesc ) override;

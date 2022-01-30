@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iberbar/Utility/Platform.h>
+#include <iberbar/Utility/Unknown.h>
+
 #ifndef __iberbarGameEngineApi__
 #	if defined ( _WINDOWS )
 #		if defined ( __iberbarGameEngineApiExport__ )

@@ -304,3 +304,67 @@ iberbar::CResult iberbar::RHI::D3D11::CComputeShader::Load( const void* pCodes, 
 
 	return CreateReflection( pCodes, nCodeLen );
 }
+
+
+
+
+
+
+
+iberbar::RHI::D3D11::CShaderProgram::CShaderProgram(
+	CDevice* pDevice,
+	IShader* pVS,
+	IShader* pPS,
+	IShader* pHS,
+	IShader* pGS,
+	IShader* pDS )
+	: IShaderProgram( pVS, pPS, pHS, pGS, pDS )
+	, m_pDevice( pDevice )
+	, m_UniformBuffers()
+{
+	assert( m_pDevice );
+	m_pDevice->AddRef();
+
+	memset( m_UniformBuffers, 0, sizeof( m_UniformBuffers ) );
+}
+
+
+iberbar::RHI::D3D11::CShaderProgram::~CShaderProgram()
+{
+	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
+
+	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
+	{
+		for ( int j = 0; j < D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; j++ )
+		{
+			SAFE_DELETE( m_UniformBuffers[ i ][ j ] );
+		}
+	}
+}
+
+
+void iberbar::RHI::D3D11::CShaderProgram::Initial()
+{
+	CShader* pShader = nullptr;
+	CShaderReflection* pReflection = nullptr;
+	const CShaderReflectionBuffer* pReflectionBuffer = nullptr;
+	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
+	{
+		pShader = (CShader*)m_pShaders[ i ];
+		if ( pShader == nullptr )
+			continue;
+
+		pReflection = pShader->GetReflectionInternal();
+		if ( pShader == nullptr )
+			continue;
+
+		for ( int nBufferIndex = 0, nBufferCount = pReflection->GetBufferCount(); nBufferIndex < nBufferCount; nBufferIndex++ )
+		{
+			pReflectionBuffer = pReflection->GetBufferByIndexInternal( nBufferIndex );
+			if ( pReflectionBuffer == nullptr || pReflectionBuffer->GetSize() == 0 )
+				continue;
+
+			m_UniformBuffers[ i ][ pReflectionBuffer->GetBindPoint() ] = new CUniformBuffer( m_pDevice, pReflectionBuffer->GetSize(), true );
+		}
+	}
+}

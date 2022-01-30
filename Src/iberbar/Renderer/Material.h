@@ -11,24 +11,21 @@ namespace iberbar
 {
 	namespace RHI
 	{
-		class IShaderState;
+		class IShaderProgram;
 	}
 
 	namespace Renderer
 	{
 
-
 		class __iberbarRendererApi__ CMaterial
-			: public CRef, public IClonable
+			: public CRef
 		{
 		public:
-			CMaterial();
+			CMaterial( RHI::IShaderProgram* pShaderProgram );
 			CMaterial( CMaterial* pMaterialOrigin );
+			CMaterial( const CMaterial& Material ) = delete;
 			virtual ~CMaterial();
 
-			virtual CMaterial* Clone() const override { return new CMaterial( *this ); }
-
-			void SetShaderState( RHI::IShaderState* pShaderState );
 			bool SetInt( const char* strName, int32 Value );
 			bool SetIntArray( const char* strName, const int32* pValues, uint32 nCount );
 			bool SetFloat( const char* strName, float Value );
@@ -44,15 +41,19 @@ namespace iberbar
 			bool SetSamplerState( const char* pstrName, RHI::ISamplerState** pSamplerStates, uint32 nElementCount = 1, uint32 nElementStart = 0 );
 			void Reset();
 
-			RHI::IShaderState* GetShaderState() const { return m_pShaderState; }
-			CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) { return &m_VariableTables[ (int)nShaderType ]; }
-			const CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) const { return &m_VariableTables[ (int)nShaderType ]; }
+			RHI::IShaderProgram* GetShaderProgram() const { return m_pShaderProgram; }
+			//CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) { return &m_VariableTables[ (int)nShaderType ]; }
+			//const CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) const { return &m_VariableTables[ (int)nShaderType ]; }
+			const CShaderVariableTable* GetShaderVariableTables() const { return m_VariableTables; }
 
 			bool CampareWithMaterial( const CMaterial* pMaterialOther ) const;
 
 		protected:
+			void Initial( RHI::IShaderProgram* pShaderProgram );
+
+		protected:
 			CMaterial* m_pMaterialParent;
-			RHI::IShaderState* m_pShaderState;
+			RHI::IShaderProgram* m_pShaderProgram;
 			CShaderVariableTable m_VariableTables[ (int)RHI::EShaderType::__Count ];
 		};
 	}

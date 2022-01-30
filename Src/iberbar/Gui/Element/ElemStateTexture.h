@@ -13,6 +13,11 @@ namespace iberbar
 		class ITexture;
 	}
 
+	namespace Renderer
+	{
+		class CMeshRendererComponent;
+	}
+
 	namespace Gui
 	{
 		class __iberbarGuiApi__ CElementStateTexture
@@ -46,6 +51,7 @@ namespace iberbar
 			bool m_bEmptyBoundingFinal;
 			Renderer::UVertex_V3F_C4B_T2F m_MeshVertices[ 4 ];
 			uint16 m_MeshIndices[ 6 ];
+			Renderer::CMeshRendererComponent* m_pMeshRendererComponent;
 			Renderer::CMaterial* m_pMaterial;
 			Renderer::CTrianglesCommand m_RenderCommand;
 		};

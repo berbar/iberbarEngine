@@ -32,6 +32,25 @@ namespace iberbar
 		};
 
 
+		class __iberbarRHIApi__ IShaderProgram abstract
+			: public IResource
+		{
+		public:
+			IShaderProgram(
+				IShader* pVS,
+				IShader* pPS,
+				IShader* pHS,
+				IShader* pGS,
+				IShader* pDS );
+			virtual ~IShaderProgram();
+
+			IShader* GetShader( EShaderType nShaderType ) { return m_pShaders[ (int)nShaderType ]; }
+
+		protected:
+			IShader* m_pShaders[ (int)EShaderType::__Count ];
+		};
+
+
 		//class __iberbarRHIApi__ IVertexShader
 		//	: public IShader
 		//{

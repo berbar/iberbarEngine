@@ -9,38 +9,19 @@
 iberbar::RHI::D3D11::CShaderState::CShaderState(
 	CDevice* pDevice,
 	CVertexDeclaration* pVertexDeclaration,
-	CVertexShader* pVertexShader,
-	CPixelShader* pPixelShader,
-	CHullShader* pHullShader,
-	CGeometryShader* pGeometryShader,
-	CDomainShader* pDomainShader )
+	CShaderProgram* pShaderProgram )
 	: m_pDevice( pDevice )
-	, m_pShaders()
-	, m_UniformBuffers()
+	, m_pVertexDeclaration( pVertexDeclaration )
+	, m_pShaderProgram( pShaderProgram )
 {
 	assert( m_pDevice );
 	m_pDevice->AddRef();
 
-	assert( pVertexDeclaration );
-	m_pVertexDeclaration = pVertexDeclaration;
+	assert( m_pVertexDeclaration );
 	m_pVertexDeclaration->AddRef();
 
-	m_pVertexShader = pVertexShader;
-	UNKNOWN_SAFE_ADDREF( m_pVertexShader );
-
-	m_pPixelShader = pPixelShader;
-	UNKNOWN_SAFE_ADDREF( m_pPixelShader );
-
-	m_pHullShader = pHullShader;
-	UNKNOWN_SAFE_ADDREF( m_pHullShader );
-
-	m_pGeometryShader = pGeometryShader;
-	UNKNOWN_SAFE_ADDREF( m_pGeometryShader );
-
-	m_pDomainShader = pDomainShader;
-	UNKNOWN_SAFE_ADDREF( m_pDomainShader );
-
-	memset( m_UniformBuffers, 0, sizeof( m_UniformBuffers ) );
+	assert( m_pShaderProgram );
+	m_pShaderProgram->AddRef();
 }
 
 
@@ -48,29 +29,26 @@ iberbar::RHI::D3D11::CShaderState::~CShaderState()
 {
 	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pVertexDeclaration );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pVertexShader );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pPixelShader );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pHullShader );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pGeometryShader );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDomainShader );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderProgram );
+
 }
 
 
-iberbar::RHI::IShader* iberbar::RHI::D3D11::CShaderState::GetShader( EShaderType eShaderType )
+iberbar::RHI::IShaderProgram* iberbar::RHI::D3D11::CShaderState::GetShaderProgram()
 {
-	return m_pShaders[ (int)eShaderType ];
+	return m_pShaderProgram;
 }
 
 
-iberbar::RHI::IUniformBuffer** iberbar::RHI::D3D11::CShaderState::GetUniformBuffers( EShaderType eShaderType )
-{
-	return (IUniformBuffer**)m_UniformBuffers[ (int)eShaderType ];
-}
+//iberbar::RHI::IUniformBuffer** iberbar::RHI::D3D11::CShaderState::GetUniformBuffers( EShaderType eShaderType )
+//{
+//	return (IUniformBuffer**)m_UniformBuffers[ (int)eShaderType ];
+//}
 
 
 iberbar::CResult iberbar::RHI::D3D11::CShaderState::Initial()
 {
-	if ( m_pVertexShader == nullptr )
+	if ( m_pShaderProgram->GetVertexShader() == nullptr )
 		return MakeResult( ResultCode::Bad, "" );
 
 	D3D11_INPUT_ELEMENT_DESC InputElementDescs[16];
@@ -78,34 +56,13 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderState::Initial()
 
 	HRESULT hResult = m_pDevice->GetD3DDevice()->CreateInputLayout(
 		InputElementDescs, m_pVertexDeclaration->GetVertexElementsCount(),
-		m_pVertexShader->GetCodePointer(), m_pVertexShader->GetCodeSize(),
+		m_pShaderProgram->GetVertexShader()->GetCodePointer(), m_pShaderProgram->GetVertexShader()->GetCodeSize(),
 		&m_pD3DInputLayout );
 	if ( FAILED( hResult ) )
 		return MakeResult( ResultCode::Bad, "" );
 
 
-	CShader* pShader = nullptr;
-	CShaderReflection* pReflection = nullptr;
-	const CShaderReflectionBuffer* pReflectionBuffer = nullptr;
-	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
-	{
-		pShader = m_pShaders[ i ];
-		if ( pShader == nullptr )
-			continue;
 
-		pReflection = pShader->GetReflectionInternal();
-		if ( pShader == nullptr )
-			continue;
-
-		for ( int nBufferIndex = 0, nBufferCount = pReflection->GetBufferCount(); nBufferIndex < nBufferCount; nBufferIndex++ )
-		{
-			pReflectionBuffer = pReflection->GetBufferByIndexInternal( nBufferIndex );
-			if ( pReflectionBuffer == nullptr || pReflectionBuffer->GetSize() == 0 )
-				continue;
-
-			m_UniformBuffers[ i ][ pReflectionBuffer->GetBindPoint() ] = new CUniformBuffer( m_pDevice, pReflectionBuffer->GetSize(), true );
-		}
-	}
 
 	return CResult();
 }

@@ -17,6 +17,7 @@ namespace iberbar
 			IndexBuffer,
 			UniformBuffer,
 			Shader,
+			ShaderProgram,
 			Effect,
 			VertexDeclaration,
 			Font,

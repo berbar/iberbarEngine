@@ -1,46 +1,35 @@
 #pragma once
 
-#include <iberbar/Renderer/Headers.h>
-#include <iberbar/Renderer/Material.h>
-#include <iberbar/RHI/Types.h>
+
+#include <iberbar/Renderer/RenderCommand.h>
 
 namespace iberbar
 {
-	namespace RHI
-	{
-		struct UVertexElement;
-	}
-
 	namespace Renderer
 	{
+		class CShaderVariableTable;
+		class IMesh;
 
-
-		class CBaseMesh
-			: public CRef
+		class __iberbarRendererApi__ CMeshDrawCommand
+			: public CRenderCommand
 		{
 		public:
-			CBaseMesh();
-			virtual ~CBaseMesh();
+			CMeshDrawCommand();
 
-			void Reset( const RHI::UVertexElement* pVertexLayout, RHI::UPrimitiveType nPrimitiveType, uint32 nNumPrimitives );
-
-			virtual const void* GetVertices() const = 0;
-			virtual const uint16* GetIndices() const = 0;
-
-		protected:
-			uint32 m_nMeshInstanceId;
-			uint8* m_pVertices;
-			uint16* m_pIndices;
-		};
-
-		class CBaseMeshDrawCommand
-		{
 		public:
-			void SetMesh( CBaseMesh* pMesh );
+			inline void SetMesh( const IMesh* pMesh ) { m_pMesh = pMesh; }
+			inline void SetShaderState( RHI::IShaderState* pShaderState ) { m_pShaderState = pShaderState; }
+			inline void SetShaderVariableTables( const CShaderVariableTable* pTables ) { m_pShaderVariableTables = pTables; }
+
+			inline RHI::IShaderState* GetShaderState() { return m_pShaderState; }
+			inline const CShaderVariableTable* GetShaderVariableTables() const { return m_pShaderVariableTables; }
+			inline const IMesh* GetMeshData() const { return m_pMesh; }
 
 		protected:
-			CBaseMesh* m_pMesh;
-			CMaterial* m_pMaterial;
+			RHI::IShaderState* m_pShaderState;
+			const CShaderVariableTable* m_pShaderVariableTables;
+			const IMesh* m_pMesh;
+			//UMeshData m_MeshData;
 		};
 	}
 }

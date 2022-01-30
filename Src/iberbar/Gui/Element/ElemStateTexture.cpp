@@ -148,9 +148,14 @@ void iberbar::Gui::CElementStateTexture::SetMaterial( Renderer::CMaterial* pMate
 	m_pMaterial = pMaterial;
 
 	if ( m_pMaterial != nullptr )
+	{
 		m_pMaterial->AddRef();
-
-	m_RenderCommand.SetMaterial( m_pMaterial );
+		m_RenderCommand.SetShaderVariableTables( m_pMaterial->GetShaderVariableTables() );
+	}
+	else
+	{
+		m_RenderCommand.SetShaderVariableTables( nullptr );
+	}
 }
 
 

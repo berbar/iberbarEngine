@@ -36,7 +36,7 @@ namespace iberbar
 			virtual void SetPrimitiveTopology( UPrimitiveType nPrimitiveType ) = 0;
 			//virtual void DrawElements( UPrimitiveType nPrimitiveType, UIndexFormat nIndexFormat, uint32 nCount, uint32 nOffset ) = 0;
 			virtual void DrawPrimitive( uint32 nBaseVertexIndex, uint32 nNumPrimitives ) = 0;
-			virtual void DrawIndexedPrimitive( uint32 nStartIndex, uint32 nBaseVertexIndex, uint32 nNumPrimitives ) = 0;
+			virtual void DrawIndexed( uint32 nIndexStart, uint32 nIndexCount, uint32 nBaseVertexStart ) = 0;
 		};
 	}
 }

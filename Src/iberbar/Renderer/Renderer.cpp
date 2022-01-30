@@ -41,13 +41,13 @@ namespace iberbar
 			FORCEINLINE uint32 GetIndexSizeTotal() const { return m_nIndexSizeTotal; }
 			FORCEINLINE uint32 GetTriangleCount() const { return m_nTriangleCount; }
 			FORCEINLINE RHI::IShaderState* GetUsingShaderState() const { return m_pUsingShaderState; }
-			FORCEINLINE CShaderVariableTable* GetUsingShaderVarTable( RHI::EShaderType eShaderType ) const { return m_pUsingShaderVarTables[ (int)eShaderType ]; }
+			FORCEINLINE const CShaderVariableTable* GetUsingShaderVarTable( RHI::EShaderType eShaderType ) const { return m_pUsingShaderVarTables[ (int)eShaderType ]; }
 
 		private:
 			RHI::ICommandContext* m_pRhiContext;
 			std::vector<CTrianglesCommand*> m_CommandList_Render;
 			RHI::IShaderState* m_pUsingShaderState;
-			CShaderVariableTable* m_pUsingShaderVarTables[ (int)RHI::EShaderType::__Count ];
+			const CShaderVariableTable* m_pUsingShaderVarTables[ (int)RHI::EShaderType::__Count ];
 			uint32 m_nVertexSize;
 			uint32 m_nVertexCount;
 			uint32 m_nVertexSizeTotal;
@@ -57,53 +57,6 @@ namespace iberbar
 		};
 	}
 }
-
-
-
-
-
-static bool CompareRenderCommand( iberbar::Renderer::CRenderCommand* a, iberbar::Renderer::CRenderCommand* b )
-{
-	return a->GetZOrder() < b->GetZOrder();
-}
-
-void iberbar::Renderer::CRenderQueue::PushBack( CRenderCommand* pCommand )
-{
-	int nZIndex = pCommand->GetZOrder();
-	if ( nZIndex < 0 )
-	{
-		m_CommandLists[ (int)UQueueGroup::Zindex_Negative ].push_back( pCommand );
-	}
-	else if ( nZIndex > 0 )
-	{
-		m_CommandLists[ (int)UQueueGroup::Zindex_Positive ].push_back( pCommand );
-	}
-	else
-	{
-		m_CommandLists[ (int)UQueueGroup::Zindex_Zero ].push_back( pCommand );
-	}	
-}
-
-void iberbar::Renderer::CRenderQueue::Sort()
-{
-	std::stable_sort(
-		std::begin( m_CommandLists[ (int)UQueueGroup::Zindex_Negative ] ),
-		std::end( m_CommandLists[ (int)UQueueGroup::Zindex_Negative ] ),
-		CompareRenderCommand );
-	std::stable_sort(
-		std::begin( m_CommandLists[ (int)UQueueGroup::Zindex_Positive ] ),
-		std::end( m_CommandLists[ (int)UQueueGroup::Zindex_Positive ] ),
-		CompareRenderCommand );
-}
-
-void iberbar::Renderer::CRenderQueue::Clear()
-{
-	for ( int i = 0; i < (int)UQueueGroup::Count; ++i )
-	{
-		m_CommandLists[ i ].clear();
-	}
-}
-
 
 
 
@@ -121,6 +74,8 @@ iberbar::Renderer::CRenderer2d::CRenderer2d()
 {
 	m_RenderQueue.push_back( CRenderQueue() );
 	m_CommandGroupStack.push( 0 );
+
+	sm_pInstance = this;
 }
 
 iberbar::Renderer::CRenderer2d::~CRenderer2d()
@@ -132,14 +87,16 @@ iberbar::Renderer::CRenderer2d::~CRenderer2d()
 	UNKNOWN_SAFE_RELEASE_NULL( m_pVertexBuffer );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pIndexBuffer );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
+
+	sm_pInstance = nullptr;
 }
 
 void iberbar::Renderer::CRenderer2d::Init( RHI::IDevice* pDevice )
 {
 	assert( pDevice );
 
-	//m_pDevice = pDevice;
-	//m_pDevice->AddRef();
+	m_pDevice = pDevice;
+	m_pDevice->AddRef();
 	//m_pDevice->CreateCommandContext( &m_pCommandContext );
 	m_pCommandContext = m_pDevice->GetDefaultContext();
 	m_pDevice->CreateVertexBuffer( UINT16_MAX * sizeof( UVertex_V3F_C4B_T2F ), RHI::UBufferUsageFlags::AnyDynamic, &m_pVertexBuffer );
@@ -379,9 +336,9 @@ void iberbar::Renderer::CRenderer2d::DrawBatchTriangles()
 
 void iberbar::Renderer::CRenderer2d::DrawOneTriangles( CTrianglesCommand* pCommand )
 {
-	RHI::IShaderState* pShaderState = pCommand->GetMaterial()->GetShaderState();
-	CShaderVariableTable* pShaderVarTable_Vertex = pCommand->GetMaterial()->GetShaderVariableTable( RHI::EShaderType::VertexShader );
-	CShaderVariableTable* pShaderVarTable_Pixel = pCommand->GetMaterial()->GetShaderVariableTable( RHI::EShaderType::PixelShader );
+	RHI::IShaderState* pShaderState = pCommand->GetShaderState();
+	const CShaderVariableTable* pShaderVarTable_Vertex = &pCommand->GetShaderVariableTables()[ (int) RHI::EShaderType::VertexShader ];
+	const CShaderVariableTable* pShaderVarTable_Pixel = &pCommand->GetShaderVariableTables()[ (int) RHI::EShaderType::PixelShader ];
 	if ( pShaderState == nullptr ||
 		pShaderVarTable_Vertex == nullptr ||
 		pShaderVarTable_Pixel == nullptr )
@@ -437,157 +394,3 @@ void iberbar::Renderer::CRenderer2d::ProcessGroupCommand( CRenderGroupCommand* p
 
 
 
-
-iberbar::Renderer::CRenderer2dState::CRenderer2dState()
-	: m_CommandList_Render()
-	, m_pUsingShaderState( nullptr )
-	, m_pUsingShaderVarTables()
-	, m_nVertexSize(0)
-	, m_nVertexCount( 0 )
-	, m_nVertexSizeTotal( 0 )
-	, m_nIndexCount( 0 )
-	, m_nIndexSizeTotal( 0 )
-	, m_nTriangleCount( 0 )
-{
-	memset( m_pUsingShaderVarTables, 0, sizeof( m_pUsingShaderVarTables ) );
-}
-
-
-iberbar::Renderer::CRenderer2dState::~CRenderer2dState()
-{
-}
-
-
-bool iberbar::Renderer::CRenderer2dState::AddCommand( CTrianglesCommand* pCommand )
-{
-	if ( pCommand->GetMaterial() == nullptr || pCommand->GetMaterial()->GetShaderState() )
-		return true;
-
-	auto pTriangles = pCommand->GetTriangles();
-
-	if ( m_CommandList_Render.empty() == true )
-	{
-		m_CommandList_Render.push_back( pCommand );
-		m_pUsingShaderState = pCommand->GetMaterial()->GetShaderState();
-		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-		{
-			m_pUsingShaderVarTables[ i ] = pCommand->GetMaterial()->GetShaderVariableTable( (RHI::EShaderType)i );
-		}
-
-		m_nVertexSize = pTriangles->vertexSize;
-		m_nVertexCount = pTriangles->vertexCount;
-		m_nVertexSizeTotal = pTriangles->vertexSizeTotal;
-		m_nIndexCount = pTriangles->indexCount;
-		m_nIndexSizeTotal = pTriangles->indexSizeTotal;
-		m_nTriangleCount = pTriangles->nTrianglesCount;
-
-		return true;
-	}
-
-	if ( pCommand->GetMaterial()->GetShaderState() != m_pUsingShaderState )
-		return false;
-
-	CShaderVariableTable* pTableUsing = nullptr;
-	CShaderVariableTable* pTableOther = nullptr;
-	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-	{
-		pTableUsing = m_pUsingShaderVarTables[ i ];
-		pTableOther = pCommand->GetMaterial()->GetShaderVariableTable( (RHI::EShaderType)i );
-		if ( pTableUsing == nullptr && pTableOther == nullptr )
-			continue;
-		if ( pTableUsing != nullptr && pTableOther != nullptr && pTableUsing->Compare( pTableOther ) == false )
-			return false;
-	}
-
-	m_CommandList_Render.push_back( pCommand );
-	m_nVertexCount += pTriangles->vertexCount;
-	m_nVertexSizeTotal += pTriangles->vertexSizeTotal;
-	m_nIndexCount += pTriangles->indexCount;
-	m_nIndexSizeTotal += pTriangles->indexSizeTotal;
-	m_nTriangleCount += pTriangles->nTrianglesCount;
-
-	return true;
-
-}
-
-
-void iberbar::Renderer::CRenderer2dState::FlushRenderList()
-{
-	m_pUsingShaderState = nullptr;
-	memset( m_pUsingShaderVarTables, 0, sizeof( m_pUsingShaderVarTables ) );
-	m_CommandList_Render.clear();
-	m_nVertexSize = 0;
-	m_nVertexCount = 0;
-	m_nVertexSizeTotal = 0;
-	m_nIndexCount = 0;
-	m_nIndexSizeTotal = 0;
-	m_nTriangleCount = 0;
-}
-
-
-void iberbar::Renderer::CRenderer2d::SetShaderBindings()
-{
-	CShaderVariableTable* pShaderVariableTable;
-	RHI::IShader* pShader;
-	const RHI::IShaderReflection* pShaderReflection;
-	const RHI::IShaderReflectionBuffer* pShaderReflectionBuffer;
-	RHI::IUniformBuffer* pUniformBuffer;
-	uint32 nTextureCount;
-	uint32 nSamplerStateCount;
-	uint32 nBufferCount;
-	const uint8* pVariablesMemory = nullptr;
-	RHI::EShaderType nShaderType;
-	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-	{
-		nShaderType = (RHI::EShaderType)i;
-		pShaderVariableTable = m_pState->GetUsingShaderVarTable( nShaderType );
-		if ( pShaderVariableTable == nullptr )
-		{
-			continue;
-		}
-
-		pShader = m_pState->GetUsingShaderState()->GetShader( nShaderType );
-		if ( pShader == nullptr )
-		{
-			continue;
-		}
-
-		pShaderReflection = pShader->GetReflection();
-		assert( pShaderReflection != nullptr );
-
-		pVariablesMemory = pShaderVariableTable->GetMemory();
-		nBufferCount = pShaderReflection->GetBufferCount();
-		if ( pVariablesMemory != nullptr && nBufferCount > 0 )
-		{
-			auto UniformBuffers = m_pState->GetUsingShaderState()->GetUniformBuffers( nShaderType );
-			for ( uint32 nBufferIndex = 0; nBufferIndex < nBufferCount; nBufferIndex++ )
-			{
-				pShaderReflectionBuffer = pShaderReflection->GetBufferByIndex( nBufferIndex );
-				pUniformBuffer = UniformBuffers[ nBufferIndex ];
-				if ( pShaderReflectionBuffer == nullptr || pUniformBuffer == nullptr )
-				{
-					m_pCommandContext->SetUniformBuffer( nShaderType, nBufferIndex, nullptr );
-					continue;
-				}
-
-				pUniformBuffer->UpdateContents( pVariablesMemory + pShaderReflectionBuffer->GetOffset(), pShaderReflectionBuffer->GetSize() );
-				m_pCommandContext->SetUniformBuffer( nShaderType, nBufferIndex, pUniformBuffer );
-			}
-		}
-
-		nTextureCount = pShaderReflection->GetTextureCountTotal();
-		const std::vector<RHI::ITexture*>& Textures = pShaderVariableTable->GetTextures();
-		for ( uint32 nTextureIndex = 0; nTextureIndex < nTextureCount; nTextureIndex++ )
-		{
-			m_pCommandContext->SetTexture( nShaderType, nTextureIndex, Textures[ nTextureIndex ] );
-		}
-
-		nSamplerStateCount = pShaderReflection->GetSamplerStateCountTotal();
-		const std::vector<RHI::ISamplerState*>& SamplerStates = pShaderVariableTable->GetSamplerStates();
-		for ( uint32 nSamplerIndex = 0; nSamplerIndex < nSamplerStateCount; nSamplerIndex++ )
-		{
-			m_pCommandContext->SetSamplerState( nShaderType, nSamplerIndex, SamplerStates[ nSamplerIndex ] );
-		}
-	}
-
-}

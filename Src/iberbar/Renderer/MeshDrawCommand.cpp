@@ -3,9 +3,10 @@
 
 
 
-iberbar::Renderer::CBaseMesh::CBaseMesh()
-	: m_nMeshInstanceId( 0 )
-	, m_pVertices( nullptr )
+iberbar::Renderer::CMeshDrawCommand::CMeshDrawCommand()
+	: CRenderCommand( URenderCommandType::DrawMesh )
+	, m_pShaderState( nullptr )
+	, m_pShaderVariableTables( nullptr )
+	, m_pMesh( nullptr )
 {
-
 }

@@ -90,6 +90,8 @@ namespace iberbar
 			bool SetSamplerState( const char* strName, RHI::ISamplerState* pSamplerState );
 			bool Compare( const CShaderVariableTable* pVariableTable ) const;
 
+			RHI::IShader* GetShader() { return m_pShader; }
+			const RHI::IShaderReflection* GetShaderReflection() const { return m_pShaderReflection; }
 			const uint8* GetMemory() const { return m_pCommonMemory; }
 			const uint32 GetMemorySize() const { return m_nCommonMemorySize; }
 			const std::vector<RHI::ITexture*>& GetTextures() const { return m_Textures; }
@@ -99,6 +101,7 @@ namespace iberbar
 			void Clear();
 
 		protected:
+			RHI::IShader* m_pShader;
 			RHI::IShaderReflection* m_pShaderReflection;
 			uint8* m_pCommonMemory;
 			uint32 m_nCommonMemorySize;

@@ -2,7 +2,7 @@
 #include <iberbar/GameEngine/Application.h>
 
 // Game
-#include <iberbar/GameEngine/Paper2dLoader.h>
+//#include <iberbar/GameEngine/Paper2dLoader.h>
 #include <iberbar/GameEngine/ResourcePreloader.h>
 #include <iberbar/GameEngine/TextureManager.h>
 #include <iberbar/GameEngine/ShaderManager.h>
@@ -13,8 +13,8 @@
 
 // Renderer
 #include <iberbar/Renderer/Renderer.h>
-#include <iberbar/Renderer/RendererSprite.h>
-#include <iberbar/Renderer/Font.h>
+#include <iberbar/Renderer/Vertex.h>
+//#include <iberbar/Renderer/Font.h>
 
 // RHI
 #include <iberbar/RHI/Device.h>
@@ -125,19 +125,18 @@ iberbar::Game::CApplication::CApplication()
 	, m_pLoggingOutputDevice( nullptr )
 
 	, m_pGuiEngine( nullptr )
-	, m_pGuiXmlParser( nullptr )
+	//, m_pGuiXmlParser( nullptr )
 	, m_pRHIDevice( nullptr )
 
 	, m_ResourcePreloader( nullptr )
 	, m_pTextureManager( nullptr )
 	, m_pShaderManager( nullptr )
 	, m_pFontManager( nullptr )
-	, m_pPaper2dLoader( nullptr )
+	//, m_pPaper2dLoader( nullptr )
 
 	, m_pRenderer( nullptr )
-	, m_pRendererSprite( nullptr )
 
-	, m_pPaper2dDirector( nullptr )
+	//, m_pPaper2dDirector( nullptr )
 
 	, m_pLuaDevice( nullptr )
 	, m_pGlobalTimer( nullptr )
@@ -215,12 +214,11 @@ void iberbar::Game::CApplication::Destroy()
 	SAFE_DELETE( m_pTimerEasySystem );
 
 	// 先释放场景内容
-	SAFE_DELETE( m_pPaper2dDirector );
+	//SAFE_DELETE( m_pPaper2dDirector );
 	SAFE_DELETE( m_pGuiEngine );
-	SAFE_DELETE( m_pGuiXmlParser );
+	//SAFE_DELETE( m_pGuiXmlParser );
 
 	// 然后释放渲染器
-	SAFE_DELETE( m_pRendererSprite );
 	SAFE_DELETE( m_pRenderer );
 
 	// 最后释放资源管理
@@ -228,7 +226,7 @@ void iberbar::Game::CApplication::Destroy()
 	SAFE_DELETE( m_pTextureManager );
 	SAFE_DELETE( m_pShaderManager );
 	SAFE_DELETE( m_pFontManager );
-	SAFE_DELETE( m_pPaper2dLoader );
+	//SAFE_DELETE( m_pPaper2dLoader );
 
 	UNKNOWN_SAFE_RELEASE_NULL( m_pRHIDevice );
 
@@ -427,7 +425,6 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	// 创建Renderer相关渲染工具
 	m_pRenderer = new Renderer::CRenderer2d();
 	m_pRenderer->Init( m_pRHIDevice );
-	m_pRendererSprite = new Renderer::CRendererSprite( m_pRenderer );
 
 	// 创建资源管理
 	m_pShaderManager = new CShaderManager( m_pRHIDevice );
@@ -436,7 +433,7 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	ret = m_pFontManager->Initial();
 	if ( ret.IsOK() == false )
 		return ret;
-	m_pPaper2dLoader = new CPaper2dLoader();
+	//m_pPaper2dLoader = new CPaper2dLoader();
 
 	// 初始化默认的渲染状态
 	ret = InitDefaultRenderState();
@@ -456,73 +453,73 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 		return MakeResult( ResultCode::Bad, "failed to create queue of commands" );
 
 	// 创建Gui引擎
-	m_pGuiEngine = new Gui::CEngine( m_pRendererSprite, m_pCommandQueue, m_pMemoryRes );
+	m_pGuiEngine = new Gui::CEngine( m_pRenderer, m_pCommandQueue, m_pMemoryRes );
 
 
 	// 创建Gui的XML解释器
-	m_pGuiXmlParser = new Gui::CXmlParser();
-	m_pGuiXmlParser->SetLogOutputDevice( m_pLoggingOutputDevice );
-	m_pGuiXmlParser->RegisterGetTexture( std::bind( &CTextureManager::GetOrCreateTextureA, m_pTextureManager, std::placeholders::_1, std::placeholders::_2 ) );
-	m_pGuiXmlParser->RegisterGetFont( [=]( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc )
-		{
-			if ( m_pFontManager->GetFont( ppOutFont, FontDesc ) == true )
-				return CResult();
-			if ( m_pFontManager->GetFontDefault( ppOutFont ) == true )
-				return CResult();
-			return MakeResult( ResultCode::Bad, "Can't find font" );
-		} );
+	//m_pGuiXmlParser = new Gui::CXmlParser();
+	//m_pGuiXmlParser->SetLogOutputDevice( m_pLoggingOutputDevice );
+	//m_pGuiXmlParser->RegisterGetTexture( std::bind( &CTextureManager::GetOrCreateTextureA, m_pTextureManager, std::placeholders::_1, std::placeholders::_2 ) );
+	//m_pGuiXmlParser->RegisterGetFont( [=]( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc )
+	//	{
+	//		if ( m_pFontManager->GetFont( ppOutFont, FontDesc ) == true )
+	//			return CResult();
+	//		if ( m_pFontManager->GetFontDefault( ppOutFont ) == true )
+	//			return CResult();
+	//		return MakeResult( ResultCode::Bad, "Can't find font" );
+	//	} );
 
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "Default", std::bind( &Gui::XmlCreateProc_Widget, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "Button", std::bind( &Gui::XmlCreateProc_Widget_Button, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "CheckBox", std::bind( &Gui::XmlCreateProc_Widget_CheckBox, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "RadioBox", std::bind( &Gui::XmlCreateProc_Widget_RadioBox, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "ListBox", std::bind( &Gui::XmlCreateProc_Widget_ListBox, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "EditBox", std::bind( &Gui::XmlCreateProc_Widget_EditBox, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Widget( "ProgressBar", std::bind( &Gui::XmlCreateProc_Widget_ProgressBar, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "Default", std::bind( &Gui::XmlCreateProc_Widget, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "Button", std::bind( &Gui::XmlCreateProc_Widget_Button, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "CheckBox", std::bind( &Gui::XmlCreateProc_Widget_CheckBox, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "RadioBox", std::bind( &Gui::XmlCreateProc_Widget_RadioBox, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "ListBox", std::bind( &Gui::XmlCreateProc_Widget_ListBox, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "EditBox", std::bind( &Gui::XmlCreateProc_Widget_EditBox, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Widget( "ProgressBar", std::bind( &Gui::XmlCreateProc_Widget_ProgressBar, std::placeholders::_1 ) );
 
-	m_pGuiXmlParser->RegisterCreateProc_Element( "Default", std::bind( &Gui::XmlCreateProc_Element, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Element( "ColorRect", std::bind( &Gui::XmlCreateProc_Element_ColorRect, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Element( "StateTexture", std::bind( &Gui::XmlCreateProc_Element_StateTexture, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Element( "StateLabel", std::bind( &Gui::XmlCreateProc_Element_StateLabel, std::placeholders::_1 ) );
-	m_pGuiXmlParser->RegisterCreateProc_Element( "TextField", std::bind( &Gui::XmlCreateProc_Element_EditBoxText, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Element( "Default", std::bind( &Gui::XmlCreateProc_Element, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Element( "ColorRect", std::bind( &Gui::XmlCreateProc_Element_ColorRect, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Element( "StateTexture", std::bind( &Gui::XmlCreateProc_Element_StateTexture, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Element( "StateLabel", std::bind( &Gui::XmlCreateProc_Element_StateLabel, std::placeholders::_1 ) );
+	//m_pGuiXmlParser->RegisterCreateProc_Element( "TextField", std::bind( &Gui::XmlCreateProc_Element_EditBoxText, std::placeholders::_1 ) );
 
-	m_pGuiXmlParser->RegisterReadProc_Widget( "Default", std::bind( &Gui::XmlReadProc_Widget,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
-	m_pGuiXmlParser->RegisterReadProc_Widget( "Button", std::bind( &Gui::XmlReadProc_Widget_Button,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
-	m_pGuiXmlParser->RegisterReadProc_Widget( "CheckBox", std::bind( &Gui::XmlReadProc_Widget_CheckBox,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
-	m_pGuiXmlParser->RegisterReadProc_Widget( "RadioBox", std::bind( &Gui::XmlReadProc_Widget_RadioBox,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
-	m_pGuiXmlParser->RegisterReadProc_Widget( "ListBox", std::bind( &Gui::XmlReadProc_Widget_ListBox,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
-	m_pGuiXmlParser->RegisterReadProc_Widget( "EditBox", std::bind( &Gui::XmlReadProc_Widget_EditBox,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
-	m_pGuiXmlParser->RegisterReadProc_Widget( "ProgressBar", std::bind( &Gui::XmlReadProc_Widget_ProgressBar,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "Default", std::bind( &Gui::XmlReadProc_Widget,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "Button", std::bind( &Gui::XmlReadProc_Widget_Button,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "CheckBox", std::bind( &Gui::XmlReadProc_Widget_CheckBox,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "RadioBox", std::bind( &Gui::XmlReadProc_Widget_RadioBox,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "ListBox", std::bind( &Gui::XmlReadProc_Widget_ListBox,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "EditBox", std::bind( &Gui::XmlReadProc_Widget_EditBox,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Widget( "ProgressBar", std::bind( &Gui::XmlReadProc_Widget_ProgressBar,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4 ) );
 
-	m_pGuiXmlParser->RegisterReadProc_Element( "Default", std::bind( &Gui::XmlReadProc_Element,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
-	m_pGuiXmlParser->RegisterReadProc_Element( "ColorRect", std::bind( &Gui::XmlReadProc_Element_ColorRect,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
-	m_pGuiXmlParser->RegisterReadProc_Element( "StateTexture", std::bind( &Gui::XmlReadProc_Element_StateTexture,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
-	m_pGuiXmlParser->RegisterReadProc_Element( "StateLabel", std::bind( &Gui::XmlReadProc_Element_StateLabel,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
-	m_pGuiXmlParser->RegisterReadProc_Element( "TextField", std::bind( &Gui::XmlReadProc_Element_EditBoxText,
-		std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Element( "Default", std::bind( &Gui::XmlReadProc_Element,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Element( "ColorRect", std::bind( &Gui::XmlReadProc_Element_ColorRect,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Element( "StateTexture", std::bind( &Gui::XmlReadProc_Element_StateTexture,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Element( "StateLabel", std::bind( &Gui::XmlReadProc_Element_StateLabel,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
+	//m_pGuiXmlParser->RegisterReadProc_Element( "TextField", std::bind( &Gui::XmlReadProc_Element_EditBoxText,
+	//	std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) );
 
 
 	// 创建Paper2d
-	m_pPaper2dDirector = new Paper2d::CDirector( m_pRendererSprite );
+	//m_pPaper2dDirector = new Paper2d::CDirector( m_pRendererSprite );
 
 
 	// 创建设备输入控制器
 	m_pInput = new CInput();
 	m_pInput->AddMouseEvent( std::bind( &Gui::CEngine::HandleMouse, m_pGuiEngine, std::placeholders::_1 ) );
-	m_pInput->AddMouseEvent( std::bind( &Paper2d::CDirector::HandleMouse, m_pPaper2dDirector, std::placeholders::_1 ) );
+	//m_pInput->AddMouseEvent( std::bind( &Paper2d::CDirector::HandleMouse, m_pPaper2dDirector, std::placeholders::_1 ) );
 	m_pInput->AddKeyboardEvent( std::bind( &Gui::CEngine::HandleKeyboard, m_pGuiEngine, std::placeholders::_1 ) );
-	m_pInput->AddKeyboardEvent( std::bind( &Paper2d::CDirector::HandleKeyboard, m_pPaper2dDirector, std::placeholders::_1 ) );
+	//m_pInput->AddKeyboardEvent( std::bind( &Paper2d::CDirector::HandleKeyboard, m_pPaper2dDirector, std::placeholders::_1 ) );
 
 	// 绑定预加载的回调方法
 	m_ResourcePreloader = new CResourcePreloader();
@@ -538,7 +535,7 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	RegisterLuaCpp_ForUtility( m_pLuaDevice->GetLuaState() );
 	RHI::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Gui::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
-	Paper2d::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
+	//Paper2d::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Game::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	MsgPack::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
 	Json::RegisterLuaCpp( m_pLuaDevice->GetLuaState() );
@@ -656,7 +653,7 @@ iberbar::CResult iberbar::Game::CApplication::InitDefaultRenderState()
 	if ( Ret.IsOK() == false )
 		return Ret;
 
-	m_pRenderer->GetRHIContext()->SetBlendStateDefault( pBlendState );
+	//m_pRenderer->GetRHIContext()->SetBlendStateDefault( pBlendState );
 
 	return CResult();
 }
@@ -677,9 +674,9 @@ iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 	{
 		RHI::UVertexElement VertexElements[] =
 		{
-			{ RHI::UVertexDeclareUsage::Position, 0, RHI::UVertexFormat::FLOAT3, offsetof( RHI::UVertex_V3F_C4B_T2F, position ) },
-			{ RHI::UVertexDeclareUsage::Color, 0, RHI::UVertexFormat::FLOAT4, offsetof( RHI::UVertex_V3F_C4B_T2F, color ) },
-			{ RHI::UVertexDeclareUsage::TexCoord, 0, RHI::UVertexFormat::FLOAT2, offsetof( RHI::UVertex_V3F_C4B_T2F, texcoord ) }
+			{ 0, RHI::UVertexDeclareUsage::Position, 0, RHI::UVertexFormat::FLOAT3, offsetof( Renderer::UVertex_V3F_C4B_T2F, position ) },
+			{ 0, RHI::UVertexDeclareUsage::Color, 0, RHI::UVertexFormat::FLOAT4, offsetof( Renderer::UVertex_V3F_C4B_T2F, color ) },
+			{ 0, RHI::UVertexDeclareUsage::TexCoord, 0, RHI::UVertexFormat::FLOAT2, offsetof( Renderer::UVertex_V3F_C4B_T2F, texcoord ) }
 		};
 		TSmartRefPtr<RHI::IShader> pVertexShader;
 		TSmartRefPtr<RHI::IShader> pPixelShader;
@@ -692,7 +689,8 @@ iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 			return ret;
 
 		TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
-		ret = m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, sizeof(RHI::UVertex_V3F_C4B_T2F) );
+		uint32 nStrides[1] = { sizeof( Renderer::UVertex_V3F_C4B_T2F ) };
+		ret = m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, nStrides, 1 );
 		if ( ret.IsOK() == false )
 			return ret;
 
@@ -700,8 +698,6 @@ iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 		ret = m_pRHIDevice->CreateShaderState( &pShaderState, pVertexDeclaration, pVertexShader, pPixelShader, nullptr, nullptr, nullptr );
 		if ( ret.IsOK() == false )
 			return ret;
-
-		m_pRendererSprite->SetDefaultShaderState( pShaderState );
 	}
 
 	return CResult();
@@ -730,7 +726,7 @@ void iberbar::Game::CApplication::OnRunTimer( int64 nElapsedTimeMilliSecond, flo
 	m_pTimerEasySystem->Run( nElapsedTimeSecond );
 
 
-	m_pPaper2dDirector->UpdateScene( nElapsedTimeSecond );
+	//m_pPaper2dDirector->UpdateScene( nElapsedTimeSecond );
 	m_pGuiEngine->Update( nElapsedTimeMilliSecond, nElapsedTimeSecond );
 	OnUpdate( nElapsedTimeMilliSecond, nElapsedTimeSecond );
 
@@ -740,10 +736,8 @@ void iberbar::Game::CApplication::OnRunTimer( int64 nElapsedTimeMilliSecond, flo
 
 	if ( m_bWndActive == true )
 	{
-		// 
-		m_pRendererSprite->Clean();
 		OnRender();
-		m_pPaper2dDirector->DrawScene();
+		//m_pPaper2dDirector->DrawScene();
 		m_pGuiEngine->Render();
 
 		CResult RetRhiBegin = m_pRHIDevice->Begin();

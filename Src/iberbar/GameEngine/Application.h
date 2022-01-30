@@ -36,7 +36,6 @@ namespace iberbar
 	namespace Renderer
 	{
 		class CRenderer2d;
-		class CRendererSprite;
 	}
 
 	namespace Gui
@@ -185,7 +184,7 @@ namespace iberbar
 			Logging::COutputDevice* GetLoggingOutputDevice() { return m_pLoggingOutputDevice; }
 			RHI::IDevice* GetRHIDevice() { return m_pRHIDevice; }
 			Gui::CEngine* GetGuiEngine() { return m_pGuiEngine; }
-			Gui::CXmlParser* GetGuiXmlParser() { return m_pGuiXmlParser; }
+			//Gui::CXmlParser* GetGuiXmlParser() { return m_pGuiXmlParser; }
 			CTextureManager* GetTextureManager() { return m_pTextureManager; }
 			CFontManager* GetFontManager() { return m_pFontManager; }
 			CLuaDevice* GetLuaDevice() { return m_pLuaDevice; }
@@ -200,18 +199,17 @@ namespace iberbar
 			Logging::COutputDevice* m_pLoggingOutputDevice;
 
 			Gui::CEngine* m_pGuiEngine;
-			Gui::CXmlParser* m_pGuiXmlParser;
+			//Gui::CXmlParser* m_pGuiXmlParser;
 			RHI::IDevice* m_pRHIDevice;
 
 			CTextureManager* m_pTextureManager;
 			CShaderManager* m_pShaderManager;
 			CFontManager* m_pFontManager;
-			CPaper2dLoader* m_pPaper2dLoader;
+			//CPaper2dLoader* m_pPaper2dLoader;
 
 			Renderer::CRenderer2d* m_pRenderer;
-			Renderer::CRendererSprite* m_pRendererSprite;
 
-			Paper2d::CDirector* m_pPaper2dDirector;
+			//Paper2d::CDirector* m_pPaper2dDirector;
 			
 			CLuaDevice* m_pLuaDevice;
 

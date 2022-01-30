@@ -39,7 +39,7 @@ namespace iberbar
 				virtual void SetDepthStencilState( IDepthStencilState* pDepthStencilState, uint32 nStencilRef ) override;
 				virtual void SetPrimitiveTopology( UPrimitiveType nPrimitiveType ) override;
 				virtual void DrawPrimitive( uint32 nBaseVertexIndex, uint32 nNumPrimitives ) override;
-				virtual void DrawIndexedPrimitive( uint32 nStartIndex, uint32 nBaseVertexIndex, uint32 nNumPrimitives ) override;
+				virtual void DrawIndexed( uint32 nIndexStart, uint32 nIndexCount, uint32 nBaseVertexStart ) override;
 
 
 			protected:

@@ -27,14 +27,14 @@ namespace iberbar
 				UTriangles();
 				UTriangles(
 					const void* vertices,
-					const uint16* indices,
+					const void* indices,
 					uint32 nVertexSize,
 					uint32 vertexCount,
 					uint32 indexCount,
 					uint32 nTrianglesCount );
 			public:
 				const void* vertices;
-				const uint16* indices;
+				const void* indices;
 				uint32 vertexSize;
 				uint32 vertexCount;
 				uint32 vertexSizeTotal;
@@ -48,13 +48,17 @@ namespace iberbar
 
 		public:
 			inline void SetTriangles( const UTriangles& triangles ) { m_Triangles = triangles; }
-			inline void SetMaterial( CMaterial* pMaterial ) { m_pMaterial = pMaterial; }
+			inline void SetShaderState( RHI::IShaderState* pShaderState ) { m_pShaderState = pShaderState; }
+			inline void SetShaderVariableTables( const CShaderVariableTable* pTables ) { m_pShaderVariableTables = pTables; }
 
 			inline const UTriangles* GetTriangles() { return &m_Triangles; }
-			inline CMaterial* GetMaterial() { return m_pMaterial; }
+			inline RHI::IShaderState* GetShaderState() { return m_pShaderState; }
+			inline const CShaderVariableTable* GetShaderVariableTables() { return m_pShaderVariableTables; }
 
 		protected:
-			CMaterial* m_pMaterial;
+			//CMaterial* m_pMaterial;
+			RHI::IShaderState* m_pShaderState;
+			const CShaderVariableTable* m_pShaderVariableTables;
 			UTriangles m_Triangles;
 		};
 	}
@@ -76,7 +80,7 @@ FORCEINLINE iberbar::Renderer::CTrianglesCommand::UTriangles::UTriangles()
 
 FORCEINLINE iberbar::Renderer::CTrianglesCommand::UTriangles::UTriangles(
 	const void* vertices,
-	const uint16* indices,
+	const void* indices,
 	uint32 nVertexSize,
 	uint32 vertexCount,
 	uint32 indexCount,

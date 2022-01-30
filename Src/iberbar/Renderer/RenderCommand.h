@@ -18,6 +18,7 @@ namespace iberbar
 		{
 			Unknown,
 			Triangles,
+			DrawMesh,
 			Callback,
 			Group
 		};

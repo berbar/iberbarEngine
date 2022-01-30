@@ -30,7 +30,6 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariableDeclaration.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\ShaderVariables.h">
       <Filter>D3D11</Filter>
     </ClInclude>

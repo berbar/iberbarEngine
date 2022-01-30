@@ -1,5 +1,6 @@
 
 #include <iberbar/Renderer/Material.h>
+#include <iberbar/RHI/Shader.h>
 #include <iberbar/RHI/ShaderState.h>
 
 
@@ -28,54 +29,41 @@ namespace iberbar
 
 
 
-iberbar::Renderer::CMaterial::CMaterial()
+iberbar::Renderer::CMaterial::CMaterial( RHI::IShaderProgram* pShaderProgram )
 	: m_pMaterialParent( nullptr )
-	, m_pShaderState( nullptr )
+	, m_pShaderProgram( nullptr )
 	, m_VariableTables()
 {
+	Initial( pShaderProgram );
 }
 
 
 iberbar::Renderer::CMaterial::CMaterial( CMaterial* pMaterialOrigin )
 	: m_pMaterialParent( pMaterialOrigin )
-	, m_pShaderState( nullptr )
+	, m_pShaderProgram( nullptr )
 	, m_VariableTables()
 {
 	assert( m_pMaterialParent );
-	SetShaderState( m_pMaterialParent->m_pShaderState );
+	m_pMaterialParent->AddRef();
+	Initial( m_pMaterialParent->m_pShaderProgram );
 }
 
 
 iberbar::Renderer::CMaterial::~CMaterial()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pMaterialParent );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderProgram );
 }
 
 
-void iberbar::Renderer::CMaterial::SetShaderState( RHI::IShaderState* pShaderState )
+void iberbar::Renderer::CMaterial::Initial( RHI::IShaderProgram* pShaderProgram )
 {
-	if ( m_pShaderState == pShaderState )
-		return;
-
-	if ( m_pShaderState != nullptr )
-		m_pShaderState->Release();
-
-	m_pShaderState = pShaderState;
-
-	if ( m_pShaderState != nullptr )
+	assert( pShaderProgram );
+	m_pShaderProgram = pShaderProgram;
+	m_pShaderProgram->AddRef();
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		m_pShaderState->AddRef();
-		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-		{
-			m_VariableTables[ i ].SetShader( m_pShaderState->GetShader( (RHI::EShaderType)i ) );
-		}
-	}
-	else
-	{
-		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-		{
-			m_VariableTables[ i ].SetShader( nullptr );
-		}
+		m_VariableTables[ i ].SetShader( m_pShaderProgram->GetShader( (RHI::EShaderType)i ) );
 	}
 }
 
@@ -238,7 +226,7 @@ void iberbar::Renderer::CMaterial::Reset()
 
 bool iberbar::Renderer::CMaterial::CampareWithMaterial( const CMaterial* pOther ) const
 {
-	if ( m_pShaderState != pOther->m_pShaderState )
+	if ( m_pShaderProgram != pOther->m_pShaderProgram )
 		return false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{

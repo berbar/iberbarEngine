@@ -2,6 +2,7 @@
 
 #include <iberbar/GameEngine/ShaderManager.h>
 #include <iberbar/GameEngine/BaseResourceManager.h>
+#include <iberbar/RHI/ShaderState.h>
 #include <iberbar/RHI/Device.h>
 
 
@@ -11,6 +12,7 @@ iberbar::Game::CShaderManager::CShaderManager( RHI::IDevice* pRHIDevice )
 	, m_nApiType( pRHIDevice->GetApiType() )
 	, m_strRootDir( "" )
 	, m_ShaderNodeList()
+	, m_ShaderStateNodeList()
 {
 	m_pRHIDevice->AddRef();
 }
@@ -24,6 +26,62 @@ iberbar::Game::CShaderManager::~CShaderManager()
 	}
 	m_ShaderNodeList.clear();
 	UNKNOWN_SAFE_RELEASE_NULL( m_pRHIDevice );
+}
+
+
+iberbar::CResult iberbar::Game::CShaderManager::GetOrCreateShaderState( const char* strFilePath, RHI::IShaderState** ppOutShaderState )
+{
+	assert( strFilePath && strFilePath[ 0 ] );
+
+	if ( FindShaderState( strFilePath, ppOutShaderState ) == true )
+		return CResult();
+
+	char ShaderPaths[ 256 ][ (int)RHI::EShaderType::__Count ];
+	memset( ShaderPaths, 0, sizeof( ShaderPaths ) );
+
+	CResult cRet = GetShaderPathsFromFile( strFilePath, ShaderPaths[ 0 ], ShaderPaths[ 1 ], ShaderPaths[ 2 ], ShaderPaths[ 3 ], ShaderPaths[ 4 ], ShaderPaths[ 5 ] );
+	if ( cRet.IsOK() == false )
+		return cRet;
+
+	TSmartRefPtr<RHI::IShader> pShaders[ (int)RHI::EShaderType::__Count ];
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	{
+		cRet = GetOrCreateShader( (RHI::EShaderType)i, ShaderPaths[ i ], &pShaders[ i ] );
+		if ( cRet.IsOK() == false )
+			return cRet;
+	}
+
+	TSmartRefPtr<RHI::IShaderState> pShaderState;
+	cRet = m_pRHIDevice->CreateShaderState(
+		&pShaderState,
+		nullptr,
+		pShaders[ (int)RHI::EShaderType::VertexShader ],
+		pShaders[ (int)RHI::EShaderType::PixelShader ],
+		pShaders[ (int)RHI::EShaderType::HullShader ],
+		pShaders[ (int)RHI::EShaderType::GeometryShader ],
+		pShaders[ (int)RHI::EShaderType::DomainShader ] );
+	if ( cRet.IsOK() == false )
+		return cRet;
+
+	_ShaderStateNode Node;
+	Node.pShaderState = pShaderState;
+	Node.pShaderState->AddRef();
+	Node.strName = strFilePath;
+	m_ShaderStateNodeList.push_back( Node );
+
+	if ( ppOutShaderState != nullptr )
+	{
+		(*ppOutShaderState) = pShaderState;
+		(*ppOutShaderState)->AddRef();
+	}
+
+	return CResult();
+}
+
+
+bool iberbar::Game::CShaderManager::FindShaderState( const char* strFilePath, RHI::IShaderState** ppOutShaderState )
+{
+
 }
 
 

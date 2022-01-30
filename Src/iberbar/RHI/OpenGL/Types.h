@@ -100,14 +100,12 @@ inline void iberbar::RHI::OpenGL::ConvertVertexAttrName( std::string& str, UVert
             break;
         case UVertexDeclareUsage::Normal:
             str = "a_normal";
+            break;
         case UVertexDeclareUsage::Color:
             str = "a_color";
             break;
         case UVertexDeclareUsage::TexCoord:
             str = "a_texcoord";
-            break;
-        case UVertexDeclareUsage::Sample:
-            str = "a_sample";
             break;
         default:
             break;
