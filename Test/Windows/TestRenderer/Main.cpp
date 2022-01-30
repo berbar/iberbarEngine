@@ -3,24 +3,24 @@
 #include <Windows.h>
 #include <iberbar/GameEngine/Application.h>
 
-#include <iberbar/GameEngine/Paper2dLoader.h>
+//#include <iberbar/GameEngine/Paper2dLoader.h>
 #include <iberbar/GameEngine/ResourcePreloader.h>
 #include <iberbar/GameEngine/FontManager.h>
 #include <iberbar/GameEngine/LoadingThread.h>
 
-#include <iberbar/Paper2d/Director.h>
-#include <iberbar/Paper2d/Scene.h>
-#include <iberbar/Paper2d/Camera.h>
-#include <iberbar/Paper2d/Image.h>
-#include <iberbar/Paper2d/Animation.h>
-#include <iberbar/Paper2d/Terrain.h>
+//#include <iberbar/Paper2d/Director.h>
+//#include <iberbar/Paper2d/Scene.h>
+//#include <iberbar/Paper2d/Camera.h>
+//#include <iberbar/Paper2d/Image.h>
+//#include <iberbar/Paper2d/Animation.h>
+//#include <iberbar/Paper2d/Terrain.h>
 
-#include <iberbar/Gui/Widgets/EditBox.h>
-#include <iberbar/Gui/Element/ElemColorRect.h>
+//#include <iberbar/Gui/Widgets/EditBox.h>
+//#include <iberbar/Gui/Element/ElemColorRect.h>
 #include <iberbar/Gui/Dialog.h>
 #include <iberbar/Gui/Engine.h>
 
-#include <iberbar/Renderer/RendererSprite.h>
+//#include <iberbar/Renderer/RendererSprite.h>
 
 #include <iberbar/Network/IO.h>
 
@@ -76,46 +76,46 @@ iberbar::CResult CTestApplication::OnCreated()
 {
 	iberbar::CResult ret;
 
-	ret = m_ResourcePreloader->ReadFile( "Scripts/Preload.xml" );
+	//ret = m_ResourcePreloader->ReadFile( "Scripts/Preload.xml" );
 
-	iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
-	if ( m_pFontManager->GetFontDefault( &pFont ) )
-	{
-		pFont->LoadText( L"fps: 0123456798." );
-	}
+	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
+	//if ( m_pFontManager->GetFontDefault( &pFont ) )
+	//{
+	//	pFont->LoadText( L"fps: 0123456798." );
+	//}
 	m_pLuaDevice->AddLuaPath( "Scripts/Game2/?.lua" );
 	m_pLuaDevice->ExecuteFile( "Scripts/Game2/main.lua" );
 	
 	iberbar::Lua::CFunctionHelper::sExecuteGlobalFunction( m_pLuaDevice->GetLuaState(), "Main" );
 
-	auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
-	auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
-	auto pEditBoxBgElement = iberbar::TSmartRefPtr<iberbar::Gui::CElementColorRect>::_sNew();
+	//auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
+	//auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
+	//auto pEditBoxBgElement = iberbar::TSmartRefPtr<iberbar::Gui::CElementColorRect>::_sNew();
 
-	pEditBox->SetRenderElement( pEditBoxBgElement );
-	pEditBox->SetTextElementRef( pEditBoxTextElement );
-	pEditBox->SetSize( iberbar::CSize2i( 200, 100 ) );
-	pEditBox->SetPosition( 100, 100 );
+	//pEditBox->SetRenderElement( pEditBoxBgElement );
+	//pEditBox->SetTextElementRef( pEditBoxTextElement );
+	//pEditBox->SetSize( iberbar::CSize2i( 200, 100 ) );
+	//pEditBox->SetPosition( 100, 100 );
 
-	pEditBoxBgElement->Init();
-	pEditBoxBgElement->SetColor( -1, iberbar::CColor4B( 0xffffffff ) );
-	pEditBoxBgElement->SetSize( iberbar::CSize2i( 200, 100 ) );
-	pEditBoxBgElement->SetZOrder( 99997 );
-	pEditBoxBgElement->AddChildElement( pEditBoxTextElement );
+	//pEditBoxBgElement->Init();
+	//pEditBoxBgElement->SetColor( -1, iberbar::CColor4B( 0xffffffff ) );
+	//pEditBoxBgElement->SetSize( iberbar::CSize2i( 200, 100 ) );
+	//pEditBoxBgElement->SetZOrder( 99997 );
+	//pEditBoxBgElement->AddChildElement( pEditBoxTextElement );
 
-	pEditBoxTextElement->SetFont( pFont );
-	pEditBoxTextElement->SetTextColor( iberbar::CColor4B( 0xff000000 ) );
-	pEditBoxTextElement->SetSelTextColor( iberbar::CColor4B( 0xffffffff ) );
-	pEditBoxTextElement->SetSelBgColor( iberbar::CColor4B( 0xff3390ff ) );
-	pEditBoxTextElement->SetCaretColor( iberbar::CColor4B( 0xff000000 ) );
-	pEditBoxTextElement->SetZOrder( 99999 );
-	pEditBoxTextElement->SetBgZOrder( 99998 );
-	pEditBoxTextElement->SetSize( iberbar::CSize2i( 200, 100 ) );
-	pEditBoxTextElement->SetTextAlignHorizental( iberbar::UAlignHorizental::Left );
+	//pEditBoxTextElement->SetFont( pFont );
+	//pEditBoxTextElement->SetTextColor( iberbar::CColor4B( 0xff000000 ) );
+	//pEditBoxTextElement->SetSelTextColor( iberbar::CColor4B( 0xffffffff ) );
+	//pEditBoxTextElement->SetSelBgColor( iberbar::CColor4B( 0xff3390ff ) );
+	//pEditBoxTextElement->SetCaretColor( iberbar::CColor4B( 0xff000000 ) );
+	//pEditBoxTextElement->SetZOrder( 99999 );
+	//pEditBoxTextElement->SetBgZOrder( 99998 );
+	//pEditBoxTextElement->SetSize( iberbar::CSize2i( 200, 100 ) );
+	//pEditBoxTextElement->SetTextAlignHorizental( iberbar::UAlignHorizental::Left );
 
-	auto pDialog = iberbar::Gui::CEngine::sGetInstance()->GetDialog( "MainMenu" );
+	//auto pDialog = iberbar::Gui::CEngine::sGetInstance()->GetDialog( "MainMenu" );
 
-	pDialog->GetWidgetRoot()->AddWidget( pEditBox );
+	//pDialog->GetWidgetRoot()->AddWidget( pEditBox );
 
 #ifdef _DEBUG
 	FILE* f = nullptr;
@@ -155,14 +155,14 @@ void CTestApplication::OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTi
 
 void CTestApplication::OnRender()
 {
-	iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
-	if ( m_pFontManager->GetFontDefault( &pFont ) )
-	{
-		iberbar::CRect2i rect( 0, 100, 200, 150 );
-		wchar_t strText[ 256 ];
-		swprintf_s( strText, L"fps: %4.4f", GetFPS() );
-		m_pRendererSprite->DrawText( INT_MAX, pFont, nullptr, strText, -1, &rect, iberbar::CColor4B( 0xffffffff ), iberbar::UFontDrawTextOptions() );
-	}
+	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
+	//if ( m_pFontManager->GetFontDefault( &pFont ) )
+	//{
+	//	iberbar::CRect2i rect( 0, 100, 200, 150 );
+	//	wchar_t strText[ 256 ];
+	//	swprintf_s( strText, L"fps: %4.4f", GetFPS() );
+	//	m_pRendererSprite->DrawText( INT_MAX, pFont, nullptr, strText, -1, &rect, iberbar::CColor4B( 0xffffffff ), iberbar::UFontDrawTextOptions() );
+	//}
 }
 
 
@@ -191,7 +191,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLin
 	appInitData.nWndWidth = 800;
 	appInitData.nWndHeight = 600;
 	appInitData.bFullScreen = false;
-	appInitData.nRHIApi = iberbar::RHI::UApiType::D3D9;
+	appInitData.nRHIApi = iberbar::RHI::UApiType::D3D11;
 	appInitData.bUseLoadingThread = true;
 	CTestApplication app;
 	app.SetConfiguration( appInitData );
