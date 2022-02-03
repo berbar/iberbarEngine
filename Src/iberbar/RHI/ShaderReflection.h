@@ -115,6 +115,15 @@ namespace iberbar
 			std::string m_strName;
 		};
 
+
+		struct UShaderInputParameterDesc
+		{
+		public:
+			uint32 SemanticIndex;
+			UVertexDeclareUsage SemanticUsage;
+			char Name[128];
+		};
+
 		class __iberbarRHIApi__ IShaderReflection abstract
 		{
 		public:
@@ -124,18 +133,22 @@ namespace iberbar
 			FORCEINLINE uint32 GetBufferSizeTotal() const { return m_nBufferSizeTotal; }
 			FORCEINLINE uint32 GetTextureCountTotal() const { return m_nTextureCountTotal; }
 			FORCEINLINE uint32 GetSamplerStateCountTotal() const { return m_nSamplerStateCountTotal; }
+			FORCEINLINE uint32 GetInputParameterCount() const { return m_nInputParametersCount; }
 
 			virtual const IShaderReflectionBuffer* GetBufferByIndex( int nIndex ) const = 0;
 			virtual const IShaderReflectionBuffer* GetBufferByName( const char* pstrName ) const = 0;
 			virtual const IShaderReflectionVariable* GetVariableByName( const char* pstrName ) const = 0;
 			virtual const IShaderReflectionBindResource* GetTextureByName( const char* pstrName ) const = 0;
 			virtual const IShaderReflectionBindResource* GetSamplerStateByName( const char* pstrName ) const = 0;
+			FORCEINLINE const UShaderInputParameterDesc& GetInputParameterDesc( uint32 nIndex ) { return m_InputParametersDesc[ nIndex ]; }
 
 		protected:
 			uint32 m_nBufferSizeTotal;
 			uint32 m_nBufferCount;
 			uint32 m_nTextureCountTotal;
 			uint32 m_nSamplerStateCountTotal;
+			uint32 m_nInputParametersCount;
+			UShaderInputParameterDesc m_InputParametersDesc[ MaxVertexElementCount ];
 		};
 	}
 }

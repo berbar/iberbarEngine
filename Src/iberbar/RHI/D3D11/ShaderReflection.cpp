@@ -255,6 +255,8 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflection::Initial( const void* pC
 	ID3D11ShaderReflectionConstantBuffer* pD3DShaderReflectionCBuffer = nullptr;
 	CShaderReflectionBuffer* pConstBuffer = nullptr;
 
+	//pD3DShaderReflection->GetInputParameterDesc( )
+
 	pD3DShaderReflection->GetDesc( &D3DDesc );
 	if ( D3DDesc.BoundResources > 0 )
 	{
@@ -322,6 +324,32 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflection::Initial( const void* pC
 		m_nBufferSizeTotal = nConstBufferOffset;
 	}*/
 
+	m_nInputParametersCount = (uint32)D3DDesc.InputParameters;
+	D3D11_SIGNATURE_PARAMETER_DESC D3DParameterDesc;
+	for ( uint32 i = 0; i < m_nInputParametersCount; i++ )
+	{
+		if ( SUCCEEDED( pD3DShaderReflection->GetInputParameterDesc( i, &D3DParameterDesc ) ) )
+		{
+			m_InputParametersDesc[ i ].SemanticIndex = D3DParameterDesc.SemanticIndex;
+			if ( strcmp( D3DParameterDesc.SemanticName, "POSITION" ) == 0 )
+			{
+				m_InputParametersDesc[ i ].SemanticUsage = UVertexDeclareUsage::Position;
+			}
+			else if ( strcmp( D3DParameterDesc.SemanticName, "COLOR" ) == 0 )
+			{
+				m_InputParametersDesc[ i ].SemanticUsage = UVertexDeclareUsage::Color;
+			}
+			else if ( strcmp( D3DParameterDesc.SemanticName, "NORMAL" ) == 0 )
+			{
+				m_InputParametersDesc[ i ].SemanticUsage = UVertexDeclareUsage::Normal;
+			}
+			else if ( strcmp( D3DParameterDesc.SemanticName, "TEXCOORD" ) == 0 )
+			{
+				m_InputParametersDesc[ i ].SemanticUsage = UVertexDeclareUsage::TexCoord;
+			}
+		}
+	}
+
 	return CResult();
 }
 
@@ -357,3 +385,4 @@ const iberbar::RHI::IShaderReflectionBindResource* iberbar::RHI::D3D11::CShaderR
 	}
 	return nullptr;
 }
+

@@ -66,5 +66,8 @@ iberbar::RHI::IShaderReflection::IShaderReflection()
 	, m_nBufferCount( 0 )
 	, m_nTextureCountTotal( 0 )
 	, m_nSamplerStateCountTotal( 0 )
+	, m_nInputParametersCount( 0 )
+	, m_InputParametersDesc()
 {
+	memset( m_InputParametersDesc, 0, sizeof( m_InputParametersDesc ) );
 }
