@@ -13,19 +13,17 @@ namespace iberbar
 			: public IResource
 		{
 		public:
-			IVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount );
+			IVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount );
 
 		public:
-			inline uint32 GetSlotCount() const { return m_nSlotCount; }
 			inline const uint32* GetStrides() const { return m_Strides; }
-			inline const UVertexElement* GetVertexElements() const { return m_pVertexElements; }
+			inline const UVertexElement* GetVertexElements() const { return m_VertexElements; }
 			inline uint32 GetVertexElementsCount() const { return m_nVertexElementsCount; }
 
 		protected:
 			uint32 m_nVertexElementsCount;
-			uint32 m_nSlotCount;
 			uint32 m_Strides[ MaxVertexElementCount ];
-			UVertexElement m_pVertexElements[ MaxVertexElementCount ];
+			UVertexElement m_VertexElements[ MaxVertexElementCount ];
 		};
 	}
 }

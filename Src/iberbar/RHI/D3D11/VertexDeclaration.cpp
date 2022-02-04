@@ -10,7 +10,7 @@ void iberbar::RHI::D3D11::CVertexDeclaration::BuildD3DInputElementDescritions( D
 	uint32 i = 0;
 	for ( ; i < m_nVertexElementsCount; i++ )
 	{
-		pRHIElement = &m_pVertexElements[ i ];
+		pRHIElement = &m_VertexElements[ i ];
 		pRefArray[ i ].SemanticName = ConvertVertexDeclareUsage( pRHIElement->nSemantic );
 		pRefArray[ i ].SemanticIndex = (UINT)pRHIElement->nSemanticIndex;
 		pRefArray[ i ].Format = ConvertVertexFormat( pRHIElement->nFormat );

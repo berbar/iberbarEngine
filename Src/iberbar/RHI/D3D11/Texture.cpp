@@ -15,14 +15,12 @@ iberbar::RHI::D3D11::CTexture::CTexture( CDevice* pDevice )
 	, m_bDynamic( false )
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 }
 
 
 iberbar::RHI::D3D11::CTexture::~CTexture()
 {
 	D3D_SAFE_RELEASE( m_pD3DShaderResourceView );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 }
 
 

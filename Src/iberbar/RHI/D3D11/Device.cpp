@@ -18,7 +18,6 @@ iberbar::RHI::D3D11::CDevice::CDevice()
 	, m_hInstance( nullptr )
 	, m_pDXGIFactory( nullptr )
 	, m_pDXGIAdapter( nullptr )
-	, m_DXGIOutputArraySize( 0 )
 	, m_pDXGISwapChain( nullptr )
 	, m_D3DFeatureLevel()
 	, m_pD3DDevice( nullptr )
@@ -35,7 +34,43 @@ iberbar::RHI::D3D11::CDevice::CDevice()
 
 iberbar::RHI::D3D11::CDevice::~CDevice()
 {
+	assert( m_pD3DDevice == nullptr );
+}
+
+
+void iberbar::RHI::D3D11::CDevice::Shutdown()
+{
 	SAFE_DELETE( m_pCommandContext );
+	for ( int i = 0, s = (int)m_VertexDeclarationsCache.size(); i < s; i++ )
+	{
+		UNKNOWN_SAFE_RELEASE_NULL( m_VertexDeclarationsCache[ i ] );
+	}
+	m_VertexDeclarationsCache.clear();
+	for ( int i = 0, s = (int)m_SamplerStatesCache.size(); i < s; i++ )
+	{
+		UNKNOWN_SAFE_RELEASE_NULL( m_SamplerStatesCache[ i ] );
+	}
+	m_SamplerStatesCache.clear();
+
+	m_pD3DDepthStencil = nullptr;
+	m_pD3DDepthStencilState = nullptr;
+	m_pD3DDepthStencilView = nullptr;
+	m_pD3DRenderTargetView = nullptr;
+	m_pD3DRasterizerState = nullptr;
+
+	m_pDXGIFactory = nullptr;
+	m_pDXGIAdapter = nullptr;
+	m_pDXGISwapChain = nullptr;
+
+	// Perform a detailed live object report (with resource types)
+	ID3D11Debug* pD3D11Debug = nullptr;
+	m_pD3DDevice->QueryInterface( __uuidof(ID3D11Debug), (void**)(&pD3D11Debug) );
+	if ( pD3D11Debug )
+	{
+		pD3D11Debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+	}
+
+	m_pD3DDevice = nullptr;
 }
 
 
@@ -157,12 +192,25 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateComputeShader( IShader** pp
 }
 
 
-iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount )
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount )
 {
 	assert( ppOutDeclaration );
-	TSmartRefPtr<CVertexDeclaration> pDeclaration = TSmartRefPtr<CVertexDeclaration>::_sNew( pVertexElements, nVertexElementsCount, pStrides, nSlotCount );
+
+	for ( int i = 0, s = (int)m_VertexDeclarationsCache.size(); i < s; i++ )
+	{
+		CVertexDeclaration* pDeclarationTemp = m_VertexDeclarationsCache[ i ];
+		if ( memcmp( pDeclarationTemp->GetVertexElements(), pVertexElements, sizeof( UVertexElement ) * MaxVertexElementCount ) == 0 )
+		{
+			UNKNOWN_SAFE_RELEASE_NULL( *ppOutDeclaration );
+			(*ppOutDeclaration) = pDeclarationTemp;
+			(*ppOutDeclaration)->AddRef();
+			return CResult();
+		}
+	}
+
+	TSmartRefPtr<CVertexDeclaration> pDeclarationNew = TSmartRefPtr<CVertexDeclaration>::_sNew( pVertexElements, nVertexElementsCount );
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutDeclaration );
-	( *ppOutDeclaration ) = pDeclaration;
+	( *ppOutDeclaration ) = pDeclarationNew;
 	( *ppOutDeclaration )->AddRef();
 	return CResult();
 }

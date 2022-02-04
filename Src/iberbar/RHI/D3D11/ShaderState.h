@@ -35,7 +35,7 @@ namespace iberbar
 
 			public:
 				virtual IShaderProgram* GetShaderProgram() override;
-				virtual IVertexDeclaration* GetVertexDeclaration() override { return m_pVertexDeclaration; }
+				virtual IVertexDeclaration* GetVertexDeclaration() override;
 				//virtual IUniformBuffer** GetUniformBuffers( EShaderType eShaderType ) override;
 
 				CResult Initial();

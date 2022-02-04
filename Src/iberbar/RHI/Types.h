@@ -279,6 +279,7 @@ namespace iberbar
             uint32 nSemanticIndex;
             UVertexFormat nFormat;
             uint32 nOffset;
+            uint32 nStride;
         };
 
         struct UVertexDeclarationDesc

@@ -15,14 +15,12 @@ iberbar::RHI::D3D11::CShader::CShader( CDevice* pDevice, EShaderType eShaderType
 	//, m_ConstBuffersData()
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 }
 
 
 iberbar::RHI::D3D11::CShader::~CShader()
 {
 	SAFE_DELETE(m_pReflection);
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	//auto iter = m_ConstantBuffers.begin();
 	//auto end = m_ConstantBuffers.end();
 	//for ( ; iter != end; iter++ )
@@ -323,7 +321,6 @@ iberbar::RHI::D3D11::CShaderProgram::CShaderProgram(
 	, m_UniformBuffers()
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 
 	memset( m_UniformBuffers, 0, sizeof( m_UniformBuffers ) );
 }
@@ -331,8 +328,6 @@ iberbar::RHI::D3D11::CShaderProgram::CShaderProgram(
 
 iberbar::RHI::D3D11::CShaderProgram::~CShaderProgram()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
-
 	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
 	{
 		for ( int j = 0; j < D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; j++ )

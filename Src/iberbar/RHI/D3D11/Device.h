@@ -13,6 +13,7 @@ namespace iberbar
 	{
 		namespace D3D11
 		{
+			class CVertexDeclaration;
 			class CSamplerState;
 			class CCommandContext;
 
@@ -24,6 +25,7 @@ namespace iberbar
 				virtual ~CDevice();
 
 			public:
+				virtual void Shutdown() override;
 				virtual void LostDevice() override;
 				virtual CResult ResetDevice( int nBackBufferWidth, int nBackBufferHeight, bool bIsWindow ) override;
 				virtual void CreateTexture( ITexture** ppTexture ) override;
@@ -35,7 +37,7 @@ namespace iberbar
 				virtual CResult CreateGeometryShader( IShader** ppOutShader ) override;
 				virtual CResult CreateDomainShader( IShader** ppOutShader ) override;
 				virtual CResult CreateComputeShader( IShader** ppOutShader ) override;
-				virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount ) override;
+				virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount ) override;
 				virtual CResult CreateShaderProgram( IShaderProgram** ppOutShaderProgram, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) override;
 				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShaderProgram* pShaderProgram ) override;
 				//virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) override;
@@ -77,9 +79,7 @@ namespace iberbar
 				HINSTANCE m_hInstance;
 				float m_D3DClearColorRGBA[ 4 ];
 				ComPtr<IDXGIFactory> m_pDXGIFactory;             // DXGI Factory object
-				ComPtr<IDXGIAdapter1> m_pDXGIAdapter;            // The DXGI adapter object for the D3D11 device
-				//ComPtr<IDXGIOutput** m_DXGIOutputArray;        // The array of output obj for the D3D11 adapter obj
-				UINT                    m_DXGIOutputArraySize;    // Number of elements in m_D3D11OutputArray
+				ComPtr<IDXGIAdapter1> m_pDXGIAdapter;            // The DXGI adapter object for the 
 				ComPtr<IDXGISwapChain> m_pDXGISwapChain;          // the D3D11 swapchain
 				//DXGI_SURFACE_DESC       m_BackBufferSurfaceDescDXGI; // D3D11 back buffer surface description
 				//bool                    m_RenderingOccluded;       // Rendering is occluded by another window
@@ -105,7 +105,7 @@ namespace iberbar
 				//bool m_bIsRendering;
 				//bool m_bHasLostDevice;
 
-
+				std::vector<CVertexDeclaration*> m_VertexDeclarationsCache;
 				std::vector<CSamplerState*> m_SamplerStatesCache;
 
 				CCommandContext* m_pCommandContext;

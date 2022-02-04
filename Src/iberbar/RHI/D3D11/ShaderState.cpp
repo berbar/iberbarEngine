@@ -15,7 +15,6 @@ iberbar::RHI::D3D11::CShaderState::CShaderState(
 	, m_pShaderProgram( pShaderProgram )
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 
 	assert( m_pVertexDeclaration );
 	m_pVertexDeclaration->AddRef();
@@ -27,7 +26,6 @@ iberbar::RHI::D3D11::CShaderState::CShaderState(
 
 iberbar::RHI::D3D11::CShaderState::~CShaderState()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pVertexDeclaration );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderProgram );
 
@@ -37,6 +35,12 @@ iberbar::RHI::D3D11::CShaderState::~CShaderState()
 iberbar::RHI::IShaderProgram* iberbar::RHI::D3D11::CShaderState::GetShaderProgram()
 {
 	return m_pShaderProgram;
+}
+
+
+iberbar::RHI::IVertexDeclaration* iberbar::RHI::D3D11::CShaderState::GetVertexDeclaration()
+{
+	return m_pVertexDeclaration;
 }
 
 

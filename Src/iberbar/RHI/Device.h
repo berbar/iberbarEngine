@@ -32,15 +32,16 @@ namespace iberbar
 
 
 		class __iberbarRHIApi__ IDevice abstract
-			: public CRef
 		{
 		public:
 			IDevice( UApiType nApiType );
+			virtual ~IDevice() {}
 
 		public:
 #ifdef _WINDOWS
 			virtual CResult CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight ) = 0;
 #endif
+			virtual void Shutdown() = 0;
 			virtual void LostDevice() = 0;
 			virtual CResult ResetDevice( int nBackBufferWidth, int nBackBufferHeight, bool bIsWindow ) = 0;
 			virtual void CreateTexture( ITexture** ppTexture ) = 0;
@@ -52,7 +53,7 @@ namespace iberbar
 			virtual CResult CreateGeometryShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreateDomainShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreateComputeShader( IShader** ppOutShader ) = 0;
-			virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, const uint32* pStrides, uint32 nSlotCount ) = 0;
+			virtual CResult CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount ) = 0;
 			virtual CResult CreateShaderProgram( IShaderProgram** ppOutShaderProgram, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) = 0;
 			virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShaderProgram* pShaderProgram ) = 0;
 			virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) = 0;

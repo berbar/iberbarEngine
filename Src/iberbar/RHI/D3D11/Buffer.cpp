@@ -11,13 +11,11 @@ iberbar::RHI::D3D11::CVertexBuffer::CVertexBuffer( CDevice* pDevice, uint32 nInS
 	, m_bLocked( false )
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 }
 
 
 iberbar::RHI::D3D11::CVertexBuffer::~CVertexBuffer()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 }
 
 
@@ -113,13 +111,11 @@ iberbar::RHI::D3D11::CIndexBuffer::CIndexBuffer( CDevice* pDevice, uint32 nInStr
 	, m_bLocked( false )
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 }
 
 
 iberbar::RHI::D3D11::CIndexBuffer::~CIndexBuffer()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 }
 
 
@@ -213,7 +209,6 @@ iberbar::RHI::D3D11::CUniformBuffer::CUniformBuffer( CDevice* pDevice, uint32 nS
 	, m_pD3DBuffer( nullptr )
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 
 	if ( bUseMemoryCache == true )
 	{
@@ -224,7 +219,6 @@ iberbar::RHI::D3D11::CUniformBuffer::CUniformBuffer( CDevice* pDevice, uint32 nS
 
 iberbar::RHI::D3D11::CUniformBuffer::~CUniformBuffer()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	SAFE_DELETE_ARRAY( m_pMemoryCache );
 }
 
