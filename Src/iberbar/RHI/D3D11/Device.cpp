@@ -236,13 +236,29 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateShaderProgram( IShaderProgr
 iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShaderProgram* pShaderProgram )
 {
 	assert( ppOutShaderState );
+
+	assert( pVertexDeclaration != nullptr );
+	assert( pShaderProgram != nullptr );
+
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderState );
+
+	for ( int i = 0, s = (int)m_ShaderStatesCache.size(); i < s; i++ )
+	{
+		if ( m_ShaderStatesCache[ i ]->GetShaderProgram() == pShaderProgram &&
+			m_ShaderStatesCache[ i ]->GetVertexDeclarationInternal() == pVertexDeclaration )
+		{
+			(*ppOutShaderState) = m_ShaderStatesCache[ i ];
+			(*ppOutShaderState)->AddRef();
+			return CResult();
+		}
+	}
+
 	TSmartRefPtr<CShaderState> pShaderState = TSmartRefPtr<CShaderState>::_sNew( this,
 		(CVertexDeclaration*)pVertexDeclaration,
 		(CShaderProgram*)pShaderProgram );
 	CResult cRet = pShaderState->Initial();
 	if ( cRet.IsOK() == false )
 		return cRet;
-	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderState );
 	( *ppOutShaderState ) = pShaderState;
 	( *ppOutShaderState )->AddRef();
 	return CResult();
@@ -365,8 +381,8 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 	ComPtr<IDXGIDevice> pDXGIDevice = nullptr;
 	ComPtr<IDXGIAdapter> pDXGIAdapter = nullptr;
-	ComPtr<IDXGIFactory1> pDXGIFactory1 = nullptr;	// D3D11.0(����DXGI1.1)�Ľӿ���
-	ComPtr<IDXGIFactory2> pDXGIFactory2 = nullptr;	// D3D11.1(����DXGI1.2)���еĽӿ���
+	ComPtr<IDXGIFactory1> pDXGIFactory1 = nullptr;
+	ComPtr<IDXGIFactory2> pDXGIFactory2 = nullptr;
 	ComPtr<ID3D11Device> pD3DDevice = nullptr;
 	ComPtr<ID3D11DeviceContext> pD3DDeviceContext = nullptr;
 	ComPtr<ID3D11Device1> pD3DDevice1 = nullptr;
@@ -375,7 +391,6 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	ComPtr<IDXGISwapChain1> pDXGISwapChain1 = nullptr;
 
 
-	// ����D3D�豸 �� D3D�豸������
 	UINT createDeviceFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)  
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -416,7 +431,6 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 		if ( hResult == E_INVALIDARG )
 		{
-			// Direct3D 11.0 ��API������D3D_FEATURE_LEVEL_11_1������������Ҫ�������Եȼ�11.0�Լ����µİ汾
 			hResult = D3D11CreateDevice(
 				nullptr,
 				d3dDriverType,
@@ -439,17 +453,13 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
-	// ����Ƿ�֧�����Եȼ�11.0��11.1
 	if ( featureLevel != D3D_FEATURE_LEVEL_11_0 && featureLevel != D3D_FEATURE_LEVEL_11_1 )
 		return MakeResult( ResultCode::Bad, "Direct3D Feature Level 11 unsupported." );
 
-	// ��� MSAA֧�ֵ������ȼ�
 	pD3DDevice->CheckMultisampleQualityLevels( DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_nMultisampleQualityLevels );
 	assert( m_nMultisampleQualityLevels > 0 );
 
 
-	// Ϊ����ȷ���� DXGI������������������Ҫ��ȡ���� D3D�豸 �� DXGI���������������������
-	// "IDXGIFactory::CreateSwapChain: This function is being called with a device from a different IDXGIFactory."
 	HR( pD3DDevice.As( &pDXGIDevice ), "" );
 	HR( pDXGIDevice->GetAdapter( &pDXGIAdapter ), "" );
 	HR( pDXGIAdapter->GetParent( __uuidof( IDXGIFactory1 ), reinterpret_cast<void**>( pDXGIFactory1.GetAddressOf() ) ), "" );

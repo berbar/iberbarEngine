@@ -11,18 +11,19 @@
 
 
 
-
 namespace iberbar
 {
 	namespace Renderer
 	{
-		class CRenderer2dState
+
+		class CDefaultRendererProcessor::_State
 		{
 		public:
-			CRenderer2dState();
-			~CRenderer2dState();
+			_State();
+			~_State();
 
 		public:
+			//void SetVertexDeclaration( RHI::IVertexDeclaration* pVertexDeclaration );
 			bool AddCommand( CMeshDrawCommand* pCommand );
 			void FlushRenderList();
 			void SetShaderBindings();
@@ -35,20 +36,55 @@ namespace iberbar
 			FORCEINLINE uint32 GetTriangleCount() const { return m_nTriangleCount; }
 			FORCEINLINE RHI::IShaderState* GetUsingShaderState() const { return m_pUsingShaderState; }
 			FORCEINLINE const CShaderVariableTable* GetUsingShaderVarTable( RHI::EShaderType eShaderType ) const { return m_pUsingShaderVarTables[ (int)eShaderType ]; }
+			FORCEINLINE const CMaterial* GetMaterial() const { return m_pMaterial; }
 
 		private:
 			RHI::ICommandContext* m_pRhiContext;
 			std::vector<CMeshDrawCommand*> m_CommandList_Render;
 			RHI::IShaderState* m_pUsingShaderState;
 			const CShaderVariableTable* m_pUsingShaderVarTables[ (int)RHI::EShaderType::__Count ];
-			uint32 m_nVertexSlotCount;
-			uint32 m_nVertexSize;
+
+			uint32 m_nVertexUsage;
+			CMaterial* m_pMaterial;
+			//uint32 m_nVertexSlotCount;
+			//uint32 m_nVertexSize;
 			uint32 m_nVertexCount;
-			uint32 m_nVertexSizes[ RHI::MaxVertexElementCount ];
+			//uint32 m_nVertexSizes[ RHI::MaxVertexElementCount ];
 			//uint32 m_nVertexSizeTotal;
 			uint32 m_nIndexCount;
-			uint32 m_nIndexSizeTotal;
-			uint32 m_nTriangleCount;
+			//uint32 m_nIndexSizeTotal;
+			//uint32 m_nTriangleCount;
+		};
+
+		template < typename TRhiBuffer >
+		class TRhiBufferLocker
+		{
+		public:
+			TRhiBufferLocker()
+				: m_pBuffer( nullptr )
+				, m_bLocked( false )
+			{
+			}
+			inline ~TRhiBufferLocker()
+			{
+				if ( m_bLocked == true )
+				{
+
+				}
+			}
+			inline CResult Lock( TRhiBuffer* pBuffer, uint32 nOffset, uint32 nSize, void** ppOut, uint32 nFlags )
+			{
+				m_pBuffer = pBuffer;
+				CResult Result = m_pBuffer->Lock( nOffset, nSize, ppOut, nFlags );
+				if ( Result.IsOK() == true )
+				{
+					m_bLocked = true;
+				}
+			}
+
+		private:
+			TRhiBuffer* m_pBuffer;
+			bool m_bLocked;
 		};
 	}
 }
@@ -112,7 +148,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 
 	//CTrianglesCommand* pCommand = nullptr;
 	CMeshDrawCommand* pCommand = nullptr;
-	const IMesh* pMesh = nullptr;
+	const CMesh* pMesh = nullptr;
 	uint32 nVertexCountInMesh = 0;
 	uint32 nIndexCountInMesh = 0;
 	const void* pVertexData = nullptr;
@@ -127,6 +163,77 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 	uint8* pVerticesTemp = nullptr;
 	uint16* pIndicesTemp = nullptr;
 
+	bool bLockAll = true;
+	uint8 LockFlags[ RHI::MaxVertexElementCount + 1 ];
+	memset( LockFlags, 0, sizeof( LockFlags ) );
+	CResult cResultLockBuffer;
+	const std::vector<uint32> StreamsUsed = m_pState->GetMaterial()->GetStreams();
+	for ( uint32 nStreamIndex : StreamsUsed )
+	{
+		cResultLockBuffer = m_VertexBuffers[ nStreamIndex ]->Lock( 0, 0, (void**)&pVerticesTemp );
+		if ( cResultLockBuffer.IsOK() == false )
+		{
+			bLockAll = false;
+			break;
+		}
+	}
+	if ( bLockAll == true )
+	{
+		cResultLockBuffer = m_pIndexBuffer->Lock( 0, nIndexSizeTotal, (void**)&pIndicesTemp );
+		if ( cResultLockBuffer.IsOK() == false )
+		{
+			bLockAll = false;
+		}
+	}
+
+	if ( bLockAll == true )
+	{
+		uint16 nIndexOffset = 0;
+		for ( size_t i = 0, s = CommandList.size(); i < s; i++ )
+		{
+			pCommand = CommandList[ i ];
+			pMesh = pCommand->GetMesh();
+
+			nVertexCountInMesh = pMesh->GetVertexCount();
+			nIndexCountInMesh = pMesh->GetIndexCount();
+			pIndexData = (const uint16*)pMesh->GetIndexData();
+
+			// 拷贝顶点数据
+			for ( uint32 nStreamIndex : StreamsUsed )
+			{
+				pVertexData = pMesh->GetVertexData( nStreamIndex );
+				uint32 nVertexDataSize = nVertexCountInMesh * 0;
+				if ( pVertexData == nullptr )
+				{
+					memset( pVerticesTemp, 0, nVertexDataSize );
+				}
+				else
+				{
+					memcpy_s( pVerticesTemp, 0, pVertexData, nVertexDataSize );
+				}
+			}
+
+			// 拷贝索引数据
+			// 索引需要偏移
+			for ( uint32 n = 0; n < nIndexCountInMesh; n++ )
+			{
+				pIndicesTemp[ n ] = pIndexData[ n ] + nIndexOffset;
+			}
+			pIndicesTemp += nIndexCountInMesh;
+			nIndexOffset += nVertexCountInMesh;
+		}
+	}
+
+	for ( uint32 nStreamIndex : StreamsUsed )
+	{
+		cResultLockBuffer = m_VertexBuffers[ nStreamIndex ]->Unlock();
+	}
+	m_pIndexBuffer->Unlock();
+
+	if ( bLockAll == false )
+	{
+		return;
+	}
 	CResult retLV = m_pVertexBuffer->Lock( 0, nVertexSizeTotal, (void**)&pVerticesTemp );
 	CResult retLI = m_pIndexBuffer->Lock( 0, nIndexSizeTotal, (void**)&pIndicesTemp );
 	if ( retLV.IsOK() && retLI.IsOK() )
@@ -167,7 +274,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 	m_pIndexBuffer->Unlock();
 
 	SetShaderBindings();
-	m_pCommandContext->SetVertexBuffer( 0, m_pVertexBuffer, 0 );
+	
 	m_pCommandContext->SetIndexBuffer( m_pIndexBuffer, 0 );
 	m_pCommandContext->SetShaderState( m_pState->GetUsingShaderState() );
 	m_pCommandContext->SetPrimitiveTopology( RHI::UPrimitiveType::Triangle );

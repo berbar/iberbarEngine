@@ -12,6 +12,7 @@ namespace iberbar
 	namespace RHI
 	{
 		class IShaderProgram;
+		class IShaderState;
 	}
 
 	namespace Renderer
@@ -21,7 +22,7 @@ namespace iberbar
 			: public CRef
 		{
 		public:
-			CMaterial( RHI::IShaderProgram* pShaderProgram );
+			CMaterial();
 			CMaterial( CMaterial* pMaterialOrigin );
 			CMaterial( const CMaterial& Material ) = delete;
 			virtual ~CMaterial();
@@ -41,19 +42,21 @@ namespace iberbar
 			bool SetSamplerState( const char* pstrName, RHI::ISamplerState** pSamplerStates, uint32 nElementCount = 1, uint32 nElementStart = 0 );
 			void Reset();
 
-			RHI::IShaderProgram* GetShaderProgram() const { return m_pShaderProgram; }
+			const std::vector<uint32>& GetStreams() const { return m_Streams; }
+			RHI::IShaderState* GetShaderState() const { return m_pShaderState; }
 			//CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) { return &m_VariableTables[ (int)nShaderType ]; }
 			//const CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) const { return &m_VariableTables[ (int)nShaderType ]; }
 			const CShaderVariableTable* GetShaderVariableTables() const { return m_VariableTables; }
 
 			bool CampareWithMaterial( const CMaterial* pMaterialOther ) const;
 
-		protected:
+		public:
 			void Initial( RHI::IShaderProgram* pShaderProgram );
 
 		protected:
 			CMaterial* m_pMaterialParent;
-			RHI::IShaderProgram* m_pShaderProgram;
+			RHI::IShaderState* m_pShaderState;
+			std::vector<uint32> m_Streams;
 			CShaderVariableTable m_VariableTables[ (int)RHI::EShaderType::__Count ];
 		};
 	}

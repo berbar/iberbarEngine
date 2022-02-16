@@ -38,6 +38,8 @@
       <Filter>Processor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RenderCommandQueue.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\RendererState.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RenderCommand.cpp" />
@@ -67,6 +69,7 @@
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Processor\BaseRendererProcessor.cpp">
       <Filter>Processor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\RendererState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Font">

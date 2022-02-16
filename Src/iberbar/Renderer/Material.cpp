@@ -1,7 +1,12 @@
 
 #include <iberbar/Renderer/Material.h>
+#include <iberbar/Renderer/Renderer.h>
+#include <iberbar/Renderer/Types.h>
 #include <iberbar/RHI/Shader.h>
 #include <iberbar/RHI/ShaderState.h>
+#include <iberbar/RHI/ShaderReflection.h>
+#include <iberbar/RHI/Device.h>
+
 
 
 namespace iberbar
@@ -29,41 +34,117 @@ namespace iberbar
 
 
 
-iberbar::Renderer::CMaterial::CMaterial( RHI::IShaderProgram* pShaderProgram )
+iberbar::Renderer::CMaterial::CMaterial()
 	: m_pMaterialParent( nullptr )
-	, m_pShaderProgram( nullptr )
+	, m_pShaderState( nullptr )
+	, m_Streams()
 	, m_VariableTables()
 {
-	Initial( pShaderProgram );
 }
 
 
 iberbar::Renderer::CMaterial::CMaterial( CMaterial* pMaterialOrigin )
 	: m_pMaterialParent( pMaterialOrigin )
-	, m_pShaderProgram( nullptr )
+	, m_pShaderState( nullptr )
+	, m_Streams()
 	, m_VariableTables()
 {
 	assert( m_pMaterialParent );
 	m_pMaterialParent->AddRef();
-	Initial( m_pMaterialParent->m_pShaderProgram );
+
+	m_pShaderState = m_pMaterialParent->m_pShaderState;
+	if ( m_pShaderState )
+	{
+		m_pShaderState->AddRef();
+		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+		{
+			m_VariableTables[ i ].SetShader( m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i ) );
+		}
+	}
+
+	m_Streams = m_pMaterialParent->m_Streams;
 }
 
 
 iberbar::Renderer::CMaterial::~CMaterial()
 {
 	UNKNOWN_SAFE_RELEASE_NULL( m_pMaterialParent );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderProgram );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
 }
 
 
 void iberbar::Renderer::CMaterial::Initial( RHI::IShaderProgram* pShaderProgram )
 {
 	assert( pShaderProgram );
-	m_pShaderProgram = pShaderProgram;
-	m_pShaderProgram->AddRef();
+
+	assert( m_pShaderState == nullptr );
+
+	RHI::IShader* pVertexShader = pShaderProgram->GetShader( RHI::EShaderType::VertexShader );
+	assert( pVertexShader );
+	RHI::IShaderReflection* pVertexShaderReflection = pVertexShader->GetReflection();
+	RHI::UVertexElement VertexElements[ RHI::MaxVertexElementCount ];
+	int nVertexElementsCount = pVertexShaderReflection->GetInputParameterCount();
+	memset( VertexElements, 0, sizeof( VertexElements ) );
+	uint32 m_nVertexElementUsage = 0;
+	for ( int i = 0; i < nVertexElementsCount; i++ )
+	{
+		const RHI::UShaderInputParameterDesc& InputParameterDesc = pVertexShaderReflection->GetInputParameterDesc( i );
+		
+		VertexElements[ i ].nOffset = 0;
+		VertexElements[ i ].nSemantic = InputParameterDesc.SemanticUsage;
+		VertexElements[ i ].nSemanticIndex = InputParameterDesc.SemanticIndex;
+		switch ( InputParameterDesc.SemanticUsage )
+		{
+			case RHI::UVertexDeclareUsage::Position:
+			{
+				VertexElements[ i ].nSlot = (int)EVertexElementSlot::Position;
+				VertexElements[ i ].nFormat = RHI::UVertexFormat::FLOAT3;
+				VertexElements[ i ].nStride = sizeof( float ) * 3;
+				break;
+			}
+			case RHI::UVertexDeclareUsage::Color:
+			{
+				VertexElements[ i ].nSlot = (int)EVertexElementSlot::Color;
+				VertexElements[ i ].nFormat = RHI::UVertexFormat::FLOAT4;
+				VertexElements[ i ].nStride = sizeof( float ) * 4;
+				break;
+			}
+			case RHI::UVertexDeclareUsage::Normal:
+			{
+				VertexElements[ i ].nSlot = (int)EVertexElementSlot::Normal;
+				VertexElements[ i ].nFormat = RHI::UVertexFormat::FLOAT3;
+				VertexElements[ i ].nStride = sizeof( float ) * 3;
+				break;
+			}
+			case RHI::UVertexDeclareUsage::TexCoord:
+			{
+				VertexElements[ i ].nSlot = (int)EVertexElementSlot::Tex0 + InputParameterDesc.SemanticIndex;
+				VertexElements[ i ].nFormat = RHI::UVertexFormat::FLOAT2;
+				VertexElements[ i ].nStride = sizeof( float ) * 2;
+				break;
+			}
+			default:break;
+		}
+
+		assert( (m_nVertexElementUsage & (0x1 << VertexElements[ i ].nSlot)) == 0 );
+		m_nVertexElementUsage = m_nVertexElementUsage | (0x1 << VertexElements[ i ].nSlot);
+		
+		m_Streams.push_back( VertexElements[ i ].nSlot );
+	}
+
+	RHI::IDevice* pRhiDevice = CRenderer2d::sGetInstance()->GetRHIDevice();
+	TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
+	CResult cResult = pRhiDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, nVertexElementsCount );
+	if ( cResult.IsOK() == false )
+		return;
+
+	cResult = pRhiDevice->CreateShaderState( &m_pShaderState, pVertexDeclaration, pShaderProgram );
+	if ( cResult.IsOK() == false )
+		return;
+
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		m_VariableTables[ i ].SetShader( m_pShaderProgram->GetShader( (RHI::EShaderType)i ) );
+		m_VariableTables[ i ].SetShader( m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i ) );
 	}
 }
 
@@ -226,7 +307,7 @@ void iberbar::Renderer::CMaterial::Reset()
 
 bool iberbar::Renderer::CMaterial::CampareWithMaterial( const CMaterial* pOther ) const
 {
-	if ( m_pShaderProgram != pOther->m_pShaderProgram )
+	if ( m_pShaderState != pOther->m_pShaderState )
 		return false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{

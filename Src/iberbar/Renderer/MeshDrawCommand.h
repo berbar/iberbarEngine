@@ -8,7 +8,8 @@ namespace iberbar
 	namespace Renderer
 	{
 		class CShaderVariableTable;
-		class IMesh;
+		class CMesh;
+		class CMaterial;
 
 		class __iberbarRendererApi__ CMeshDrawCommand
 			: public CRenderCommand
@@ -17,19 +18,15 @@ namespace iberbar
 			CMeshDrawCommand();
 
 		public:
-			inline void SetMesh( const IMesh* pMesh ) { m_pMesh = pMesh; }
-			inline void SetShaderState( RHI::IShaderState* pShaderState ) { m_pShaderState = pShaderState; }
-			inline void SetShaderVariableTables( const CShaderVariableTable* pTables ) { m_pShaderVariableTables = pTables; }
+			inline void SetMesh( const CMesh* pMesh ) { m_pMesh = pMesh; }
+			inline void SetMaterial( const CMaterial* pMaterial ) { m_pMaterial = pMaterial; }
 
-			inline RHI::IShaderState* GetShaderState() { return m_pShaderState; }
-			inline const CShaderVariableTable* GetShaderVariableTables() const { return m_pShaderVariableTables; }
-			inline const IMesh* GetMeshData() const { return m_pMesh; }
+			inline const CMesh* GetMesh() const { return m_pMesh; }
+			inline const CMaterial* GetMaterial() const { return m_pMaterial; }
 
 		protected:
-			RHI::IShaderState* m_pShaderState;
-			const CShaderVariableTable* m_pShaderVariableTables;
-			const IMesh* m_pMesh;
-			//UMeshData m_MeshData;
+			const CMesh* m_pMesh;
+			const CMaterial* m_pMaterial;
 		};
 	}
 }

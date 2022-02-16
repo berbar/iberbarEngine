@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iberbar/Renderer/Headers.h>
-#include <iberbar/Renderer/Vertex.h>
+#include <iberbar/Renderer/Types.h>
+#include <iberbar/Utility/Math/Matrix.h>
 
 
 namespace iberbar
@@ -13,60 +14,102 @@ namespace iberbar
 
 	namespace Renderer
 	{
-		class __iberbarRendererApi__ IMesh
+
+		
+
+
+		class __iberbarRendererApi__ CMesh
 			: public CRef
 		{
 		public:
-			IMesh();
-			IMesh( const IMesh& ) = delete;
-			virtual ~IMesh() {}
+			CMesh();
+			CMesh( const CMesh& ) = delete;
+
+			inline uint32 GetIndexCount() const { return m_nIndexCount; }
+			inline uint16* GetIndexData() { return m_IndexData; }
+			inline const uint16* GetIndexData() const { return m_IndexData; }
 			
 			inline uint32 GetVertexCount() const { return m_nVertexCount; }
-			inline uint32 GetVertexSlotCount() const { return m_nVertexSlotCount; }
-			inline const void* GetVertexData( int nSlot ) const { return m_VertexDataSlots[ nSlot ]; }
-			inline uint32 GetVertexSize( int nSlot ) const { return m_VertexDataSizes[ nSlot ]; }
-			inline void* GetIndexData() const { return m_IndexData; }
-			inline uint32 GetIndexCount() const {}
-			inline RHI::UIndexFormat GetIndexFormat() const { return m_nIndexFormat; }
+			inline const void* GetVertexData( int nStreamIndex ) const { return (&m_Positions)[ nStreamIndex ]; }
+			inline const UVector3f* GetPositions() const { return m_Positions; }
+			inline const CColor4F* GetColors() const { return m_Colors; }
+			inline const UVector3f* GetNormals() const { return m_Normals; }
+			inline const UVector2f* GetTexcoords( int nSlot ) const { return m_TexcoordSlots[ nSlot  ]; }
 			
 
 		protected:
-			uint32 m_nVertexCount;
-			uint32 m_nVertexSlotCount;
-			RHI::UIndexFormat m_nIndexFormat;
 			uint32 m_nIndexCount;
-			void* m_IndexData;
-			void* m_VertexDataSlots[ RHI::MaxVertexElementCount ];
-			uint32 m_VertexDataSizes[ RHI::MaxVertexElementCount ];
+			uint16* m_IndexData;
+			uint32 m_nVertexCount;
 			
-			//RHI::UVertexDeclarationDesc m_VertexDeclarationDesc;
+			UVector3f* m_Positions;
+			CColor4F* m_Colors;
+			UVector3f* m_Normals;
+			UVector2f* m_TexcoordSlots[8];
 		};
 
 
-		class __iberbarRendererApi__ CMeshFilter
+		//class __iberbarRendererApi__ CMeshFilter
+		//{
+		//public:
+		//	void SetMesh( IMesh* pMesh );
+		//	IMesh* GetMesh();
+
+		//protected:
+		//	IMesh* m_pMesh;
+		//};
+
+
+		class __iberbarRendererApi__ CMeshDefault
+			: public CMesh
 		{
 		public:
-			void SetMesh( IMesh* pMesh );
-			IMesh* GetMesh();
+			CMeshDefault();
+			virtual ~CMeshDefault();
+
+			void NewVertices( uint32 nVertexCount, uint32 nUsage );
+			void NewIndices( uint32 nIndexCount );
+
+			inline uint16* GetBufferIndices() { return m_IndexData; }
+			inline UVector3f* GetBufferPositions() { return m_Positions; }
+			inline CColor4F* GetColors() { return m_Colors; }
+			inline UVector3f* GetBufferNormals() { return m_Normals; }
+			inline UVector2f* GetBufferTexcoords( int nSlot ) { return m_TexcoordSlots[ nSlot ]; }
 
 		protected:
-			IMesh* m_pMesh;
+			uint32 m_nVertexUsage;
 		};
 
 
 
-		class __iberbarRendererApi__ CMesh_V3F_C4F_T2F
-			: public IMesh
+		template < int tTexCount >
+		class TMeshForUI
 		{
 		public:
-			CMesh_V3F_C4F_T2F();
+			TMeshForUI()
+			{
+				memset( m_BufferPositions, 0, sizeof( m_BufferPositions ) );
+				memset( m_BufferColors, 0, sizeof( m_BufferColors ) );
+				memset( m_BufferTexcoordSlots, 0, sizeof( m_BufferTexcoordSlots ) );
+				memset( m_BufferIndices, 0, sizeof( m_BufferIndices ) );
 
-			Renderer::UVertex_V3F_C4B_T2F* GetVertexPtrInternal() { return m_MeshVertices; }
-			const Renderer::UVertex_V3F_C4B_T2F* GetVertexPtrInternal() const { return m_MeshVertices; }
+				m_nIndexCount = 6;
+				m_IndexData = m_BufferIndices;
+
+				m_nVertexCount = 4;
+				m_Positions = m_BufferPositions;
+				m_Colors = m_BufferColors;
+				for ( int i = 0; i < tTexCount; i++ )
+				{
+					m_TexcoordSlots[ i ] = m_BufferTexcoordSlots[ i ];
+				}
+			}
 
 		protected:
-			Renderer::UVertex_V3F_C4B_T2F m_MeshVertices[ 4 ];
-			uint16 m_MeshIndices[ 6 ];
+			UVector3f m_BufferPositions[ 4 ];
+			CColor4F m_BufferColors[ 4 ];
+			UVector2f m_BufferTexcoordSlots[ 4 ][ tTexCount ];
+			uint16 m_BufferIndices[ 6 ];
 		};
 	}
 }

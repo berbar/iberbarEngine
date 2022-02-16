@@ -223,10 +223,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\RendererState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Resource.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\ShaderVariables.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Sprite.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Types.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -258,6 +260,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\RendererState.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\ShaderVariables.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\TrianglesCommand.cpp" />
   </ItemGroup>

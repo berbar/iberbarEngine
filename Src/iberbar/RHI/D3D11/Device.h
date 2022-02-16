@@ -14,6 +14,7 @@ namespace iberbar
 		namespace D3D11
 		{
 			class CVertexDeclaration;
+			class CShaderState;
 			class CSamplerState;
 			class CCommandContext;
 
@@ -107,6 +108,7 @@ namespace iberbar
 
 				std::vector<CVertexDeclaration*> m_VertexDeclarationsCache;
 				std::vector<CSamplerState*> m_SamplerStatesCache;
+				std::vector<CShaderState*> m_ShaderStatesCache;
 
 				CCommandContext* m_pCommandContext;
 			};

@@ -20,6 +20,8 @@ namespace iberbar
 			: public CBaseRendererProcessor
 		{
 		public:
+			class _State;
+		public:
 			virtual void VisitQueue( CRenderQueue* pQueue ) override;
 			virtual void Flush() override;
 
@@ -32,7 +34,7 @@ namespace iberbar
 			void ProcessGroupCommand( CRenderGroupCommand* pCommand );
 
 		private:
-			CRenderer2dState* m_pState;
+			_State* m_pState;
 			RHI::ICommandContext* m_pCommandContext;
 			RHI::IIndexBuffer* m_pIndexBuffer;
 			RHI::IVertexBuffer* m_VertexBuffers[ RHI::MaxVertexElementCount ];
