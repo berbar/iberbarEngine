@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iberbar/Renderer/Headers.h>
 
 namespace iberbar
 {
@@ -34,5 +35,9 @@ namespace iberbar
 			Tex6 = 0x0001 << (int)EVertexElementSlot::Tex6,
 			Tex7 = 0x0001 << (int)EVertexElementSlot::Tex7,
 		};
+
+
+		static const uint32 g_nRhiUniformBindPoint_Matrices = 13;
+		static const uint32 g_nRhiUniformBindPoint_UserMax = 9;
 	}
 }

@@ -30,7 +30,7 @@ iberbar::Renderer::CMeshRendererComponent::~CMeshRendererComponent()
 }
 
 
-void iberbar::Renderer::CMeshRendererComponent::SetMesh( IMesh* pMesh )
+void iberbar::Renderer::CMeshRendererComponent::SetMesh( CMesh* pMesh )
 {
 	if ( m_pMesh == pMesh )
 		return;
@@ -43,7 +43,7 @@ void iberbar::Renderer::CMeshRendererComponent::SetMesh( IMesh* pMesh )
 
 	m_RenderCommand.SetMesh( m_pMesh );
 
-	UpdateBoundShaderStates( -1 );
+	//UpdateBoundShaderStates( -1 );
 }
 
 
@@ -115,18 +115,18 @@ void iberbar::Renderer::CMeshRendererComponent::SetMaterial( int nIndex, CMateri
 	if ( pMaterial != nullptr )
 		pMaterial->AddRef();
 
-	UpdateBoundShaderStates( nIndex );
+	//UpdateBoundShaderStates( nIndex );
 
 
 	if ( nIndex == 0 )
 	{
 		if ( m_Materials[ 0 ] != nullptr )
 		{
-			m_RenderCommand.SetShaderVariableTables( m_Materials[ 0 ]->GetShaderVariableTables() );
+			m_RenderCommand.SetMaterial( m_Materials[ 0 ] );
 		}
 		else
 		{
-			m_RenderCommand.SetShaderVariableTables( nullptr );
+			m_RenderCommand.SetMaterial( nullptr );
 		}
 	}
 }
@@ -141,27 +141,27 @@ void iberbar::Renderer::CMeshRendererComponent::Render()
 }
 
 
-void iberbar::Renderer::CMeshRendererComponent::UpdateBoundShaderStates( int nIndex )
-{
-
-	if ( nIndex < 0 )
-	{
-		for ( int i = 0, s = (int)m_Materials.size(); i < s; i++ )
-		{
-			UNKNOWN_SAFE_RELEASE_NULL( m_BoundShaderStates[ i ] );
-			if ( m_pMesh != nullptr )
-			{
-				CRenderer2d::sGetInstance()->GetRHIDevice()->CreateShaderState( , nullptr, m_Materials[i]->GetShaderProgram() );
-			}
-			
-		}
-
-		m_RenderCommand.SetShaderState( m_BoundShaderStates[ 0 ] );
-	}
-	else
-	{
-		m_RenderCommand.SetShaderState( m_BoundShaderStates[ 0 ] );
-	}
-
-	
-}
+//void iberbar::Renderer::CMeshRendererComponent::UpdateBoundShaderStates( int nIndex )
+//{
+//
+//	if ( nIndex < 0 )
+//	{
+//		for ( int i = 0, s = (int)m_Materials.size(); i < s; i++ )
+//		{
+//			UNKNOWN_SAFE_RELEASE_NULL( m_BoundShaderStates[ i ] );
+//			if ( m_pMesh != nullptr )
+//			{
+//				CRenderer2d::sGetInstance()->GetRHIDevice()->CreateShaderState( , nullptr, m_Materials[i]->GetShaderProgram() );
+//			}
+//			
+//		}
+//
+//		m_RenderCommand.SetShaderState( m_BoundShaderStates[ 0 ] );
+//	}
+//	else
+//	{
+//		m_RenderCommand.SetShaderState( m_BoundShaderStates[ 0 ] );
+//	}
+//
+//	
+//}

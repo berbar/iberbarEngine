@@ -9,6 +9,7 @@ iberbar::RHI::D3D11::CVertexBuffer::CVertexBuffer( CDevice* pDevice, uint32 nInS
 	, m_pDevice( pDevice )
 	, m_pD3DBuffer( nullptr )
 	, m_bLocked( false )
+	, m_D3DMappedSubResource()
 {
 	assert( m_pDevice );
 }
@@ -109,6 +110,7 @@ iberbar::RHI::D3D11::CIndexBuffer::CIndexBuffer( CDevice* pDevice, uint32 nInStr
 	, m_pDevice( pDevice )
 	, m_pD3DBuffer( nullptr )
 	, m_bLocked( false )
+	, m_D3DMappedSubResource()
 {
 	assert( m_pDevice );
 }
@@ -205,21 +207,21 @@ void iberbar::RHI::D3D11::CIndexBuffer::Destroy()
 iberbar::RHI::D3D11::CUniformBuffer::CUniformBuffer( CDevice* pDevice, uint32 nSize, bool bUseMemoryCache )
 	: m_pDevice( pDevice )
 	, m_nSize( nSize )
-	, m_pMemoryCache( nullptr )
+	//, m_pMemoryCache( nullptr )
 	, m_pD3DBuffer( nullptr )
 {
 	assert( m_pDevice );
 
-	if ( bUseMemoryCache == true )
-	{
-		m_pMemoryCache = new uint8[ m_nSize ];
-	}
+	//if ( bUseMemoryCache == true )
+	//{
+	//	m_pMemoryCache = new uint8[ m_nSize ];
+	//}
 }
 
 
 iberbar::RHI::D3D11::CUniformBuffer::~CUniformBuffer()
 {
-	SAFE_DELETE_ARRAY( m_pMemoryCache );
+	//SAFE_DELETE_ARRAY( m_pMemoryCache );
 }
 
 
@@ -232,11 +234,11 @@ void iberbar::RHI::D3D11::CUniformBuffer::UpdateContents( const void* pContents,
 	
 	int nContentSizeCopy = tMin( nContentSize, m_nSize );
 
-	if ( m_pMemoryCache != nullptr )
-	{
-		if ( memcmp( m_pMemoryCache, pContents, nContentSizeCopy ) == 0 )
-			return;
-	}
+	//if ( m_pMemoryCache != nullptr )
+	//{
+	//	if ( memcmp( m_pMemoryCache, pContents, nContentSizeCopy ) == 0 )
+	//		return;
+	//}
 
 	D3D11_MAPPED_SUBRESOURCE m_D3DMappedSubResource;
 	memset( &m_D3DMappedSubResource, 0, sizeof( m_D3DMappedSubResource ) );
@@ -262,10 +264,31 @@ iberbar::CResult iberbar::RHI::D3D11::CUniformBuffer::Initial()
 }
 
 
+iberbar::CResult iberbar::RHI::D3D11::CUniformBuffer::InitialWithData( const void* pContents, uint32 nContentSize )
+{
+	D3D11_BUFFER_DESC Desc;
+	memset( &Desc, 0, sizeof( D3D11_BUFFER_DESC ) );
+	Desc.Usage = D3D11_USAGE_DEFAULT;
+	Desc.ByteWidth = m_nSize;
+	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	Desc.CPUAccessFlags = 0;
+	D3D11_SUBRESOURCE_DATA InitialData;
+	memset( &InitialData, 0, sizeof( InitialData ) );
+	InitialData.pSysMem = pContents;
+	InitialData.SysMemPitch = nContentSize;
+	InitialData.SysMemSlicePitch = 0;
+	HRESULT hResult = m_pDevice->GetD3DDevice()->CreateBuffer( &Desc, &InitialData, &m_pD3DBuffer );
+	if ( FAILED( hResult ) )
+		return MakeResult( ResultCode::Bad, "" );
+
+	return CResult();
+}
+
+
 void iberbar::RHI::D3D11::CUniformBuffer::Destroy()
 {
 	m_pD3DBuffer = nullptr;
 	m_nSize = 0;
-	SAFE_DELETE_ARRAY( m_pMemoryCache );
+	//SAFE_DELETE_ARRAY( m_pMemoryCache );
 }
 

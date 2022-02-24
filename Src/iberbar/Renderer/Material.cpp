@@ -5,6 +5,7 @@
 #include <iberbar/RHI/Shader.h>
 #include <iberbar/RHI/ShaderState.h>
 #include <iberbar/RHI/ShaderReflection.h>
+#include <iberbar/RHI/VertexDeclaration.h>
 #include <iberbar/RHI/Device.h>
 
 
@@ -142,10 +143,29 @@ void iberbar::Renderer::CMaterial::Initial( RHI::IShaderProgram* pShaderProgram 
 	if ( cResult.IsOK() == false )
 		return;
 
-	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-	{
-		m_VariableTables[ i ].SetShader( m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i ) );
-	}
+	//RHI::IShader* pShader = nullptr;
+	//RHI::IShaderReflection* pShaderReflection = nullptr;
+	//const RHI::IShaderReflectionBuffer* pShaderReflectionBuffer = nullptr;
+	//RHI::IUniformBuffer* pUniformBuffer = nullptr;
+	//uint32 nCBufferCount = 0;
+	//for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	//{
+	//	pShader = pShaderProgram->GetShader( (RHI::EShaderType)i );
+	//	pShaderReflection = pShader->GetReflection();
+	//	m_VariableTables[ i ].SetShader( pShader );
+	//	nCBufferCount = pShaderReflection->GetBufferCount();
+	//	if ( nCBufferCount > 0 )
+	//	{
+	//		m_ShaderUniformBuffers[ i ].resize( nCBufferCount );
+	//		for ( uint32 nCBufferIndex = 0; nCBufferIndex < nCBufferCount; nCBufferIndex++ )
+	//		{
+	//			pShaderReflectionBuffer = pShaderReflection->GetBufferByIndex( nCBufferIndex );
+	//			pRhiDevice->CreateUniformBuffer( &pUniformBuffer, pShaderReflectionBuffer->GetSize() );
+	//			m_ShaderUniformBuffers[ i ][ nCBufferIndex ] = pUniformBuffer;
+	//			pUniformBuffer = nullptr;
+	//		}
+	//	}
+	//}
 }
 
 

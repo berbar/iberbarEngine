@@ -12,6 +12,7 @@ namespace iberbar
 		class ITexture;
 		class IVertexBuffer;
 		class IIndexBuffer;
+		class IUniformBuffer;
 		class IShader;
 		class IVertexDeclaration;
 		class IShaderState;
@@ -47,6 +48,7 @@ namespace iberbar
 			virtual void CreateTexture( ITexture** ppTexture ) = 0;
 			virtual CResult CreateVertexBuffer( uint32 nInSize, uint32 nUsage, IVertexBuffer** ppOutBuffer ) = 0;
 			virtual CResult CreateIndexBuffer( uint32 nStride, uint32 nInSize, uint32 nUsage, IIndexBuffer** ppOutBuffer ) = 0;
+			virtual CResult CreateUniformBuffer( IUniformBuffer** ppOutBuffer, uint32 nSize ) = 0;
 			virtual CResult CreateVertexShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreatePixelShader( IShader** ppOutShader ) = 0;
 			virtual CResult CreateHullShader( IShader** ppOutShader ) = 0;

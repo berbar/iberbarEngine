@@ -116,6 +116,7 @@ namespace iberbar
 				virtual void UpdateContents( const void* pContents, uint32 nContentSize ) override;
 
 				CResult Initial();
+				CResult InitialWithData( const void* pContents, uint32 nContentSize );
 				void Destroy();
 
 				FORCEINLINE ID3D11Buffer* GetD3DBuffer() { return m_pD3DBuffer.Get(); }
@@ -123,7 +124,7 @@ namespace iberbar
 			protected:
 				CDevice* m_pDevice;
 				uint32 m_nSize;
-				uint8* m_pMemoryCache;
+				//uint8* m_pMemoryCache;
 				ComPtr<ID3D11Buffer> m_pD3DBuffer;
 			};
 

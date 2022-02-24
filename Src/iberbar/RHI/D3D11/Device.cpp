@@ -126,6 +126,20 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateIndexBuffer( uint32 nStride
 }
 
 
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateUniformBuffer( IUniformBuffer** ppOutBuffer, uint32 nSize )
+{
+	assert( ppOutBuffer );
+	TSmartRefPtr<CUniformBuffer> pUniformBuffer = TSmartRefPtr<CUniformBuffer>::_sNew( this, nSize, UBufferUsageFlags::Dynamic );
+	CResult ret = pUniformBuffer->Initial();
+	if ( ret.IsOK() == false )
+		return ret;
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutBuffer );
+	(*ppOutBuffer) = pUniformBuffer;
+	(*ppOutBuffer)->AddRef();
+	return CResult();
+}
+
+
 iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateVertexShader( IShader** ppOutShader )
 {
 	assert( ppOutShader );

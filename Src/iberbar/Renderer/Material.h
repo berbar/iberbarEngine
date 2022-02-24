@@ -13,6 +13,7 @@ namespace iberbar
 	{
 		class IShaderProgram;
 		class IShaderState;
+		class IUniformBuffer;
 	}
 
 	namespace Renderer
@@ -46,7 +47,8 @@ namespace iberbar
 			RHI::IShaderState* GetShaderState() const { return m_pShaderState; }
 			//CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) { return &m_VariableTables[ (int)nShaderType ]; }
 			//const CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) const { return &m_VariableTables[ (int)nShaderType ]; }
-			const CShaderVariableTable* GetShaderVariableTables() const { return m_VariableTables; }
+			inline const CShaderVariableTable* GetShaderVariableTables() const { return m_VariableTables; }
+			//inline const std::vector<RHI::IUniformBuffer*> GetShaderUniformBuffers( RHI::EShaderType nShaderType ) const { return m_ShaderUniformBuffers[ (int)nShaderType ]; }
 
 			bool CampareWithMaterial( const CMaterial* pMaterialOther ) const;
 
@@ -58,6 +60,8 @@ namespace iberbar
 			RHI::IShaderState* m_pShaderState;
 			std::vector<uint32> m_Streams;
 			CShaderVariableTable m_VariableTables[ (int)RHI::EShaderType::__Count ];
+			//std::vector<int> m_ShaderUniformBuffersDirty[ (int)RHI::EShaderType::__Count ];
+			//std::vector<RHI::IUniformBuffer*> m_ShaderUniformBuffers[ (int)RHI::EShaderType::__Count ];
 		};
 	}
 }

@@ -8,6 +8,7 @@ namespace iberbar
 	namespace Renderer
 	{
 		class CRenderer2d;
+		class CBaseRendererProcessor;
 
 		class __iberbarRendererApi__ CRenderGroupCommandManager
 		{
@@ -32,6 +33,8 @@ namespace iberbar
 			CRenderGroupCommand( const CRenderGroupCommand& Other );
 			virtual ~CRenderGroupCommand();
 
+			void SetRendererProcessor( CBaseRendererProcessor* pRendererProcessor ) { m_pRendererProcessor = pRendererProcessor; }
+			CBaseRendererProcessor* GetRendererProcessor() { return m_pRendererProcessor; }
 			int GetQueueId() const { return m_nQueueId; }
 
 			CRenderGroupCommand& operator=( const CRenderGroupCommand& Command ) = delete;
@@ -39,6 +42,7 @@ namespace iberbar
 		protected:
 			CRenderGroupCommandManager* m_pGroupCommandManager;
 			int m_nQueueId;
+			CBaseRendererProcessor* m_pRendererProcessor;
 		};
 	}
 }

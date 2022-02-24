@@ -32,6 +32,7 @@ namespace iberbar
 				virtual void CreateTexture( ITexture** ppTexture ) override;
 				virtual CResult CreateVertexBuffer( uint32 nInSize, uint32 nUsage, IVertexBuffer** ppOutBuffer ) override;
 				virtual CResult CreateIndexBuffer( uint32 nStride, uint32 nInSize, uint32 nUsage, IIndexBuffer** ppOutBuffer ) override;
+				virtual CResult CreateUniformBuffer( IUniformBuffer** ppOutBuffer, uint32 nSize ) override;
 				virtual CResult CreateVertexShader( IShader** ppOutShader ) override;
 				virtual CResult CreatePixelShader( IShader** ppOutShader ) override;
 				virtual CResult CreateHullShader( IShader** ppOutShader ) override;

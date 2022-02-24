@@ -84,6 +84,7 @@ namespace iberbar
 
 		template < int tTexCount >
 		class TMeshForUI
+			: public CMesh
 		{
 		public:
 			TMeshForUI()

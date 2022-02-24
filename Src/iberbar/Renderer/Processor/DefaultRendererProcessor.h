@@ -7,6 +7,8 @@ namespace iberbar
 	namespace RHI
 	{
 		class ICommandContext;
+		class IIndexBuffer;
+		class IVertexBuffer;
 	}
 
 	namespace Renderer
@@ -22,6 +24,10 @@ namespace iberbar
 		public:
 			class _State;
 		public:
+			CDefaultRendererProcessor( IRenderer* pRenderer, PCallbackRendererVisitQueue pRendererVisitQueue );
+			virtual ~CDefaultRendererProcessor();
+
+			void Initial();
 			virtual void VisitQueue( CRenderQueue* pQueue ) override;
 			virtual void Flush() override;
 
@@ -30,8 +36,7 @@ namespace iberbar
 			void VisitCommand( CRenderCommand* pCommand );
 			void DrawBatchTriangles();
 			void DrawOneTriangles( CTrianglesCommand* pCommand );
-			void Flush();
-			void ProcessGroupCommand( CRenderGroupCommand* pCommand );
+			//void ProcessGroupCommand( CRenderGroupCommand* pCommand );
 
 		private:
 			_State* m_pState;

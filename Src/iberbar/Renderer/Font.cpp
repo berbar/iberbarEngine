@@ -58,7 +58,6 @@ iberbar::Renderer::CFontTextureCache::CFontTextureCache( RHI::IDevice* pDevice, 
 	, m_pDevice( pDevice )
 	, m_pTextures()
 {
-	m_pDevice->AddRef();
 	if ( m_pDevice->GetApiType() == RHI::UApiType::D3D9 )
 	{
 		//m_nFix = 0.5f;
@@ -68,7 +67,6 @@ iberbar::Renderer::CFontTextureCache::CFontTextureCache( RHI::IDevice* pDevice, 
 
 iberbar::Renderer::CFontTextureCache::~CFontTextureCache()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	SafeReleaseStdVector( m_pTextures );
 }
 

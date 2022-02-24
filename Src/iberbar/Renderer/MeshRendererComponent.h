@@ -13,7 +13,7 @@ namespace iberbar
 
 	namespace Renderer
 	{
-		class IMesh;
+		class CMesh;
 		class CMaterial;
 
 		class __iberbarRendererApi__ CMeshRendererComponent
@@ -23,7 +23,7 @@ namespace iberbar
 			virtual ~CMeshRendererComponent();
 
 		public:
-			void SetMesh( IMesh* pMesh );
+			void SetMesh( CMesh* pMesh );
 			void SetMaterialCount( int nCount );
 			void SetMaterial( CMaterial* pMaterial );
 			void SetMaterial( int nIndex, CMaterial* pMaterial );
@@ -32,10 +32,10 @@ namespace iberbar
 			virtual void Render();
 
 		protected:
-			void UpdateBoundShaderStates( int nIndex );
+			//void UpdateBoundShaderStates( int nIndex );
 
 		protected:
-			IMesh* m_pMesh;
+			CMesh* m_pMesh;
 			std::vector<CMaterial*> m_Materials;
 			std::vector<RHI::IShaderState*> m_BoundShaderStates;
 			Renderer::CMeshDrawCommand m_RenderCommand;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iberbar/Renderer/Types.h>
 #include <iberbar/Renderer/RenderCommandQueue.h>
 #include <iberbar/Renderer/CallbackCommand.h>
 
@@ -14,13 +15,13 @@ namespace iberbar
 		class __iberbarRendererApi__ CBaseRendererProcessor abstract
 		{
 		public:
-			typedef void(IRenderer::* PCallbackRendererVisitQueue)(CRenderCommand* pCommand);
+			typedef void(IRenderer::* PCallbackRendererVisitQueue)( CRenderCommand* );
 
 		public:
-			CBaseRendererProcessor( IRenderer* pRenderer, PCallbackRendererVisitQueue pRendererVisitQueue );
+			CBaseRendererProcessor(  );
 			virtual ~CBaseRendererProcessor() {}
 
-			virtual void VisitQueue( CRenderQueue* pQueue ) = 0;
+			virtual void VisitQueue( IRenderer* pRenderer, PCallbackRendererVisitQueue pRendererVisitQueue, CRenderQueue* pQueue ) = 0;
 			virtual void Flush() = 0;
 
 		protected:
@@ -45,7 +46,7 @@ FORCEINLINE void iberbar::Renderer::CBaseRendererProcessor::DefaultVisitCommand(
 		break;
 
 	case URenderCommandType::Group:
-		Flush();
+		//Flush();
 		(m_pRenderer->*m_pRendererVisitQueue)(pCommand);
 		break;
 
