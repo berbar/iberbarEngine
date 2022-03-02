@@ -133,7 +133,7 @@ void iberbar::Renderer::CMaterial::Initial( RHI::IShaderProgram* pShaderProgram 
 		m_Streams.push_back( VertexElements[ i ].nSlot );
 	}
 
-	RHI::IDevice* pRhiDevice = CRenderer2d::sGetInstance()->GetRHIDevice();
+	RHI::IDevice* pRhiDevice = CRenderer::sGetInstance()->GetRHIDevice();
 	TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
 	CResult cResult = pRhiDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, nVertexElementsCount );
 	if ( cResult.IsOK() == false )

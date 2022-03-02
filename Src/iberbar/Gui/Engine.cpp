@@ -15,7 +15,7 @@
 iberbar::Gui::CEngine* iberbar::Gui::CEngine::sm_pInstance = nullptr;
 
 
-iberbar::Gui::CEngine::CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue )
+iberbar::Gui::CEngine::CEngine( Renderer::CRenderer* pRenderer, CCommandQueue* pCommandQueue )
 	: m_pRenderer( pRenderer )
 	, m_pRenderGroupCommandManager( pRenderer->GetRenderGroupCommandManager() )
 	, m_pRenderCommand_Callback( new Renderer::CRenderCallbackCommand() )
@@ -31,7 +31,7 @@ iberbar::Gui::CEngine::CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue*
 }
 
 
-iberbar::Gui::CEngine::CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes )
+iberbar::Gui::CEngine::CEngine( Renderer::CRenderer* pRenderer, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes )
 	: m_pRenderer( pRenderer )
 	, m_pRenderGroupCommandManager( pRenderer->GetRenderGroupCommandManager() )
 	, m_pRenderCommand_Callback( new Renderer::CRenderCallbackCommand() )

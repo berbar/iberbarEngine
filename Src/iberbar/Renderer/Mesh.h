@@ -72,7 +72,7 @@ namespace iberbar
 
 			inline uint16* GetBufferIndices() { return m_IndexData; }
 			inline UVector3f* GetBufferPositions() { return m_Positions; }
-			inline CColor4F* GetColors() { return m_Colors; }
+			inline CColor4F* GetBufferColors() { return m_Colors; }
 			inline UVector3f* GetBufferNormals() { return m_Normals; }
 			inline UVector2f* GetBufferTexcoords( int nSlot ) { return m_TexcoordSlots[ nSlot ]; }
 
@@ -106,11 +106,19 @@ namespace iberbar
 				}
 			}
 
+		public:
+			inline UVector3f* GetBufferPositions() { return m_BufferPositions; }
+			inline CColor4F* GetBufferColors() { return m_BufferColors; }
+			inline UVector2f* GetBufferTexcoords( int nSlot ) { assert( nSlot < tTexCount ); return m_BufferTexcoordSlots[ nSlot ]; }
+
 		protected:
 			UVector3f m_BufferPositions[ 4 ];
 			CColor4F m_BufferColors[ 4 ];
 			UVector2f m_BufferTexcoordSlots[ 4 ][ tTexCount ];
 			uint16 m_BufferIndices[ 6 ];
 		};
+
+		template class __iberbarRendererApi__ TMeshForUI<1>;
+		typedef TMeshForUI<1> CMeshForUI_1;
 	}
 }

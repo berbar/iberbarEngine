@@ -24,7 +24,7 @@ namespace iberbar
 		public:
 			class _State;
 		public:
-			CDefaultRendererProcessor( IRenderer* pRenderer, PCallbackRendererVisitQueue pRendererVisitQueue );
+			CDefaultRendererProcessor();
 			virtual ~CDefaultRendererProcessor();
 
 			void Initial();

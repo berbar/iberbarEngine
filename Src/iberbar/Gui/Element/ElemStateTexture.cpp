@@ -4,6 +4,8 @@
 #include <iberbar/Gui/Element/ElemStateTexture.h>
 #include <iberbar/Gui/Engine.h>
 #include <iberbar/Renderer/Renderer.h>
+#include <iberbar/Renderer/Mesh.h>
+#include <iberbar/Renderer/MeshRendererComponent.h>
 #include <iberbar/Utility/RectClip2d.h>
 
 
@@ -12,13 +14,10 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture()
 	: CRenderElement()
 	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
-	, m_MeshVertices()
-	, m_MeshIndices()
+	, m_pMesh( new Renderer::CMeshForUI_1() )
+	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
 	, m_pMaterial( nullptr )
-	, m_RenderCommand()
 {
-	memset( m_MeshVertices, 0, sizeof( m_MeshVertices ) );
-	memset( m_MeshIndices, 0, sizeof( m_MeshIndices ) );
 }
 
 
@@ -26,14 +25,10 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture(const CElementStateText
 	: CRenderElement( element )
 	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
-	, m_MeshVertices()
-	, m_MeshIndices()
+	, m_pMesh( new Renderer::CMeshForUI_1() )
+	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
 	, m_pMaterial( nullptr )
-	, m_RenderCommand()
 {
-	memset( m_MeshVertices, 0, sizeof( m_MeshVertices ) );
-	memset( m_MeshIndices, 0, sizeof( m_MeshIndices ) );
-
 	SetColor( element.m_Color );
 	SetUV( element.m_UV );
 	SetMaterial( element.m_pMaterial );
@@ -42,6 +37,8 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture(const CElementStateText
 
 iberbar::Gui::CElementStateTexture::~CElementStateTexture()
 {
+	UNKNOWN_SAFE_RELEASE_NULL( m_pMesh );
+	SAFE_DELETE( m_pMeshRendererComponent );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pMaterial );
 }
 
@@ -54,11 +51,11 @@ iberbar::Gui::CElementStateTexture* iberbar::Gui::CElementStateTexture::Clone() 
 
 void iberbar::Gui::CElementStateTexture::Init()
 {
-	m_RenderCommand.SetTriangles( Renderer::CTrianglesCommand::UTriangles(
-		m_MeshVertices,
-		m_MeshIndices,
-		sizeof( Renderer::UVertex_V3F_C4B_T2F ), 4, 6, 2
-	) );
+	//m_RenderCommand.SetTriangles( Renderer::CTrianglesCommand::UTriangles(
+	//	m_MeshVertices,
+	//	m_MeshIndices,
+	//	sizeof( Renderer::UVertex_V3F_C4B_T2F ), 4, 6, 2
+	//) );
 }
 
 
@@ -66,7 +63,7 @@ void iberbar::Gui::CElementStateTexture::SetZOrder( int nZOrder )
 {
 	CRenderElement::SetZOrder( nZOrder );
 
-	m_RenderCommand.SetZOrder( nZOrder );
+	m_pMeshRendererComponent->SetZOrder( nZOrder );
 }
 
 
@@ -105,8 +102,8 @@ void iberbar::Gui::CElementStateTexture::Render()
 			m_bEmptyBoundingFinal = true;
 		}
 
-		Renderer::VerticesRectUpdatePosition( m_MeshVertices, rcBoundingFinal, 0 );
-		Renderer::VerticesRectUpdateUV( m_MeshVertices, rcTexCoordFinal );
+		Renderer::VerticesRectUpdatePosition( m_pMesh->GetBufferPositions(), rcBoundingFinal, 0 );
+		Renderer::VerticesRectUpdateUV( m_pMesh->GetBufferTexcoords(0), rcTexCoordFinal );
 	}
 
 	if ( m_bEmptyBoundingFinal == true )
@@ -114,7 +111,7 @@ void iberbar::Gui::CElementStateTexture::Render()
 		return;
 	}
 
-	CEngine::sGetInstance()->GetRenderer()->AddCommand( &m_RenderCommand );
+	m_pMeshRendererComponent->Render();
 
 	CRenderElement::Render();
 }
@@ -123,10 +120,11 @@ void iberbar::Gui::CElementStateTexture::Render()
 void iberbar::Gui::CElementStateTexture::SetColor( const CColor4F& Color )
 {
 	m_Color = Color;
-	m_MeshVertices[ 0 ].color = Color;
-	m_MeshVertices[ 1 ].color = Color;
-	m_MeshVertices[ 2 ].color = Color;
-	m_MeshVertices[ 3 ].color = Color;
+	CColor4F* pBuffer = m_pMesh->GetBufferColors();
+	pBuffer[ 0 ] = Color;
+	pBuffer[ 1 ] = Color;
+	pBuffer[ 2 ] = Color;
+	pBuffer[ 3 ] = Color;
 }
 
 
@@ -150,11 +148,11 @@ void iberbar::Gui::CElementStateTexture::SetMaterial( Renderer::CMaterial* pMate
 	if ( m_pMaterial != nullptr )
 	{
 		m_pMaterial->AddRef();
-		m_RenderCommand.SetShaderVariableTables( m_pMaterial->GetShaderVariableTables() );
+		m_pMeshRendererComponent->SetMaterial( m_pMaterial );
 	}
 	else
 	{
-		m_RenderCommand.SetShaderVariableTables( nullptr );
+		m_pMeshRendererComponent->SetMaterial( nullptr );
 	}
 }
 

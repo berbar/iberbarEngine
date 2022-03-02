@@ -137,7 +137,7 @@ void iberbar::Renderer::CMeshRendererComponent::Render()
 	if ( m_pMesh == nullptr )
 		return;
 
-	CRenderer2d::sGetInstance()->AddCommand( &m_RenderCommand );
+	CRenderer::sGetInstance()->AddCommand( &m_RenderCommand );
 }
 
 

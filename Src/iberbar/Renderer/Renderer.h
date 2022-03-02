@@ -35,12 +35,12 @@ namespace iberbar
 
 
 
-		class __iberbarRendererApi__ CRenderer2d
+		class __iberbarRendererApi__ CRenderer
 			: public IRenderer
 		{
 		public:
-			CRenderer2d();
-			virtual ~CRenderer2d();
+			CRenderer();
+			virtual ~CRenderer();
 
 		public:
 			void Init( RHI::IDevice* pDevice );
@@ -61,8 +61,8 @@ namespace iberbar
 			void OnRhiLost();
 			CResult OnRhiReset();
 			
-		protected:
-			void ProcessGroupCommand( CRenderCommand* pCommand );
+		public:
+			void ProcessGroupCommand( CRenderGroupCommand* pCommand );
 
 		protected:
 			std::vector<CRenderQueue> m_RenderQueue;
@@ -79,9 +79,9 @@ namespace iberbar
 
 
 		private:
-			static CRenderer2d* sm_pInstance;
+			static CRenderer* sm_pInstance;
 		public:
-			static CRenderer2d* sGetInstance() { return sm_pInstance; }
+			static CRenderer* sGetInstance() { return sm_pInstance; }
 		};
 	}
 }

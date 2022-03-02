@@ -15,6 +15,8 @@ namespace iberbar
 
 	namespace Renderer
 	{
+		//class CMeshForUI_1;
+		template <int > class TMeshForUI;
 		class CMeshRendererComponent;
 	}
 
@@ -49,11 +51,13 @@ namespace iberbar
 			CRect2f m_UV;
 			bool m_bDirtyMeshPositionOrUV;
 			bool m_bEmptyBoundingFinal;
-			Renderer::UVertex_V3F_C4B_T2F m_MeshVertices[ 4 ];
-			uint16 m_MeshIndices[ 6 ];
+			//Renderer::UVertex_V3F_C4B_T2F m_MeshVertices[ 4 ];
+			//uint16 m_MeshIndices[ 6 ];
+			//Renderer::CMeshForUI_1* m_pMesh;
+			Renderer::TMeshForUI<1>* m_pMesh;
 			Renderer::CMeshRendererComponent* m_pMeshRendererComponent;
 			Renderer::CMaterial* m_pMaterial;
-			Renderer::CTrianglesCommand m_RenderCommand;
+			//Renderer::CTrianglesCommand m_RenderCommand;
 		};
 
 

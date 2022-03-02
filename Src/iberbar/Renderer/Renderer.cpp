@@ -19,16 +19,16 @@
 
 
 
-iberbar::Renderer::CRenderer2d* iberbar::Renderer::CRenderer2d::sm_pInstance = nullptr;
+iberbar::Renderer::CRenderer* iberbar::Renderer::CRenderer::sm_pInstance = nullptr;
 
 
-iberbar::Renderer::CRenderer2d::CRenderer2d()
+iberbar::Renderer::CRenderer::CRenderer()
 	: m_RenderQueue()
 	, m_CommandGroupStack()
 	, m_bIsRendering( false )
 	, m_pDevice( nullptr )
 	//, m_pCommandContext( nullptr )
-	, m_pRenderGroupCommandManager( new CRenderGroupCommandManager( this ) )
+	, m_pRenderGroupCommandManager( new CRenderGroupCommandManager() )
 {
 	m_RenderQueue.push_back( CRenderQueue() );
 	m_CommandGroupStack.push( 0 );
@@ -36,7 +36,7 @@ iberbar::Renderer::CRenderer2d::CRenderer2d()
 	sm_pInstance = this;
 }
 
-iberbar::Renderer::CRenderer2d::~CRenderer2d()
+iberbar::Renderer::CRenderer::~CRenderer()
 {
 	m_RenderQueue.clear();
 	SAFE_DELETE( m_pRenderGroupCommandManager );
@@ -44,25 +44,25 @@ iberbar::Renderer::CRenderer2d::~CRenderer2d()
 	sm_pInstance = nullptr;
 }
 
-void iberbar::Renderer::CRenderer2d::Init( RHI::IDevice* pDevice )
+void iberbar::Renderer::CRenderer::Init( RHI::IDevice* pDevice )
 {
 	assert( pDevice );
 
 	m_pDevice = pDevice;
-	m_pDefaultRendererProcessor = new CDefaultRendererProcessor( this, static_cast<CBaseRendererProcessor::PCallbackRendererVisitQueue>( &CRenderer2d::ProcessGroupCommand ) );
+	m_pDefaultRendererProcessor = new CDefaultRendererProcessor();
 	m_pDefaultRendererProcessor->Initial();
 
 }
 
 
-void iberbar::Renderer::CRenderer2d::AddCommand( CRenderCommand* pCommand )
+void iberbar::Renderer::CRenderer::AddCommand( CRenderCommand* pCommand )
 {
 	int nQueueId = m_CommandGroupStack.top();
 	AddCommand( pCommand, nQueueId );
 }
 
 
-void iberbar::Renderer::CRenderer2d::AddCommand( CRenderCommand* pCommand, int nQueueId )
+void iberbar::Renderer::CRenderer::AddCommand( CRenderCommand* pCommand, int nQueueId )
 {
 	assert( pCommand );
 	assert( nQueueId >= 0 );
@@ -71,13 +71,13 @@ void iberbar::Renderer::CRenderer2d::AddCommand( CRenderCommand* pCommand, int n
 	m_RenderQueue[ nQueueId ].PushBack( pCommand );
 }
 
-void iberbar::Renderer::CRenderer2d::CleanupCommands()
+void iberbar::Renderer::CRenderer::CleanupCommands()
 {
 
 }
 
 
-int iberbar::Renderer::CRenderer2d::CreateRenderQueue()
+int iberbar::Renderer::CRenderer::CreateRenderQueue()
 {
 	CRenderQueue queue;
 	m_RenderQueue.push_back( queue );
@@ -85,21 +85,21 @@ int iberbar::Renderer::CRenderer2d::CreateRenderQueue()
 }
 
 
-void iberbar::Renderer::CRenderer2d::PushRenderQueue( int nQueueId )
+void iberbar::Renderer::CRenderer::PushRenderQueue( int nQueueId )
 {
 	assert( m_bIsRendering == false );
 	m_CommandGroupStack.push( nQueueId );
 }
 
 
-void iberbar::Renderer::CRenderer2d::PopRenderQueue()
+void iberbar::Renderer::CRenderer::PopRenderQueue()
 {
 	assert( m_bIsRendering == false );
 	m_CommandGroupStack.pop();
 }
 
 
-void iberbar::Renderer::CRenderer2d::Clear()
+void iberbar::Renderer::CRenderer::Clear()
 {
 	size_t n = m_RenderQueue.size();
 	for ( size_t i = 0; i < n; i++ )
@@ -108,16 +108,17 @@ void iberbar::Renderer::CRenderer2d::Clear()
 	}
 }
 
-void iberbar::Renderer::CRenderer2d::Render()
+void iberbar::Renderer::CRenderer::Render()
 {
 	m_bIsRendering = true;
 
-	for ( int i = 0; i < m_RenderQueue.size(); i++ )
-	{
-		m_RenderQueue[ i ].Sort();
-	}
+	//for ( int i = 0; i < m_RenderQueue.size(); i++ )
+	//{
+	//	m_RenderQueue[ i ].Sort();
+	//}
 
-	VisitQueue( m_RenderQueue[ 0 ] );
+	m_RenderQueue[ 0 ].Sort();
+	m_pDefaultRendererProcessor->VisitQueue( &m_RenderQueue[ 0 ] );
 
 	Clear();
 
@@ -125,12 +126,12 @@ void iberbar::Renderer::CRenderer2d::Render()
 }
 
 
-void iberbar::Renderer::CRenderer2d::OnRhiLost()
+void iberbar::Renderer::CRenderer::OnRhiLost()
 {
 }
 
 
-iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
+iberbar::CResult iberbar::Renderer::CRenderer::OnRhiReset()
 {
 	CResult Ret;
 
@@ -138,14 +139,14 @@ iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
 }
 
 
-//void iberbar::Renderer::CRenderer2d::VisitQueue( CRenderQueue& queue )
+//void iberbar::Renderer::CRenderer::VisitQueue( CRenderQueue& queue )
 //{
 //	VisitCommandList( queue.GetQueueGroup( CRenderQueue::UQueueGroup::Zindex_Negative ) );
 //	VisitCommandList( queue.GetQueueGroup( CRenderQueue::UQueueGroup::Zindex_Zero ) );
 //	VisitCommandList( queue.GetQueueGroup( CRenderQueue::UQueueGroup::Zindex_Positive ) );
 //}
 //
-//void iberbar::Renderer::CRenderer2d::VisitCommandList( const URenderCommandList& commandList )
+//void iberbar::Renderer::CRenderer::VisitCommandList( const URenderCommandList& commandList )
 //{
 //	if ( commandList.empty() == true )
 //		return;
@@ -159,7 +160,7 @@ iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
 //}
 //
 //
-//void iberbar::Renderer::CRenderer2d::VisitCommand( CRenderCommand* pCommand )
+//void iberbar::Renderer::CRenderer::VisitCommand( CRenderCommand* pCommand )
 //{
 //	URenderCommandType nCommandType = pCommand->GetCommandType();
 //	switch ( nCommandType )
@@ -199,7 +200,7 @@ iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
 //}
 //
 //
-//void iberbar::Renderer::CRenderer2d::DrawBatchTriangles()
+//void iberbar::Renderer::CRenderer::DrawBatchTriangles()
 //{
 //	auto& CommandList = m_pState->GetRenderList();
 //	if ( CommandList.empty() == true )
@@ -253,7 +254,7 @@ iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
 //}
 //
 //
-//void iberbar::Renderer::CRenderer2d::DrawOneTriangles( CTrianglesCommand* pCommand )
+//void iberbar::Renderer::CRenderer::DrawOneTriangles( CTrianglesCommand* pCommand )
 //{
 //	RHI::IShaderState* pShaderState = pCommand->GetShaderState();
 //	const CShaderVariableTable* pShaderVarTable_Vertex = &pCommand->GetShaderVariableTables()[ (int) RHI::EShaderType::VertexShader ];
@@ -292,15 +293,16 @@ iberbar::CResult iberbar::Renderer::CRenderer2d::OnRhiReset()
 //}
 
 
-//void iberbar::Renderer::CRenderer2d::Flush()
+//void iberbar::Renderer::CRenderer::Flush()
 //{
 //	DrawBatchTriangles();
 //}
 
 
-void iberbar::Renderer::CRenderer2d::ProcessGroupCommand( CRenderCommand* pCommand )
+void iberbar::Renderer::CRenderer::ProcessGroupCommand( CRenderGroupCommand* pCommand )
 {
 	//Flush();
+	assert( m_bIsRendering == true );
 
 	CRenderGroupCommand* pGroupCommand = (CRenderGroupCommand*)pCommand;
 	CRenderQueue* pQueue = GetRenderQueue( pGroupCommand->GetQueueId() );

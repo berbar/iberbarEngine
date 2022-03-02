@@ -423,7 +423,7 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 		return ret;
 
 	// 创建Renderer相关渲染工具
-	m_pRenderer = new Renderer::CRenderer2d();
+	m_pRenderer = new Renderer::CRenderer();
 	m_pRenderer->Init( m_pRHIDevice );
 
 	// 创建资源管理

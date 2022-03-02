@@ -15,21 +15,14 @@ namespace iberbar
 		class __iberbarRendererApi__ CBaseRendererProcessor abstract
 		{
 		public:
-			typedef void(IRenderer::* PCallbackRendererVisitQueue)( CRenderCommand* );
-
-		public:
-			CBaseRendererProcessor(  );
+			CBaseRendererProcessor() {}
 			virtual ~CBaseRendererProcessor() {}
 
-			virtual void VisitQueue( IRenderer* pRenderer, PCallbackRendererVisitQueue pRendererVisitQueue, CRenderQueue* pQueue ) = 0;
+			virtual void VisitQueue( CRenderQueue* pQueue ) = 0;
 			virtual void Flush() = 0;
 
 		protected:
 			void DefaultVisitCommand( CRenderCommand* pCommand );
-
-		protected:
-			IRenderer* m_pRenderer;
-			PCallbackRendererVisitQueue m_pRendererVisitQueue;
 		};
 	}
 }
@@ -47,7 +40,7 @@ FORCEINLINE void iberbar::Renderer::CBaseRendererProcessor::DefaultVisitCommand(
 
 	case URenderCommandType::Group:
 		//Flush();
-		(m_pRenderer->*m_pRendererVisitQueue)(pCommand);
+		//(m_pRenderer->*m_pRendererVisitQueue)(pCommand);
 		break;
 
 	default:

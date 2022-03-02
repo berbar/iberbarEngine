@@ -15,7 +15,7 @@ namespace iberbar
 
 	namespace Renderer
 	{
-		class CRenderer2d;
+		class CRenderer;
 		class CRenderCommand;
 		class CRenderCallbackCommand;
 		class CRenderGroupCommandManager;
@@ -30,14 +30,14 @@ namespace iberbar
 		class __iberbarGuiApi__ CEngine final
 		{
 		public:
-			CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue );
-			CEngine( Renderer::CRenderer2d* pRenderer, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes );
+			CEngine( Renderer::CRenderer* pRenderer, CCommandQueue* pCommandQueue );
+			CEngine( Renderer::CRenderer* pRenderer, CCommandQueue* pCommandQueue, std::pmr::memory_resource* pMemoryRes );
 			~CEngine();
 
 		public:
 			std::pmr::memory_resource* GetMemoryPool() { return m_pMemoryRes; }
 			CViewportState* GetViewportState() { return &m_ViewportState; }
-			Renderer::CRenderer2d* GetRenderer() { return m_pRenderer; }
+			Renderer::CRenderer* GetRenderer() { return m_pRenderer; }
 
 		public:
 			void AddDialog( CDialog* pDialog );
@@ -57,7 +57,7 @@ namespace iberbar
 			void HandleKeyboard( const UKeyboardEventData* pEventData );
 
 		private:
-			Renderer::CRenderer2d* m_pRenderer;
+			Renderer::CRenderer* m_pRenderer;
 			Renderer::CRenderGroupCommandManager* m_pRenderGroupCommandManager;
 			Renderer::CRenderCallbackCommand* m_pRenderCommand_Callback;
 			CCommandQueue* m_pCommandQueue;

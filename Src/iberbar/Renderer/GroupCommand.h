@@ -7,20 +7,19 @@ namespace iberbar
 {
 	namespace Renderer
 	{
-		class CRenderer2d;
+		class CRenderer;
 		class CBaseRendererProcessor;
 
 		class __iberbarRendererApi__ CRenderGroupCommandManager
 		{
 		public:
-			CRenderGroupCommandManager( CRenderer2d* pRenderer );
+			CRenderGroupCommandManager();
 			~CRenderGroupCommandManager();
 
 			int AllocQueueId();
 			void ReleaseQueueId( int nQueueId );
 
 		private:
-			CRenderer2d* m_pRenderer;
 			std::unordered_map<int, bool> m_QueueIdMapping;
 			std::vector<int> m_UnusedQueueId;
 		};

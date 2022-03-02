@@ -90,9 +90,8 @@ namespace iberbar
 
 
 
-iberbar::Renderer::CDefaultRendererProcessor::CDefaultRendererProcessor( IRenderer* pRenderer, PCallbackRendererVisitQueue pRendererVisitQueue )
-	: CBaseRendererProcessor( pRenderer, pRendererVisitQueue )
-	, m_pState( nullptr )
+iberbar::Renderer::CDefaultRendererProcessor::CDefaultRendererProcessor()
+	: m_pState( nullptr )
 	, m_pCommandContext( nullptr )
 	, m_pIndexBuffer( nullptr )
 	, m_VertexBuffers()
@@ -114,7 +113,7 @@ iberbar::Renderer::CDefaultRendererProcessor::~CDefaultRendererProcessor()
 
 void iberbar::Renderer::CDefaultRendererProcessor::Initial()
 {
-	RHI::IDevice* pRhiDevice = CRenderer2d::sGetInstance()->GetRHIDevice();
+	RHI::IDevice* pRhiDevice = CRenderer::sGetInstance()->GetRHIDevice();
 	m_pCommandContext = pRhiDevice->GetDefaultContext();
 	for ( int i = 0; i < RHI::MaxVertexElementCount; i++ )
 	{
@@ -129,6 +128,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::Initial()
 
 void iberbar::Renderer::CDefaultRendererProcessor::VisitQueue( CRenderQueue* pQueue )
 {
+	pQueue->Sort();
 	VisitCommandList( pQueue->GetQueueGroup( CRenderQueue::UQueueGroup::Zindex_Negative ) );
 	VisitCommandList( pQueue->GetQueueGroup( CRenderQueue::UQueueGroup::Zindex_Zero ) );
 	VisitCommandList( pQueue->GetQueueGroup( CRenderQueue::UQueueGroup::Zindex_Positive ) );
@@ -170,8 +170,17 @@ void iberbar::Renderer::CDefaultRendererProcessor::VisitCommand( CRenderCommand*
 		break;
 	}
 
+	case URenderCommandType::Callback:
+		Flush();
+		((CRenderCallbackCommand*)pCommand)->Execute();
+		break;
+
+	case URenderCommandType::Group:
+		CRenderer::sGetInstance()->ProcessGroupCommand( (CRenderGroupCommand*)pCommand );
+		break;
+
 	default:
-		DefaultVisitCommand( pCommand );
+		//DefaultVisitCommand( pCommand );
 		break;
 	}
 }
@@ -414,7 +423,7 @@ iberbar::Renderer::CDefaultRendererProcessor::_State::~_State()
 
 void iberbar::Renderer::CDefaultRendererProcessor::_State::Initial()
 {
-	RHI::IDevice* pRhiDevice = CRenderer2d::sGetInstance()->GetRHIDevice();
+	RHI::IDevice* pRhiDevice = CRenderer::sGetInstance()->GetRHIDevice();
 	m_pRhiContext = pRhiDevice->GetDefaultContext();
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
