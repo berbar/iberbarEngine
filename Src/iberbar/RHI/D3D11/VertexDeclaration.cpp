@@ -14,7 +14,7 @@ void iberbar::RHI::D3D11::CVertexDeclaration::BuildD3DInputElementDescritions( D
 		pRefArray[ i ].SemanticName = ConvertVertexDeclareUsage( pRHIElement->nSemantic );
 		pRefArray[ i ].SemanticIndex = (UINT)pRHIElement->nSemanticIndex;
 		pRefArray[ i ].Format = ConvertVertexFormat( pRHIElement->nFormat );
-		pRefArray[ i ].InputSlot = 0;
+		pRefArray[ i ].InputSlot = pRHIElement->nSlot;
 		pRefArray[ i ].AlignedByteOffset = pRHIElement->nOffset;
 		pRefArray[ i ].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		pRefArray[ i ].InstanceDataStepRate = 0;

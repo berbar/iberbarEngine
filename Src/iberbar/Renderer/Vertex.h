@@ -25,6 +25,9 @@ namespace iberbar
 
 		template < typename T >
 		void VerticesRectUpdatePosition( UVector3f pVertices[ 4 ], const TRect<T>& Bounding, float nZPosition );
+
+		template < typename T >
+		void IndicesRectUpdate( T pIndices[ 6 ] );
 	}
 }
 
@@ -65,4 +68,18 @@ inline void iberbar::Renderer::VerticesRectUpdatePosition( UVector3f pVertices[ 
 	pVertices[ 1 ] = UVector3f( (float)Bounding.r, (float)Bounding.t, nZPosition );
 	pVertices[ 2 ] = UVector3f( (float)Bounding.l, (float)Bounding.b, nZPosition );
 	pVertices[ 3 ] = UVector3f( (float)Bounding.r, (float)Bounding.b, nZPosition );
+}
+
+
+template < typename T >
+inline void iberbar::Renderer::IndicesRectUpdate( T pIndices[ 6 ] )
+{
+	//static T uRectVertexIndices[] = { 0, 1, 2, 1, 3, 2 };
+	//memcpy_s();
+	pIndices[ 0 ] = 0;
+	pIndices[ 1 ] = 1;
+	pIndices[ 2 ] = 2;
+	pIndices[ 3 ] = 1;
+	pIndices[ 4 ] = 3;
+	pIndices[ 5 ] = 2;
 }

@@ -56,6 +56,7 @@ iberbar::Renderer::CRenderGroupCommand::CRenderGroupCommand( CRenderGroupCommand
 	: CRenderCommand( URenderCommandType::Group )
 	, m_pGroupCommandManager( pManager )
 	, m_nQueueId( 0 )
+	, m_pRendererProcessor( nullptr )
 {
 	assert( m_pGroupCommandManager );
 	m_nQueueId = m_pGroupCommandManager->AllocQueueId();

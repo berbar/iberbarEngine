@@ -46,7 +46,7 @@ namespace iberbar
 			RHI::IUniformBuffer* m_UniformBuffers[ (int)RHI::EShaderType::__Count ][ 10 ];
 
 			uint32 m_nVertexUsage;
-			CMaterial* m_pMaterial;
+			const CMaterial* m_pMaterial;
 			uint32 m_nVertexCount;
 			uint32 m_nIndexCount;
 		};
@@ -119,7 +119,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::Initial()
 	{
 		pRhiDevice->CreateVertexBuffer( UINT16_MAX * 16, RHI::UBufferUsageFlags::AnyDynamic, &m_VertexBuffers[ i ] );
 	}
-	pRhiDevice->CreateIndexBuffer( 0, UINT16_MAX * 6 / 4, RHI::UBufferUsageFlags::AnyDynamic, &m_pIndexBuffer );
+	pRhiDevice->CreateIndexBuffer( sizeof(uint16), UINT16_MAX * 6 / 4, RHI::UBufferUsageFlags::AnyDynamic, &m_pIndexBuffer );
 
 	m_pState = new CDefaultRendererProcessor::_State();
 	m_pState->Initial();
@@ -165,6 +165,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::VisitCommand( CRenderCommand*
 			m_pState->AddCommand( pTrianglesCommand ) == false )
 		{
 			DrawBatchTriangles();
+			m_pState->FlushRenderList();
 			m_pState->AddCommand( pTrianglesCommand );
 		}
 		break;
@@ -192,6 +193,10 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 	if ( CommandList.empty() == true )
 		return;
 
+	const CMaterial* pMaterial = m_pState->GetMaterial();
+	if ( pMaterial == nullptr || pMaterial->GetShaderState() == nullptr )
+		return;
+
 	//CTrianglesCommand* pCommand = nullptr;
 	CMeshDrawCommand* pCommand = nullptr;
 	const CMesh* pMesh = nullptr;
@@ -206,18 +211,21 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 	//uint32 nIndexSizeTotal = m_pState->GetIndexSizeTotal();
 	//uint32 nTriangleCount = m_pState->GetTriangleCount();
 
-	uint8* pVerticesTemp = nullptr;
+	//uint8* pVerticesTemp[ RHI::MaxVertexElementCount ];
+	uint8* pVertexBytesBufferArray[ RHI::MaxVertexElementCount ];
+	memset( pVertexBytesBufferArray, 0, sizeof( uint8* ) * RHI::MaxVertexElementCount );
 	uint16* pIndicesTemp = nullptr;
+	
 
 	bool bLockAll = true;
 	uint8 LockFlags[ RHI::MaxVertexElementCount + 1 ];
 	memset( LockFlags, 0, sizeof( LockFlags ) );
 	CResult cResultLockBuffer;
-	const std::vector<uint32> StreamsUsed = m_pState->GetMaterial()->GetStreams();
-	const uint32* StreamsStride = m_pState->GetMaterial()->GetShaderState()->GetVertexDeclaration()->GetStrides();
+	const std::vector<uint32> StreamsUsed = pMaterial->GetStreams();
+	const uint32* StreamsStride = pMaterial->GetShaderState()->GetVertexDeclaration()->GetStrides();
 	for ( uint32 nStreamIndex : StreamsUsed )
 	{
-		cResultLockBuffer = m_VertexBuffers[ nStreamIndex ]->Lock( 0, nVertexCount * StreamsStride[ nStreamIndex ], (void**)&pVerticesTemp );
+		cResultLockBuffer = m_VertexBuffers[ nStreamIndex ]->Lock( 0, nVertexCount * StreamsStride[ nStreamIndex ], (void**)(&(pVertexBytesBufferArray[ nStreamIndex ])) );
 		if ( cResultLockBuffer.IsOK() == false )
 		{
 			bLockAll = false;
@@ -249,15 +257,16 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 			for ( uint32 nStreamIndex : StreamsUsed )
 			{
 				pVertexData = pMesh->GetVertexData( nStreamIndex );
-				uint32 nVertexDataSize = nVertexCountInMesh * 0;
-				if ( pVertexData == nullptr )
-				{
-					memset( pVerticesTemp, 0, nVertexDataSize );
-				}
-				else
-				{
-					memcpy_s( pVerticesTemp, 0, pVertexData, nVertexDataSize );
-				}
+				uint32 nVertexDataSize = nVertexCountInMesh * StreamsStride[ nStreamIndex ];
+				//if ( pVertexData == nullptr )
+				//{
+				//	memset( pVertexBytesBufferArray[ nStreamIndex ], 0, nVertexDataSize );
+				//}
+				//else
+				//{
+				//	memcpy_s( pVertexBytesBufferArray[ nStreamIndex ], nVertexDataSize, pVertexData, nVertexDataSize );
+				//}
+				pVertexBytesBufferArray[ nStreamIndex ] += nVertexDataSize;
 			}
 
 			// ¿½±´Ë÷ÒýÊý¾Ý
@@ -322,12 +331,14 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 
 	m_pState->SetShaderBindings();
 	
+	for ( uint32 nStreamIndex : StreamsUsed )
+	{
+		m_pCommandContext->SetVertexBuffer( nStreamIndex, m_VertexBuffers[ nStreamIndex ], 0 );
+	}
 	m_pCommandContext->SetIndexBuffer( m_pIndexBuffer, 0 );
 	m_pCommandContext->SetShaderState( m_pState->GetUsingShaderState() );
 	m_pCommandContext->SetPrimitiveTopology( RHI::UPrimitiveType::Triangle );
 	m_pCommandContext->DrawIndexed( 0, nIndexCount, 0 );
-
-	m_pState->FlushRenderList();
 }
 
 
@@ -373,6 +384,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawOneTriangles( CTrianglesC
 void iberbar::Renderer::CDefaultRendererProcessor::Flush()
 {
 	DrawBatchTriangles();
+	m_pState->FlushRenderList();
 }
 
 
@@ -444,16 +456,20 @@ bool iberbar::Renderer::CDefaultRendererProcessor::_State::AddCommand( CMeshDraw
 
 	if ( m_CommandList_Render.empty() == true )
 	{
-		m_CommandList_Render.push_back( pCommand );
 		m_pUsingShaderState = pCommand->GetMaterial()->GetShaderState();
 
+		const CShaderVariableTable* pTables = pCommand->GetMaterial()->GetShaderVariableTables();
 		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 		{
-			m_pUsingShaderVarTables[ i ] = &(pCommand->GetMaterial()->GetShaderVariableTables()[ i ]);
+			if ( pTables[ i ].GetShaderReflection() == nullptr )
+				continue;
+			m_pUsingShaderVarTables[ i ] = &(pTables[ i ]);
 		}
 
+		m_CommandList_Render.push_back( pCommand );
 		m_nVertexCount = pMesh->GetVertexCount();
 		m_nIndexCount = pMesh->GetIndexCount();
+		m_pMaterial = pCommand->GetMaterial();
 
 		return true;
 	}
@@ -475,8 +491,8 @@ bool iberbar::Renderer::CDefaultRendererProcessor::_State::AddCommand( CMeshDraw
 
 	m_CommandList_Render.push_back( pCommand );
 	m_nVertexCount += pMesh->GetVertexCount();
-
 	m_nIndexCount += pMesh->GetIndexCount();
+	m_pMaterial = pCommand->GetMaterial();
 
 	return true;
 

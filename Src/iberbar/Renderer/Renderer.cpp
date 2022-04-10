@@ -29,6 +29,8 @@ iberbar::Renderer::CRenderer::CRenderer()
 	, m_pDevice( nullptr )
 	//, m_pCommandContext( nullptr )
 	, m_pRenderGroupCommandManager( new CRenderGroupCommandManager() )
+	, m_pCurrentRendererProcessor( nullptr )
+	, m_pDefaultRendererProcessor( nullptr )
 {
 	m_RenderQueue.push_back( CRenderQueue() );
 	m_CommandGroupStack.push( 0 );
@@ -51,7 +53,6 @@ void iberbar::Renderer::CRenderer::Init( RHI::IDevice* pDevice )
 	m_pDevice = pDevice;
 	m_pDefaultRendererProcessor = new CDefaultRendererProcessor();
 	m_pDefaultRendererProcessor->Initial();
-
 }
 
 
@@ -117,10 +118,11 @@ void iberbar::Renderer::CRenderer::Render()
 	//	m_RenderQueue[ i ].Sort();
 	//}
 
-	m_RenderQueue[ 0 ].Sort();
-	m_pDefaultRendererProcessor->VisitQueue( &m_RenderQueue[ 0 ] );
+	//m_RenderQueue[ 0 ].Sort();
+	//m_pCurrentRendererProcessor = m_pDefaultRendererProcessor;
+	//m_pCurrentRendererProcessor->VisitQueue( &m_RenderQueue[ 0 ] );
 
-	Clear();
+	//Clear();
 
 	m_bIsRendering = false;
 }

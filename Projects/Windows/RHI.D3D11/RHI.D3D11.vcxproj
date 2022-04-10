@@ -228,6 +228,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Shader.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\StateCache.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\TestDraw.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Types.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\VertexDeclaration.h" />
@@ -270,6 +271,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\StateCache.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\TestDraw.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Texture.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\VertexDeclaration.cpp" />
   </ItemGroup>

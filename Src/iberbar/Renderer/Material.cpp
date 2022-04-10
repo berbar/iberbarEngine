@@ -54,16 +54,8 @@ iberbar::Renderer::CMaterial::CMaterial( CMaterial* pMaterialOrigin )
 	m_pMaterialParent->AddRef();
 
 	m_pShaderState = m_pMaterialParent->m_pShaderState;
-	if ( m_pShaderState )
-	{
-		m_pShaderState->AddRef();
-		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
-		{
-			m_VariableTables[ i ].SetShader( m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i ) );
-		}
-	}
-
 	m_Streams = m_pMaterialParent->m_Streams;
+	InitialVariableTables();
 }
 
 
@@ -143,6 +135,8 @@ void iberbar::Renderer::CMaterial::Initial( RHI::IShaderProgram* pShaderProgram 
 	if ( cResult.IsOK() == false )
 		return;
 
+	InitialVariableTables();
+
 	//RHI::IShader* pShader = nullptr;
 	//RHI::IShaderReflection* pShaderReflection = nullptr;
 	//const RHI::IShaderReflectionBuffer* pShaderReflectionBuffer = nullptr;
@@ -166,6 +160,19 @@ void iberbar::Renderer::CMaterial::Initial( RHI::IShaderProgram* pShaderProgram 
 	//		}
 	//	}
 	//}
+}
+
+
+void iberbar::Renderer::CMaterial::InitialVariableTables()
+{
+	if ( m_pShaderState )
+	{
+		m_pShaderState->AddRef();
+		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+		{
+			m_VariableTables[ i ].SetShader( m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i ) );
+		}
+	}
 }
 
 

@@ -60,6 +60,9 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.h">
       <Filter>D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\D3D11\TestDraw.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Buffer.cpp">
@@ -102,6 +105,9 @@
       <Filter>D3D11</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\Effect.cpp">
+      <Filter>D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\D3D11\TestDraw.cpp">
       <Filter>D3D11</Filter>
     </ClCompile>
   </ItemGroup>

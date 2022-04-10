@@ -104,6 +104,13 @@ namespace iberbar
 				{
 					m_TexcoordSlots[ i ] = m_BufferTexcoordSlots[ i ];
 				}
+				//IndicesRectUpdate( m_BufferIndices );
+				m_BufferIndices[ 0 ] = 0;
+				m_BufferIndices[ 1 ] = 1;
+				m_BufferIndices[ 2 ] = 2;
+				m_BufferIndices[ 3 ] = 1;
+				m_BufferIndices[ 4 ] = 3;
+				m_BufferIndices[ 5 ] = 2;
 			}
 
 		public:

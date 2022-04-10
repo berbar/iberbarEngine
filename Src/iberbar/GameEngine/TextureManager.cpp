@@ -10,13 +10,11 @@ iberbar::Game::CTextureManager::CTextureManager( RHI::IDevice* pDevice )
 	: m_pDevice( pDevice )
 	, m_TextureList()
 {
-	m_pDevice->AddRef();
 }
 
 
 iberbar::Game::CTextureManager::~CTextureManager()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	for ( size_t i = 0, s = m_TextureList.size(); i < s; i++ )
 	{
 		UNKNOWN_SAFE_RELEASE_NULL( m_TextureList[ i ].pTexture );

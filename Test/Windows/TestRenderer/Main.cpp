@@ -8,6 +8,9 @@
 #include <iberbar/GameEngine/FontManager.h>
 #include <iberbar/GameEngine/LoadingThread.h>
 
+#include <iberbar/GameEngine/ShaderManager.h>
+#include <iberbar/GameEngine/TextureManager.h>
+
 //#include <iberbar/Paper2d/Director.h>
 //#include <iberbar/Paper2d/Scene.h>
 //#include <iberbar/Paper2d/Camera.h>
@@ -19,6 +22,8 @@
 //#include <iberbar/Gui/Element/ElemColorRect.h>
 #include <iberbar/Gui/Dialog.h>
 #include <iberbar/Gui/Engine.h>
+#include <iberbar/Gui/Widget.h>
+#include <iberbar/Gui/Element/ElemStateTexture.h>
 
 //#include <iberbar/Renderer/RendererSprite.h>
 
@@ -26,6 +31,11 @@
 
 #include <iberbar/Lua/LuaDevice.h>
 #include <iberbar/Lua/FunctionHelper.h>
+
+#include <iberbar/RHI/Device.h>
+#include <iberbar/RHI/RenderState.h>
+#include <iberbar/RHI/Shader.h>
+#include <iberbar/RHI/TestDraw.h>
 
 #include <iberbar/Utility/RefStatistics.h>
 
@@ -63,11 +73,15 @@ protected:
 	virtual void OnDestroy() override;
 	virtual void OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTimeSecond ) override;
 	virtual void OnRender() override;
+
+public:
+	iberbar::RHI::ITestDraw* m_pTestDraw;
 };
 
 
 
 CTestApplication::CTestApplication()
+	: m_pTestDraw( nullptr )
 {
 }
 
@@ -75,6 +89,8 @@ CTestApplication::CTestApplication()
 iberbar::CResult CTestApplication::OnCreated()
 {
 	iberbar::CResult ret;
+
+	//m_pTestDraw = m_pRHIDevice->CreateTestDraw();
 
 	//ret = m_ResourcePreloader->ReadFile( "Scripts/Preload.xml" );
 
@@ -87,6 +103,43 @@ iberbar::CResult CTestApplication::OnCreated()
 	m_pLuaDevice->ExecuteFile( "Scripts/Game2/main.lua" );
 	
 	iberbar::Lua::CFunctionHelper::sExecuteGlobalFunction( m_pLuaDevice->GetLuaState(), "Main" );
+
+	iberbar::TSmartRefPtr<iberbar::Gui::CDialog> dlg = nullptr;
+	iberbar::Gui::CDialog::sCreateDialog( &dlg );
+	dlg->SetId( "MainMenu" );
+	dlg->SetPosition( 0, 0 );
+	dlg->SetSize( 800, 600 );
+
+	iberbar::TSmartRefPtr<iberbar::Gui::CWidget> bg = iberbar::TSmartRefPtr<iberbar::Gui::CWidget>::_sNew();
+	bg->SetSize( 800, 600 );
+
+	iberbar::TSmartRefPtr<iberbar::RHI::IShaderProgram> pShaderProgram;
+	m_pShaderManager->GetShaderProgram( "PositionColorTexture2d", &pShaderProgram );
+
+	iberbar::TSmartRefPtr<iberbar::RHI::ITexture> pTexture;
+	m_pTextureManager->GetOrCreateTextureA( "Images/Background.png", &pTexture );
+
+	iberbar::TSmartRefPtr<iberbar::RHI::ISamplerState> pSamplerState;
+	iberbar::RHI::UTextureSamplerState SamplerStateDesc;
+	m_pRHIDevice->CreateSamplerState( &pSamplerState, SamplerStateDesc );
+
+	float Viewport[ 2 ] = { 800, 600 };
+	iberbar::TSmartRefPtr<iberbar::Renderer::CMaterial> mat = iberbar::TSmartRefPtr<iberbar::Renderer::CMaterial>::_sNew();
+	mat->Initial( pShaderProgram );
+	mat->SetTexture( "g_texture", &pTexture );
+	mat->SetSamplerState( "g_textureSampler", &pSamplerState );
+	mat->SetInt( "g_rhw", 1 );
+	mat->SetStruct( "g_viewport", Viewport, sizeof(float) * 2 );
+
+	iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture> element_texture = iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture>::_sNew();
+	bg->SetRenderElement( element_texture );
+	element_texture->SetSize( 100, 100 );
+	element_texture->SetPercentW( true );
+	element_texture->SetPercentH( true );
+	element_texture->SetUV( iberbar::CRect2f( 0.0, 0.0, 1.0, 1.0 ) );
+	element_texture->SetMaterial( mat );
+
+	dlg->GetWidgetRoot()->AddWidget( bg );
 
 	//auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
 	//auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
@@ -145,6 +198,7 @@ iberbar::CResult CTestApplication::OnCreated()
 
 void CTestApplication::OnDestroy()
 {
+	SAFE_DELETE( m_pTestDraw );
 }
 
 
@@ -155,6 +209,7 @@ void CTestApplication::OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTi
 
 void CTestApplication::OnRender()
 {
+	//m_pTestDraw->Draw();
 	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
 	//if ( m_pFontManager->GetFontDefault( &pFont ) )
 	//{

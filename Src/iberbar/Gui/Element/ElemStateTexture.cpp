@@ -14,10 +14,13 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture()
 	: CRenderElement()
 	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
+	, m_bDirtyMeshPositionOrUV( false )
+	, m_bEmptyBoundingFinal( true )
 	, m_pMesh( new Renderer::CMeshForUI_1() )
 	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
 	, m_pMaterial( nullptr )
 {
+	m_pMeshRendererComponent->SetMesh( m_pMesh );
 }
 
 
@@ -25,6 +28,8 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture(const CElementStateText
 	: CRenderElement( element )
 	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
+	, m_bDirtyMeshPositionOrUV( false )
+	, m_bEmptyBoundingFinal( true )
 	, m_pMesh( new Renderer::CMeshForUI_1() )
 	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
 	, m_pMaterial( nullptr )
@@ -32,6 +37,8 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture(const CElementStateText
 	SetColor( element.m_Color );
 	SetUV( element.m_UV );
 	SetMaterial( element.m_pMaterial );
+
+	m_pMeshRendererComponent->SetMesh( m_pMesh );
 }
 
 
@@ -100,6 +107,10 @@ void iberbar::Gui::CElementStateTexture::Render()
 		if ( rcBoundingFinal.IsEmpty() == true )
 		{
 			m_bEmptyBoundingFinal = true;
+		}
+		else
+		{
+			m_bEmptyBoundingFinal = false;
 		}
 
 		Renderer::VerticesRectUpdatePosition( m_pMesh->GetBufferPositions(), rcBoundingFinal, 0 );

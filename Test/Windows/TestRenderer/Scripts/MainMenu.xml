@@ -15,6 +15,18 @@
         </Styles>
     </Widget>
 
+    <Widget Type="Default" Id="Background_2"
+        X="0" Y="0"
+        Width="200" Height="200"
+        AlignHorizental="Center"
+        AlignVertical="Center">
+        <Styles>
+            <Element Type="StateTexture" X="0" Y="0" Width="100%" Height="100%">
+                <Texture State="All" Src="Images/FastTurtle.png" UV="0,0,1,1" Color="0xffffffff" />
+            </Element>
+        </Styles>
+    </Widget>
+
     <Widget Type="Button" Id="Btn-StartGame"
         X="100" Y="-100"
         Width="200" Height="50"

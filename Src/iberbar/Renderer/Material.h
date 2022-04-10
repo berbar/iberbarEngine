@@ -56,6 +56,9 @@ namespace iberbar
 			void Initial( RHI::IShaderProgram* pShaderProgram );
 
 		protected:
+			void InitialVariableTables();
+
+		protected:
 			CMaterial* m_pMaterialParent;
 			RHI::IShaderState* m_pShaderState;
 			std::vector<uint32> m_Streams;

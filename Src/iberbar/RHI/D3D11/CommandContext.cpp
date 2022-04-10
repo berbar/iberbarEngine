@@ -50,6 +50,7 @@ void iberbar::RHI::D3D11::CCommandContext::SetIndexBuffer( IIndexBuffer* pIndexB
 void iberbar::RHI::D3D11::CCommandContext::SetShaderState( IShaderState* pShaderState )
 {
 	CShaderState* pShaderStateInternal = (CShaderState*)pShaderState;
+	//CShaderProgram* pShaderProgram = pShaderStateInternal->GetShaderProgramInternal();
 	m_StateCache.SetVertexShader( pShaderStateInternal->GetD3DVertexShader() );
 	m_StateCache.SetPixelShader( pShaderStateInternal->GetD3DPixelShader() );
 	m_StateCache.SetGeometryShader( pShaderStateInternal->GetD3DGeometryShader() );

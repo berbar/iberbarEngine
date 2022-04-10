@@ -7,16 +7,18 @@
 
 iberbar::CResult iberbar::Game::LoadMaterialFromJson( Renderer::CMaterial** ppOutMaterial, const char* pstrJsonText )
 {
-	nlohmann::json Json = nlohmann::json::parse( pstrJsonText );
-	
-	auto strShaderState = JsonGetString( Json, "ShaderState" );
-	if ( strShaderState.has_value() == false )
-		return MakeResult( ResultCode::Bad, "" );
+	//nlohmann::json Json = nlohmann::json::parse( pstrJsonText );
+	//
+	//auto strShaderState = JsonGetString( Json, "ShaderState" );
+	//if ( strShaderState.has_value() == false )
+	//	return MakeResult( ResultCode::Bad, "" );
 
-	CShaderManager::GetOrCreateShader();
-	RHI::IShaderState* pShaderState = nullptr;
+	//CShaderManager::GetOrCreateShader();
+	//RHI::IShaderState* pShaderState = nullptr;
 
-	TSmartRefPtr<Renderer::CMaterial> pMaterial = TSmartRefPtr<Renderer::CMaterial>::_sNew();
+	//TSmartRefPtr<Renderer::CMaterial> pMaterial = TSmartRefPtr<Renderer::CMaterial>::_sNew();
 
-	pMaterial->SetShaderState( pShaderState );
+	//pMaterial->SetShaderState( pShaderState );
+
+	return MakeResult( ResultCode::Bad, "" );
 }

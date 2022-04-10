@@ -1,0 +1,18 @@
+{
+    "ShaderState": "PositionColorTexture2d",
+    "Textures": {
+        "g_texture": "Images/Background.png"
+    },
+    "SamplerStates": {
+        "g_textureSampler": {
+            "MipFilter": 2,
+            "MinFilter": 2,
+            "MagFilter": 2,
+            "AddressU": 1,
+            "AddressV": 1,
+            "AddressW": 1
+        }
+    },
+    "Variables": {
+    }
+}

@@ -10,6 +10,11 @@
 #include <iberbar/RHI/D3D11/RenderState.h>
 
 
+#ifdef _DEBUG
+#include <iberbar/RHI/D3D11/TestDraw.h>
+#endif
+
+
 
 
 iberbar::RHI::D3D11::CDevice::CDevice()
@@ -355,7 +360,7 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::Begin()
 
 void iberbar::RHI::D3D11::CDevice::End()
 {
-	if ( true )
+	if ( false )
 	{
 		m_pDXGISwapChain->Present( 1, 0 );
 	}
@@ -375,6 +380,16 @@ void iberbar::RHI::D3D11::CDevice::SetClearColor( const CColor4B& color )
 	m_D3DClearColorRGBA[ 3 ] = m_ClearColor.a;
 
 }
+
+
+#ifdef _DEBUG
+iberbar::RHI::ITestDraw* iberbar::RHI::D3D11::CDevice::CreateTestDraw()
+{
+	CTestDraw* TestDraw = new CTestDraw();
+	TestDraw->Initial( this );
+	return TestDraw;
+}
+#endif
 
 
 iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight )
@@ -640,6 +655,42 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	m_pCommandContext = new CCommandContext( this );
 
 	return CResult();
+}
+
+
+const char* iberbar::RHI::D3D11::CDevice::GetShaderCompileTarget( EShaderType eShaderType )
+{
+	const char* pstrTarget = nullptr;
+	if ( eShaderType == EShaderType::VertexShader )
+	{
+		pstrTarget = "vs_5_0";
+	}
+	else if ( eShaderType == EShaderType::PixelShader )
+	{
+		pstrTarget = "ps_5_0";
+	}
+	else if ( eShaderType == EShaderType::HullShader )
+	{
+		pstrTarget = "hs_5_0";
+	}
+	else if ( eShaderType == EShaderType::GeometryShader )
+	{
+		pstrTarget = "gs_5_0";
+	}
+	else if ( eShaderType == EShaderType::DomainShader )
+	{
+		pstrTarget = "ds_5_0";
+	}
+	else if ( eShaderType == EShaderType::ComputeShader )
+	{
+		pstrTarget = "cs_5_0";
+	}
+	else
+	{
+		return nullptr;
+	}
+
+	return pstrTarget;
 }
 
 

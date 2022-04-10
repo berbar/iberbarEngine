@@ -1,0 +1,9 @@
+{
+    "D3D": {
+        "VS": "Shaders/D3D/PositionColorTexture2d_VS.hlsl",
+        "PS": "Shaders/D3D/PositionColorTexture2d_PS.hlsl"
+    },
+    "OpenGL": {
+
+    }
+}

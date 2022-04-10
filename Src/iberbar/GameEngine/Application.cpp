@@ -130,6 +130,7 @@ iberbar::Game::CApplication::CApplication()
 
 	, m_ResourcePreloader( nullptr )
 	, m_pTextureManager( nullptr )
+	, m_pShaderLoader( nullptr )
 	, m_pShaderManager( nullptr )
 	, m_pFontManager( nullptr )
 	//, m_pPaper2dLoader( nullptr )
@@ -225,10 +226,16 @@ void iberbar::Game::CApplication::Destroy()
 	SAFE_DELETE( m_ResourcePreloader );
 	SAFE_DELETE( m_pTextureManager );
 	SAFE_DELETE( m_pShaderManager );
+	SAFE_DELETE( m_pShaderLoader );
 	SAFE_DELETE( m_pFontManager );
 	//SAFE_DELETE( m_pPaper2dLoader );
 
-	UNKNOWN_SAFE_RELEASE_NULL( m_pRHIDevice );
+	if ( m_pRHIDevice )
+	{
+		m_pRHIDevice->Shutdown();
+		delete m_pRHIDevice;
+		m_pRHIDevice = nullptr;
+	}
 
 	SAFE_DELETE( m_pGlobalTimer );
 	SAFE_DELETE( m_pInput );
@@ -427,7 +434,8 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 	m_pRenderer->Init( m_pRHIDevice );
 
 	// 创建资源管理
-	m_pShaderManager = new CShaderManager( m_pRHIDevice );
+	m_pShaderLoader = new CShaderLoader( m_pRHIDevice );
+	m_pShaderManager = new CShaderManager();
 	m_pTextureManager = new CTextureManager( m_pRHIDevice );
 	m_pFontManager = new CFontManager( m_pRHIDevice );
 	ret = m_pFontManager->Initial();
@@ -669,35 +677,32 @@ iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 		return MakeResult( ResultCode::Bad, "Unknown rhi api" );
 	strShaderRootDir += strRhiApiName;
 
-	m_pShaderManager->SetRootDir( strShaderRootDir.c_str() );
+	m_pShaderLoader->SetRootDir( strShaderRootDir.c_str() );
 
 	{
-		RHI::UVertexElement VertexElements[] =
-		{
-			{ 0, RHI::UVertexDeclareUsage::Position, 0, RHI::UVertexFormat::FLOAT3, offsetof( Renderer::UVertex_V3F_C4B_T2F, position ) },
-			{ 0, RHI::UVertexDeclareUsage::Color, 0, RHI::UVertexFormat::FLOAT4, offsetof( Renderer::UVertex_V3F_C4B_T2F, color ) },
-			{ 0, RHI::UVertexDeclareUsage::TexCoord, 0, RHI::UVertexFormat::FLOAT2, offsetof( Renderer::UVertex_V3F_C4B_T2F, texcoord ) }
-		};
-		TSmartRefPtr<RHI::IShader> pVertexShader;
-		TSmartRefPtr<RHI::IShader> pPixelShader;
-		ret = m_pShaderManager->GetOrCreateShader( RHI::EShaderType::VertexShader, "PositionColorTexture2d", &pVertexShader );
-		if ( ret.IsOK() == false )
-			return ret;
-		
-		ret = m_pShaderManager->GetOrCreateShader( RHI::EShaderType::PixelShader, "PositionColorTexture2d", &pPixelShader );
+		//RHI::UVertexElement VertexElements[] =
+		//{
+		//	{ 0, RHI::UVertexDeclareUsage::Position, 0, RHI::UVertexFormat::FLOAT3, offsetof( Renderer::UVertex_V3F_C4B_T2F, position ) },
+		//	{ 0, RHI::UVertexDeclareUsage::Color, 0, RHI::UVertexFormat::FLOAT4, offsetof( Renderer::UVertex_V3F_C4B_T2F, color ) },
+		//	{ 0, RHI::UVertexDeclareUsage::TexCoord, 0, RHI::UVertexFormat::FLOAT2, offsetof( Renderer::UVertex_V3F_C4B_T2F, texcoord ) }
+		//};
+		TSmartRefPtr<RHI::IShaderProgram> pShaderProgram;
+		ret = m_pShaderLoader->LoadShaderProgram( "PositionColorTexture2d", &pShaderProgram );
 		if ( ret.IsOK() == false )
 			return ret;
 
-		TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
-		uint32 nStrides[1] = { sizeof( Renderer::UVertex_V3F_C4B_T2F ) };
-		ret = m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, nStrides, 1 );
-		if ( ret.IsOK() == false )
-			return ret;
+		m_pShaderManager->AddShaderProgram( "PositionColorTexture2d" , pShaderProgram );
 
-		TSmartRefPtr<RHI::IShaderState> pShaderState;
-		ret = m_pRHIDevice->CreateShaderState( &pShaderState, pVertexDeclaration, pVertexShader, pPixelShader, nullptr, nullptr, nullptr );
-		if ( ret.IsOK() == false )
-			return ret;
+		//TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
+		//uint32 nStrides[1] = { sizeof( Renderer::UVertex_V3F_C4B_T2F ) };
+		//ret = m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, nStrides, 1 );
+		//if ( ret.IsOK() == false )
+		//	return ret;
+
+		//TSmartRefPtr<RHI::IShaderState> pShaderState;
+		//ret = m_pRHIDevice->CreateShaderState( &pShaderState, pVertexDeclaration, pVertexShader, pPixelShader, nullptr, nullptr, nullptr );
+		//if ( ret.IsOK() == false )
+		//	return ret;
 	}
 
 	return CResult();
@@ -736,13 +741,14 @@ void iberbar::Game::CApplication::OnRunTimer( int64 nElapsedTimeMilliSecond, flo
 
 	if ( m_bWndActive == true )
 	{
-		OnRender();
+		//OnRender();
 		//m_pPaper2dDirector->DrawScene();
 		m_pGuiEngine->Render();
 
 		CResult RetRhiBegin = m_pRHIDevice->Begin();
 		if ( RetRhiBegin.IsOK() )
 		{
+			OnRender();
 			m_pRenderer->Render();
 			m_pRHIDevice->End();
 		}

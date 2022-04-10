@@ -51,6 +51,10 @@ namespace iberbar
 				virtual void End() override;
 				virtual void SetClearColor( const CColor4B& color ) override;
 
+#ifdef _DEBUG
+				virtual ITestDraw* CreateTestDraw() override;
+#endif
+
 			public:
 				//virtual void SetVertexBuffer( uint32 nStreamIndex, IVertexBuffer* pVertexBuffer, uint32 nOffset ) override;
 				//virtual void SetIndexBuffer( IIndexBuffer* pIndexBuffer, uint32 nOffset ) override;
@@ -72,6 +76,8 @@ namespace iberbar
 				ID3D11DeviceContext* GetD3DDeviceContext() { return m_pD3DDeviceContext.Get(); }
 				// Ó²¼þ´¦Àí
 				//bool IsHardwareVertexProcessing() { return m_bIsHardwareVertexProcessing; }
+
+				const char* GetShaderCompileTarget( EShaderType eShaderType );
 
 			protected:
 				CResult ResetDevice() { return ResetDevice( m_ContextSize.w, m_ContextSize.h, m_bIsWindow ); }

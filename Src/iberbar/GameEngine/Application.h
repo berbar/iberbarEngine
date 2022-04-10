@@ -35,7 +35,7 @@ namespace iberbar
 
 	namespace Renderer
 	{
-		class CRenderer2d;
+		class CRenderer;
 	}
 
 	namespace Gui
@@ -54,6 +54,7 @@ namespace iberbar
 		class CPaper2dLoader;
 		class CResourcePreloader;
 		class CTextureManager;
+		class CShaderLoader;
 		class CShaderManager;
 		class CFontManager;
 		class CTimerEasySystem;
@@ -203,11 +204,12 @@ namespace iberbar
 			RHI::IDevice* m_pRHIDevice;
 
 			CTextureManager* m_pTextureManager;
+			CShaderLoader* m_pShaderLoader;
 			CShaderManager* m_pShaderManager;
 			CFontManager* m_pFontManager;
 			//CPaper2dLoader* m_pPaper2dLoader;
 
-			Renderer::CRenderer2d* m_pRenderer;
+			Renderer::CRenderer* m_pRenderer;
 
 			//Paper2d::CDirector* m_pPaper2dDirector;
 			

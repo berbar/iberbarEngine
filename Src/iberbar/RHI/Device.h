@@ -25,6 +25,10 @@ namespace iberbar
 		class CTrace;
 		struct UVertexElement;
 
+#ifdef _DEBUG
+		class ITestDraw;
+#endif
+
 		typedef CResult( UCallbackDeviceOnCreated )(IDevice* pDevice);
 		typedef void(UCallbackDeviceOnLost)( IDevice* device );
 		typedef CResult( UCallbackDeviceOnReset )(IDevice* device);
@@ -65,6 +69,10 @@ namespace iberbar
 			virtual CResult Begin() = 0;
 			virtual void End() = 0;
 			virtual void SetClearColor( const CColor4B& color ) { m_ClearColor = CColor4F( color ); }
+
+#ifdef _DEBUG
+			virtual ITestDraw* CreateTestDraw() = 0;
+#endif
 
 		public:
 			inline UApiType GetApiType() const { return m_nApiType; }

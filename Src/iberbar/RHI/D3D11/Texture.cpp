@@ -80,6 +80,11 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateFromFileInMemory( const vo
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
+	D3D11_TEXTURE2D_DESC Desc;
+	memset( &Desc, 0, sizeof( Desc ) );
+	m_pD3DTexture->GetDesc( &Desc );
+	m_Size = CSize2i( Desc.Width, Desc.Height );
+
 	return CResult();
 }
 
@@ -95,6 +100,11 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateFromFileA( const char* str
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
+	D3D11_TEXTURE2D_DESC Desc;
+	memset( &Desc, 0, sizeof( Desc ) );
+	m_pD3DTexture->GetDesc( &Desc );
+	m_Size = CSize2i( Desc.Width, Desc.Height );
+
 	return CResult();
 }
 
@@ -107,6 +117,11 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateFromFileW( const wchar_t* 
 	{
 		return MakeResult( ResultCode::Bad, "" );
 	}
+
+	D3D11_TEXTURE2D_DESC Desc;
+	memset( &Desc, 0, sizeof( Desc ) );
+	m_pD3DTexture->GetDesc( &Desc );
+	m_Size = CSize2i( Desc.Width, Desc.Height );
 
 	return CResult();
 }

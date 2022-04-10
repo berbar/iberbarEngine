@@ -20,7 +20,7 @@ namespace iberbar
 			Child,
 		};
 
-		class __iberbarGuiApi__ CDialog final
+		class __iberbarGuiApi__ CDialog
 			: public CObject
 		{
 		public:

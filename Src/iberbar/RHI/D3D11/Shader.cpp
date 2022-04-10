@@ -43,32 +43,8 @@ iberbar::CResult iberbar::RHI::D3D11::CShader::LoadFromFile( const char* pstrFil
 		return MakeResult( ResultCode::Bad, "failed to D3DReadFileToBlob, file=%s", pstrFile );
 	}
 
-	const char* pstrTarget = nullptr;
-	if ( m_eShaderType == EShaderType::VertexShader )
-	{
-		pstrTarget = "vs_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::PixelShader )
-	{
-		pstrTarget = "ps_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::HullShader )
-	{
-		pstrTarget = "hs_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::GeometryShader )
-	{
-		pstrTarget = "gs_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::DomainShader )
-	{
-		pstrTarget = "ds_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::ComputeShader )
-	{
-		pstrTarget = "cs_5_0";
-	}
-	else
+	const char* pstrTarget = m_pDevice->GetShaderCompileTarget( m_eShaderType );
+	if ( pstrTarget == nullptr )
 	{
 		return MakeResult( ResultCode::Bad, "not support" );
 	}
@@ -108,7 +84,13 @@ iberbar::CResult iberbar::RHI::D3D11::CShader::LoadFromSource( const char* pstrS
 	ComPtr<ID3DBlob> pD3DBlobError = nullptr;
 	HRESULT hResult;
 
-	hResult = D3DCompile( pstrSource, strlen( pstrSource ), "", NULL, NULL, "Main", NULL, 0, 0, &pD3DBlob, &pD3DBlobError );
+	const char* pstrTarget = m_pDevice->GetShaderCompileTarget( m_eShaderType );
+	if ( pstrTarget == nullptr )
+	{
+		return MakeResult( ResultCode::Bad, "not support" );
+	}
+
+	hResult = D3DCompile( pstrSource, strlen( pstrSource ), "", NULL, NULL, "Main", pstrTarget, 0, 0, &pD3DBlob, &pD3DBlobError );
 	if ( FAILED( hResult ) )
 	{
 		std::string strError = UnicodeToUtf8( (const wchar_t*)pD3DBlobError->GetBufferPointer() );
