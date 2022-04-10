@@ -41,6 +41,7 @@ namespace iberbar
 				CResult Initial();
 				inline CDevice* GetDevice() { return m_pDevice; }
 				inline CVertexDeclaration* GetVertexDeclarationInternal() { return m_pVertexDeclaration; }
+				inline CShaderProgram* GetShaderProgramInternal() { return m_pShaderProgram; }
 				//inline CShader* GetShaderInternal( EShaderType eShaderType ) { return (CShader*)m_pShaderProgram->GetShader( eShaderType ); }
 
 				inline ID3D11VertexShader* GetD3DVertexShader() { return m_pD3DVertexShader.Get(); }

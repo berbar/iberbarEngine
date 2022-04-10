@@ -65,8 +65,20 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderState::Initial()
 	if ( FAILED( hResult ) )
 		return MakeResult( ResultCode::Bad, "" );
 
+	if ( m_pShaderProgram->GetVertexShader() )
+		m_pD3DVertexShader = m_pShaderProgram->GetVertexShader()->GetD3DShader();
 
+	if ( m_pShaderProgram->GetPixelShader() )
+		m_pD3DPixelShader = m_pShaderProgram->GetPixelShader()->GetD3DShader();
 
+	if ( m_pShaderProgram->GetGeometryShader() )
+		m_pD3DGeometryShader = m_pShaderProgram->GetGeometryShader()->GetD3DShader();
+
+	if ( m_pShaderProgram->GetHullShader() )
+		m_pD3DHullShader = m_pShaderProgram->GetHullShader()->GetD3DShader();
+
+	if ( m_pShaderProgram->GetDomainShader() )
+		m_pD3DDomainShader = m_pShaderProgram->GetDomainShader()->GetD3DShader();
 
 	return CResult();
 }
