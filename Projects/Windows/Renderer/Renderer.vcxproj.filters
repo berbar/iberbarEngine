@@ -39,6 +39,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\RenderCommandQueue.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Types.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Effects\EffectMatrices.h">
+      <Filter>Effects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\RenderCommand.cpp" />
@@ -68,6 +71,10 @@
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Processor\BaseRendererProcessor.cpp">
       <Filter>Processor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Effect.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Effects\EffectMatrices.cpp">
+      <Filter>Effects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Font">
@@ -78,6 +85,9 @@
     </Filter>
     <Filter Include="Processor">
       <UniqueIdentifier>{b2f5d1cb-ff60-43d1-b0bd-1eccae2215d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Effects">
+      <UniqueIdentifier>{87fe3ddd-6495-4b0f-a083-6c21fa3d7c3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

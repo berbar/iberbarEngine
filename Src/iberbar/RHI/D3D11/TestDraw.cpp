@@ -5,6 +5,7 @@
 #include <iberbar/RHI/D3D11/Buffer.h>
 #include <iberbar/RHI/D3D11/ShaderState.h>
 #include <iberbar/RHI/D3D11/VertexDeclaration.h>
+#include <iberbar/RHI/D3D11/Texture.h>
 #include <iberbar/RHI/D3D11/Device.h>
 #include <DirectXMath.h>
 
@@ -61,8 +62,8 @@ SamplerState g_textureSampler : register(s0);
 // 像素着色器
 float4 Main(VertexOut pIn) : SV_Target
 {
-    //return g_texture.Sample(g_textureSampler, pIn.texcoord) * pIn.color;
-    return pIn.color;
+    return g_texture.Sample(g_textureSampler, pIn.texcoord) * pIn.color;
+    //return pIn.color;
 }
 )";
 
@@ -90,6 +91,7 @@ iberbar::RHI::D3D11::CTestDraw::CTestDraw()
 	, m_pShaderProgram( nullptr )
 	, m_pVertexDecl( nullptr )
 	, m_pShaderState( nullptr )
+	, m_pTexture( nullptr )
 {
 
 }
@@ -104,6 +106,7 @@ iberbar::RHI::D3D11::CTestDraw::~CTestDraw()
 	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderProgram );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pVertexDecl );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pTexture );
 }
 
 
@@ -115,13 +118,13 @@ void iberbar::RHI::D3D11::CTestDraw::Initial( CDevice* pDevice )
 	m_pDevice->CreateVertexBuffer( sizeof( VertexPosColor ) * 3, UBufferUsageFlags::Dynamic, (IVertexBuffer**)&m_pVertexBuffer );
 	//m_pDevice->CreateIndexBuffer( sizeof( uint ) * 3, UBufferUsageFlags::Dynamic, (IVertexBuffer**)&m_pVertexBuffer );
 
-	m_pDevice->CreateVertexShader( (IShader**)&m_pVertexShader );
-	m_pVertexShader->LoadFromSource( TestDrawVS );
+	//m_pDevice->CreateVertexShader( (IShader**)&m_pVertexShader );
+	//m_pVertexShader->LoadFromSource( TestDrawVS );
 
-	m_pDevice->CreatePixelShader( (IShader**)&m_pPixelShader );
-	m_pPixelShader->LoadFromSource( TestDrawPS );
+	//m_pDevice->CreatePixelShader( (IShader**)&m_pPixelShader );
+	//m_pPixelShader->LoadFromSource( TestDrawPS );
 
-	m_pDevice->CreateShaderProgram( (IShaderProgram**)&m_pShaderProgram, m_pVertexShader, m_pPixelShader, nullptr, nullptr, nullptr );
+	//m_pDevice->CreateShaderProgram( (IShaderProgram**)&m_pShaderProgram, m_pVertexShader, m_pPixelShader, nullptr, nullptr, nullptr );
 
 	//uint32 nSlot;
 	//UVertexDeclareUsage nSemantic;
@@ -136,7 +139,7 @@ void iberbar::RHI::D3D11::CTestDraw::Initial( CDevice* pDevice )
 	};
 	m_pDevice->CreateVertexDeclaration( (IVertexDeclaration**)&m_pVertexDecl, VertexElements, 3 );
 
-	m_pDevice->CreateShaderState( (IShaderState**)&m_pShaderState, m_pVertexDecl, m_pShaderProgram );
+	//m_pDevice->CreateShaderState( (IShaderState**)&m_pShaderState, m_pVertexDecl, m_pShaderProgram );
 
 	// 创建并绑定顶点布局
 	//m_pDevice->GetD3DDevice()->CreateInputLayout( VertexPosColor::inputLayout, ARRAYSIZE( VertexPosColor::inputLayout ),
@@ -147,9 +150,9 @@ void iberbar::RHI::D3D11::CTestDraw::Draw()
 {
 	VertexPosColor vertices[] =
 	{
-		{ XMFLOAT2( 0.0f, 1.5f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ) },
-		{ XMFLOAT2( 0.5f, -0.5f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ) },
-		{ XMFLOAT2( -0.5f, -0.5f ), XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ) }
+		{ XMFLOAT2( 0.0f, 1.5f ), XMFLOAT4( 0.0f, 1.0f, 0.0f, 1.0f ), XMFLOAT2( 0.5f, 0.0f ) },
+		{ XMFLOAT2( 0.5f, -0.5f ), XMFLOAT4( 0.0f, 0.0f, 1.0f, 1.0f ), XMFLOAT2( 1.0f, 1.0f ) },
+		{ XMFLOAT2( -0.5f, -0.5f ), XMFLOAT4( 1.0f, 0.0f, 0.0f, 1.0f ), XMFLOAT2( 0.0f, 1.0f ) }
 	};
 
 	//D3D11_MAPPED_SUBRESOURCE m_D3DMappedSubResource;
@@ -183,6 +186,7 @@ void iberbar::RHI::D3D11::CTestDraw::Draw()
 	//m_pD3DDeviceContext->IASetVertexBuffers( 0, 1, vbs, strides, offsets );
 	m_pDevice->GetDefaultContext()->SetShaderState( m_pShaderState );
 	m_pDevice->GetDefaultContext()->SetVertexBuffer( 0, m_pVertexBuffer, 0 );
+	//m_pDevice->GetDefaultContext()->SetTexture( EShaderType::PixelShader, 0, m_pTexture );
 	//UINT stride = sizeof( VertexPosColor );	// 跨越字节数
 	//UINT offset = 0;
 	//m_pD3DDeviceContext->IASetVertexBuffers( 0, 1, m_pVertexBuffer.GetAddressOf(), &stride, &offset );
@@ -198,6 +202,23 @@ void iberbar::RHI::D3D11::CTestDraw::Draw()
 
 	// 绘制三角形
 	m_pD3DDeviceContext->Draw( 6, 0 );
+}
+
+
+void iberbar::RHI::D3D11::CTestDraw::SetShaderProgram( IShaderProgram* pShaderProgram )
+{
+	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
+	m_pDevice->CreateShaderState( (IShaderState**)&m_pShaderState, m_pVertexDecl, pShaderProgram );
+	//m_pShaderState = (CShaderState*)pShaderState;
+	//UNKNOWN_SAFE_ADDREF( m_pShaderState );
+}
+
+
+void iberbar::RHI::D3D11::CTestDraw::SetTexture( ITexture* pTexture )
+{
+	UNKNOWN_SAFE_RELEASE_NULL( m_pTexture );
+	m_pTexture = (CTexture*)pTexture;
+	UNKNOWN_SAFE_ADDREF( m_pTexture );
 }
 
 

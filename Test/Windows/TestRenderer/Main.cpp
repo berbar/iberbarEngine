@@ -90,8 +90,6 @@ iberbar::CResult CTestApplication::OnCreated()
 {
 	iberbar::CResult ret;
 
-	//m_pTestDraw = m_pRHIDevice->CreateTestDraw();
-
 	//ret = m_ResourcePreloader->ReadFile( "Scripts/Preload.xml" );
 
 	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
@@ -126,20 +124,29 @@ iberbar::CResult CTestApplication::OnCreated()
 	float Viewport[ 2 ] = { 800, 600 };
 	iberbar::TSmartRefPtr<iberbar::Renderer::CMaterial> mat = iberbar::TSmartRefPtr<iberbar::Renderer::CMaterial>::_sNew();
 	mat->Initial( pShaderProgram );
-	mat->SetTexture( "g_texture", &pTexture );
-	mat->SetSamplerState( "g_textureSampler", &pSamplerState );
+	mat->SetTexture( "g_texture", pTexture );
+	mat->SetSamplerState( "g_textureSampler", pSamplerState );
 	mat->SetInt( "g_rhw", 1 );
-	mat->SetStruct( "g_viewport", Viewport, sizeof(float) * 2 );
+	mat->SetFloat( "g_viewport_w", Viewport[0] );
+	mat->SetFloat( "g_viewport_h", Viewport[1] );
 
 	iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture> element_texture = iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture>::_sNew();
 	bg->SetRenderElement( element_texture );
-	element_texture->SetSize( 100, 100 );
-	element_texture->SetPercentW( true );
-	element_texture->SetPercentH( true );
+	element_texture->SetPosition( 0, 0 );
+	element_texture->SetSize( 2, 2 );
+	//element_texture->SetAlignHorizental( iberbar::UAlignHorizental::Center );
+	//element_texture->SetAlignVertical( iberbar::UAlignVertical::Center );
+	//element_texture->SetSize( 100, 100 );
+	//element_texture->SetPercentW( true );
+	//element_texture->SetPercentH( true );
 	element_texture->SetUV( iberbar::CRect2f( 0.0, 0.0, 1.0, 1.0 ) );
 	element_texture->SetMaterial( mat );
 
 	dlg->GetWidgetRoot()->AddWidget( bg );
+
+	m_pTestDraw = m_pRHIDevice->CreateTestDraw();
+	m_pTestDraw->SetShaderProgram( pShaderProgram );
+	m_pTestDraw->SetTexture( pTexture );
 
 	//auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
 	//auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
@@ -209,7 +216,8 @@ void CTestApplication::OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTi
 
 void CTestApplication::OnRender()
 {
-	//m_pTestDraw->Draw();
+	if ( m_pTestDraw )
+		m_pTestDraw->Draw();
 	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
 	//if ( m_pFontManager->GetFontDefault( &pFont ) )
 	//{

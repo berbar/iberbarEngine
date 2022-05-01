@@ -118,11 +118,11 @@ void iberbar::Renderer::CRenderer::Render()
 	//	m_RenderQueue[ i ].Sort();
 	//}
 
-	//m_RenderQueue[ 0 ].Sort();
-	//m_pCurrentRendererProcessor = m_pDefaultRendererProcessor;
-	//m_pCurrentRendererProcessor->VisitQueue( &m_RenderQueue[ 0 ] );
+	m_RenderQueue[ 0 ].Sort();
+	m_pCurrentRendererProcessor = m_pDefaultRendererProcessor;
+	m_pCurrentRendererProcessor->VisitQueue( &m_RenderQueue[ 0 ] );
 
-	//Clear();
+	Clear();
 
 	m_bIsRendering = false;
 }

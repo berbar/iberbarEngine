@@ -20,7 +20,7 @@ namespace iberbar
 			bool Ret = false;
 			for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 			{
-				Ret = Ret && pVarTables[ i ].SetInt( pstrName, Value );
+				Ret = Ret || pVarTables[ i ].SetInt( pstrName, Value );
 			}
 			return Ret;
 		}
@@ -41,6 +41,7 @@ iberbar::Renderer::CMaterial::CMaterial()
 	, m_Streams()
 	, m_VariableTables()
 {
+	memset( m_VariableTables, 0, sizeof( m_VariableTables ) );
 }
 
 
@@ -53,6 +54,8 @@ iberbar::Renderer::CMaterial::CMaterial( CMaterial* pMaterialOrigin )
 	assert( m_pMaterialParent );
 	m_pMaterialParent->AddRef();
 
+	memset( m_VariableTables, 0, sizeof( m_VariableTables ) );
+
 	m_pShaderState = m_pMaterialParent->m_pShaderState;
 	m_Streams = m_pMaterialParent->m_Streams;
 	InitialVariableTables();
@@ -63,6 +66,10 @@ iberbar::Renderer::CMaterial::~CMaterial()
 {
 	UNKNOWN_SAFE_RELEASE_NULL( m_pMaterialParent );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	{
+		SAFE_DELETE( m_VariableTables[ i ] );
+	}
 }
 
 
@@ -168,9 +175,15 @@ void iberbar::Renderer::CMaterial::InitialVariableTables()
 	if ( m_pShaderState )
 	{
 		m_pShaderState->AddRef();
+		RHI::IShader* pShader;
 		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 		{
-			m_VariableTables[ i ].SetShader( m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i ) );
+			pShader = m_pShaderState->GetShaderProgram()->GetShader( (RHI::EShaderType)i );
+			if ( pShader )
+			{
+				m_VariableTables[ i ] = new CShaderVariableTable();
+				m_VariableTables[ i ]->SetShader( pShader );
+			}
 		}
 	}
 }
@@ -181,7 +194,7 @@ bool iberbar::Renderer::CMaterial::SetInt( const char* pstrName, int32 Value )
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetInt( pstrName, Value );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetInt( pstrName, Value ));
 	}
 	return Ret;
 }
@@ -192,7 +205,7 @@ bool iberbar::Renderer::CMaterial::SetIntArray( const char* pstrName, const int3
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetIntArray( pstrName, pValues, nCount );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetIntArray( pstrName, pValues, nCount ));
 	}
 	return Ret;
 }
@@ -203,7 +216,7 @@ bool iberbar::Renderer::CMaterial::SetFloat( const char* pstrName, float Value )
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetFloat( pstrName, Value );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetFloat( pstrName, Value ));
 	}
 	return Ret;
 }
@@ -214,7 +227,7 @@ bool iberbar::Renderer::CMaterial::SetFloatArray( const char* pstrName, const fl
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetFloatArray( pstrName, pValues, nCount );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetFloatArray( pstrName, pValues, nCount ));
 	}
 	return Ret;
 }
@@ -225,7 +238,7 @@ bool iberbar::Renderer::CMaterial::SetVector( const char* pstrName, const Direct
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetVector( pstrName, Value );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetVector( pstrName, Value ));
 	}
 	return Ret;
 }
@@ -236,7 +249,7 @@ bool iberbar::Renderer::CMaterial::SetVectorArray( const char* pstrName, const D
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetVectorArray( pstrName, pValues, nCount );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetVectorArray( pstrName, pValues, nCount ));
 	}
 	return Ret;
 }
@@ -247,7 +260,7 @@ bool iberbar::Renderer::CMaterial::SetMatrix( const char* pstrName, const Direct
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetMatrix( pstrName, Value );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetMatrix( pstrName, Value ));
 	}
 	return Ret;
 }
@@ -258,7 +271,7 @@ bool iberbar::Renderer::CMaterial::SetMatrixArray( const char* pstrName, const D
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetMatrixArray( pstrName, pValues, nCount );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetMatrixArray( pstrName, pValues, nCount ));
 	}
 	return Ret;
 }
@@ -269,7 +282,7 @@ bool iberbar::Renderer::CMaterial::SetColor( const char* pstrName, const CColor4
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetColor( pstrName, Value );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetColor( pstrName, Value ));
 	}
 	return Ret;
 }
@@ -280,7 +293,7 @@ bool iberbar::Renderer::CMaterial::SetColorArray( const char* pstrName, const CC
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetColorArray( pstrName, pValues, nCount );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetColorArray( pstrName, pValues, nCount ));
 	}
 	return Ret;
 }
@@ -291,7 +304,18 @@ bool iberbar::Renderer::CMaterial::SetStruct( const char* pstrName, const void* 
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetStruct( pstrName, Value, nSize );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetStruct( pstrName, Value, nSize ));
+	}
+	return Ret;
+}
+
+
+bool iberbar::Renderer::CMaterial::SetTexture( const char* pstrName, RHI::ITexture* pTexture )
+{
+	bool Ret = false;
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	{
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetTexture( pstrName, pTexture ));
 	}
 	return Ret;
 }
@@ -302,7 +326,18 @@ bool iberbar::Renderer::CMaterial::SetTexture( const char* pstrName, RHI::ITextu
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetTexture( pstrName, ppTextures[ 0 ] );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetTexture( pstrName, ppTextures[ 0 ] ));
+	}
+	return Ret;
+}
+
+
+bool iberbar::Renderer::CMaterial::SetSamplerState( const char* pstrName, RHI::ISamplerState* pSamplerState )
+{
+	bool Ret = false;
+	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
+	{
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetSamplerState( pstrName, pSamplerState ));
 	}
 	return Ret;
 }
@@ -313,7 +348,7 @@ bool iberbar::Renderer::CMaterial::SetSamplerState( const char* pstrName, RHI::I
 	bool Ret = false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		Ret = Ret && m_VariableTables[ i ].SetSamplerState( pstrName, ppSamplerStates[ 0 ] );
+		Ret = Ret || (m_VariableTables[ i ] && m_VariableTables[ i ]->SetSamplerState( pstrName, ppSamplerStates[ 0 ] ));
 	}
 	return Ret;
 }
@@ -338,7 +373,7 @@ bool iberbar::Renderer::CMaterial::CampareWithMaterial( const CMaterial* pOther 
 		return false;
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
-		if ( m_VariableTables[ i ].Compare( &(pOther->m_VariableTables[ i ]) ) == false )
+		if ( m_VariableTables[ i ] && m_VariableTables[ i ]->Compare( (pOther->m_VariableTables[ i ]) ) == false )
 			return false;
 	}
 	return true;

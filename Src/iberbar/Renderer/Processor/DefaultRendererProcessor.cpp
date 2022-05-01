@@ -258,14 +258,14 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 			{
 				pVertexData = pMesh->GetVertexData( nStreamIndex );
 				uint32 nVertexDataSize = nVertexCountInMesh * StreamsStride[ nStreamIndex ];
-				//if ( pVertexData == nullptr )
-				//{
-				//	memset( pVertexBytesBufferArray[ nStreamIndex ], 0, nVertexDataSize );
-				//}
-				//else
-				//{
-				//	memcpy_s( pVertexBytesBufferArray[ nStreamIndex ], nVertexDataSize, pVertexData, nVertexDataSize );
-				//}
+				if ( pVertexData == nullptr )
+				{
+					memset( pVertexBytesBufferArray[ nStreamIndex ], 0, nVertexDataSize );
+				}
+				else
+				{
+					memcpy_s( pVertexBytesBufferArray[ nStreamIndex ], nVertexDataSize, pVertexData, nVertexDataSize );
+				}
 				pVertexBytesBufferArray[ nStreamIndex ] += nVertexDataSize;
 			}
 
@@ -329,16 +329,18 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 	//m_pVertexBuffer->Unlock();
 	//m_pIndexBuffer->Unlock();
 
-	m_pState->SetShaderBindings();
+	m_pCommandContext->SetShaderState( m_pState->GetUsingShaderState() );
+	//m_pState->SetShaderBindings();
 	
 	for ( uint32 nStreamIndex : StreamsUsed )
 	{
 		m_pCommandContext->SetVertexBuffer( nStreamIndex, m_VertexBuffers[ nStreamIndex ], 0 );
 	}
 	m_pCommandContext->SetIndexBuffer( m_pIndexBuffer, 0 );
-	m_pCommandContext->SetShaderState( m_pState->GetUsingShaderState() );
 	m_pCommandContext->SetPrimitiveTopology( RHI::UPrimitiveType::Triangle );
 	m_pCommandContext->DrawIndexed( 0, nIndexCount, 0 );
+	//m_pCommandContext->Draw
+	//m_pCommandContext->DrawPrimitive( 0, 1 );
 }
 
 
@@ -458,12 +460,12 @@ bool iberbar::Renderer::CDefaultRendererProcessor::_State::AddCommand( CMeshDraw
 	{
 		m_pUsingShaderState = pCommand->GetMaterial()->GetShaderState();
 
-		const CShaderVariableTable* pTables = pCommand->GetMaterial()->GetShaderVariableTables();
+		CShaderVariableTable *const *const pTables = pCommand->GetMaterial()->GetShaderVariableTables();
 		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 		{
-			if ( pTables[ i ].GetShaderReflection() == nullptr )
-				continue;
-			m_pUsingShaderVarTables[ i ] = &(pTables[ i ]);
+			//if ( pTables[ i ] == nullptr )
+			//	continue;
+			m_pUsingShaderVarTables[ i ] = (pTables[ i ]);
 		}
 
 		m_CommandList_Render.push_back( pCommand );
@@ -482,7 +484,7 @@ bool iberbar::Renderer::CDefaultRendererProcessor::_State::AddCommand( CMeshDraw
 	for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 	{
 		pTableUsing = m_pUsingShaderVarTables[ i ];
-		pTableOther = &(pCommand->GetMaterial()->GetShaderVariableTables()[ i ]);
+		pTableOther = (pCommand->GetMaterial()->GetShaderVariableTables()[ i ]);
 		if ( pTableUsing == nullptr && pTableOther == nullptr )
 			continue;
 		if ( pTableUsing != nullptr && pTableOther != nullptr && pTableUsing->Compare( pTableOther ) == false )
@@ -542,10 +544,10 @@ void iberbar::Renderer::CDefaultRendererProcessor::_State::SetShaderBindings()
 			{
 				pShaderReflectionBuffer = pShaderReflection->GetBufferByIndex( nBufferIndex );
 				// 检查用户定义的BindPoint
-				if ( pShaderReflectionBuffer->GetBindPoint() <= g_nRhiUniformBindPoint_UserMax )
-				{
-					continue;
-				}
+				//if ( pShaderReflectionBuffer->GetBindPoint() <= g_nRhiUniformBindPoint_UserMax )
+				//{
+				//	continue;
+				//}
 
 				pUniformBuffer = UniformBuffers[ nBufferIndex ];
 				pUniformBuffer->UpdateContents( pVariablesMemory + pShaderReflectionBuffer->GetOffset(), pShaderReflectionBuffer->GetSize() );

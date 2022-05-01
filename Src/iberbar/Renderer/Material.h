@@ -39,15 +39,17 @@ namespace iberbar
 			bool SetColor( const char* strName, const CColor4F& Value );
 			bool SetColorArray( const char* strName, const CColor4F* pValues, uint32 nCount );
 			bool SetStruct( const char* strName, const void* Value, uint32 nSize );
-			bool SetTexture( const char* pstrName, RHI::ITexture** ppTextures, uint32 nElementCount = 1, uint32 nElementStart = 0 );
-			bool SetSamplerState( const char* pstrName, RHI::ISamplerState** pSamplerStates, uint32 nElementCount = 1, uint32 nElementStart = 0 );
+			bool SetTexture( const char* pstrName, RHI::ITexture* pTexture );
+			bool SetTexture( const char* pstrName, RHI::ITexture** ppTextures, uint32 nElementCount, uint32 nElementStart );
+			bool SetSamplerState( const char* pstrName, RHI::ISamplerState* pSamplerState );
+			bool SetSamplerState( const char* pstrName, RHI::ISamplerState** ppSamplerStates, uint32 nElementCount, uint32 nElementStart );
 			void Reset();
 
 			const std::vector<uint32>& GetStreams() const { return m_Streams; }
 			RHI::IShaderState* GetShaderState() const { return m_pShaderState; }
 			//CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) { return &m_VariableTables[ (int)nShaderType ]; }
 			//const CShaderVariableTable* GetShaderVariableTable( RHI::EShaderType nShaderType ) const { return &m_VariableTables[ (int)nShaderType ]; }
-			inline const CShaderVariableTable* GetShaderVariableTables() const { return m_VariableTables; }
+			inline CShaderVariableTable *const *const GetShaderVariableTables() const { return m_VariableTables; }
 			//inline const std::vector<RHI::IUniformBuffer*> GetShaderUniformBuffers( RHI::EShaderType nShaderType ) const { return m_ShaderUniformBuffers[ (int)nShaderType ]; }
 
 			bool CampareWithMaterial( const CMaterial* pMaterialOther ) const;
@@ -62,7 +64,8 @@ namespace iberbar
 			CMaterial* m_pMaterialParent;
 			RHI::IShaderState* m_pShaderState;
 			std::vector<uint32> m_Streams;
-			CShaderVariableTable m_VariableTables[ (int)RHI::EShaderType::__Count ];
+			
+			CShaderVariableTable* m_VariableTables[ (int)RHI::EShaderType::__Count ];
 			//std::vector<int> m_ShaderUniformBuffersDirty[ (int)RHI::EShaderType::__Count ];
 			//std::vector<RHI::IUniformBuffer*> m_ShaderUniformBuffers[ (int)RHI::EShaderType::__Count ];
 		};

@@ -193,6 +193,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\CallbackCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\CustomCommand.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Effect.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Renderer\Effects\EffectMatrices.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\Font.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Renderer\FontDrawState.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -232,6 +233,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\CallbackCommand.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Effect.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Renderer\Effects\EffectMatrices.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\Font.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Renderer\FontDrawState.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>

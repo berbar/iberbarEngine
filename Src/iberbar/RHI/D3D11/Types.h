@@ -292,6 +292,9 @@ inline uint32 iberbar::RHI::D3D11::GetVertexCountForPrimitiveCount( uint32 nNumP
 	{
 	case UPrimitiveType::TriangleStrip:
 		return nNumPrimitives * 3;
+
+	case UPrimitiveType::Triangle:
+		return nNumPrimitives * 3;
 	}
 
 	return 0;

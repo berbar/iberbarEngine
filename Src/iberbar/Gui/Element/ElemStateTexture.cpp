@@ -14,12 +14,15 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture()
 	: CRenderElement()
 	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
-	, m_bDirtyMeshPositionOrUV( false )
+	, m_bDirtyMeshPositionOrUV( true )
 	, m_bEmptyBoundingFinal( true )
 	, m_pMesh( new Renderer::CMeshForUI_1() )
 	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
 	, m_pMaterial( nullptr )
 {
+	SetColor( m_Color );
+	//SetUV( m_UV );
+
 	m_pMeshRendererComponent->SetMesh( m_pMesh );
 }
 
@@ -28,7 +31,7 @@ iberbar::Gui::CElementStateTexture::CElementStateTexture(const CElementStateText
 	: CRenderElement( element )
 	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
 	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
-	, m_bDirtyMeshPositionOrUV( false )
+	, m_bDirtyMeshPositionOrUV( true )
 	, m_bEmptyBoundingFinal( true )
 	, m_pMesh( new Renderer::CMeshForUI_1() )
 	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
@@ -113,6 +116,8 @@ void iberbar::Gui::CElementStateTexture::Render()
 			m_bEmptyBoundingFinal = false;
 		}
 
+		rcBoundingFinal.t = - rcBoundingFinal.t;
+		rcBoundingFinal.b = - rcBoundingFinal.b;
 		Renderer::VerticesRectUpdatePosition( m_pMesh->GetBufferPositions(), rcBoundingFinal, 0 );
 		Renderer::VerticesRectUpdateUV( m_pMesh->GetBufferTexcoords(0), rcTexCoordFinal );
 	}

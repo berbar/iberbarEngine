@@ -1,30 +1,32 @@
 #pragma once
 
+#include <iberbar/Renderer/Headers.h>
+#include <iberbar/Utility/Result.h>
 
 namespace iberbar
 {
 	namespace RHI
 	{
-		class IShaderState;
+		class IUniformBuffer;
 	}
 
 	namespace Renderer
 	{
 
 		class CEffectBase
+			: public CRef
 		{
 		public:
-			void SetVariables();
-			virtual void Apply();
+			CEffectBase();
+			virtual ~CEffectBase();
 
 		protected:
-			RHI::IShaderState* m_pShaderState;
+			CResult InitialRhiUniformBuffer( uint32 nSize );
+
+		protected:
+			RHI::IUniformBuffer* m_pRhiUniformBuffer;
 		};
 
 
-		class CEffectParameters
-		{
-
-		};
 	}
 }

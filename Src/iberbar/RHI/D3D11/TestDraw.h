@@ -23,6 +23,7 @@ namespace iberbar
 			class CVertexBuffer;
 			class CIndexBuffer;
 			class CVertexDeclaration;
+			class CTexture;
 
 			class CTestDraw final
 				: public ITestDraw
@@ -34,6 +35,8 @@ namespace iberbar
 				void Initial( CDevice* pDevice );
 
 				virtual void Draw() override;
+				virtual void SetShaderProgram( IShaderProgram* pShaderProgram ) override;
+				virtual void SetTexture( ITexture* pTexture ) override;
 
 			private:
 				CDevice* m_pDevice;
@@ -48,6 +51,7 @@ namespace iberbar
 				CShaderProgram* m_pShaderProgram;
 				CVertexDeclaration* m_pVertexDecl;
 				CShaderState* m_pShaderState;
+				CTexture* m_pTexture;
 			};
 		}
 	}

@@ -99,7 +99,7 @@ iberbar::CResult iberbar::RHI::D3D11::CShaderReflectionType::Initial( ID3D11Shad
 			break;
 	}
 
-	m_nElementCount = D3DTypeDesc.Elements;
+	m_nElementCount = D3DTypeDesc.Elements == 0 ? 1 : D3DTypeDesc.Elements; // D3DTypeDesc.Elements == 0£¬·ÇÊý×é
 	m_nRowCount = D3DTypeDesc.Rows;
 	m_nColumnCount = D3DTypeDesc.Columns;
 

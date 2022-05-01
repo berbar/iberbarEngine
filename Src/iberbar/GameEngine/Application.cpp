@@ -693,6 +693,11 @@ iberbar::CResult iberbar::Game::CApplication::LoadDefaultShaders()
 
 		m_pShaderManager->AddShaderProgram( "PositionColorTexture2d" , pShaderProgram );
 
+		ret = m_pShaderLoader->LoadShaderProgram( "PositionColor2d", &pShaderProgram );
+		if ( ret.IsOK() == false )
+			return ret;
+		m_pShaderManager->AddShaderProgram( "PositionColor2d", pShaderProgram );
+
 		//TSmartRefPtr<RHI::IVertexDeclaration> pVertexDeclaration;
 		//uint32 nStrides[1] = { sizeof( Renderer::UVertex_V3F_C4B_T2F ) };
 		//ret = m_pRHIDevice->CreateVertexDeclaration( &pVertexDeclaration, VertexElements, 3, nStrides, 1 );
