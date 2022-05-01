@@ -132,10 +132,10 @@ iberbar::CResult CTestApplication::OnCreated()
 
 	iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture> element_texture = iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture>::_sNew();
 	bg->SetRenderElement( element_texture );
-	element_texture->SetPosition( 0, 0 );
-	element_texture->SetSize( 2, 2 );
-	//element_texture->SetAlignHorizental( iberbar::UAlignHorizental::Center );
-	//element_texture->SetAlignVertical( iberbar::UAlignVertical::Center );
+	element_texture->SetPosition( -300, 0 );
+	element_texture->SetSize( 400, 300 );
+	element_texture->SetAlignHorizental( iberbar::UAlignHorizental::Left );
+	element_texture->SetAlignVertical( iberbar::UAlignVertical::Top );
 	//element_texture->SetSize( 100, 100 );
 	//element_texture->SetPercentW( true );
 	//element_texture->SetPercentH( true );
@@ -216,8 +216,8 @@ void CTestApplication::OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTi
 
 void CTestApplication::OnRender()
 {
-	if ( m_pTestDraw )
-		m_pTestDraw->Draw();
+	//if ( m_pTestDraw )
+		//m_pTestDraw->Draw();
 	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
 	//if ( m_pFontManager->GetFontDefault( &pFont ) )
 	//{

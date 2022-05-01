@@ -6,6 +6,7 @@
 #include <iberbar/Renderer/Renderer.h>
 #include <iberbar/Renderer/CallbackCommand.h>
 #include <iberbar/Renderer/GroupCommand.h>
+#include <iberbar/Renderer/Effects/EffectMatrices.h>
 #include <iberbar/Utility/Command.h>
 
 
@@ -26,8 +27,11 @@ iberbar::Gui::CEngine::CEngine( Renderer::CRenderer* pRenderer, CCommandQueue* p
 	, m_Dialogs()
 	, m_RenderGroupCommandList()
 	, m_ViewportState()
+	, m_CanvasResolution( 0, 0 )
+	, m_pEffectMatrices( new Renderer::CEffectMatrices() )
 {
 	sm_pInstance = this;
+	m_pRenderCommand_Callback->SetProc( std::bind( &CEngine::OnRenderCallbackCommand, this ) );
 }
 
 
@@ -42,8 +46,11 @@ iberbar::Gui::CEngine::CEngine( Renderer::CRenderer* pRenderer, CCommandQueue* p
 	, m_Dialogs()
 	, m_RenderGroupCommandList()
 	, m_ViewportState()
+	, m_CanvasResolution( 0, 0 )
+	, m_pEffectMatrices( new Renderer::CEffectMatrices() )
 {
 	sm_pInstance = this;
+	m_pRenderCommand_Callback->SetProc( std::bind( &CEngine::OnRenderCallbackCommand, this ) );
 }
 
 
@@ -78,7 +85,17 @@ iberbar::Gui::CEngine::~CEngine()
 
 	SAFE_DELETE( m_pRenderCommand_Callback );
 
+	UNKNOWN_SAFE_RELEASE_NULL( m_pEffectMatrices );
+
 	sm_pInstance = nullptr;
+}
+
+
+iberbar::CResult iberbar::Gui::CEngine::Initial()
+{
+	m_pEffectMatrices->Initial();
+
+	return CResult();
 }
 
 
@@ -208,6 +225,8 @@ void iberbar::Gui::CEngine::Update( int64 nElapsedTimeMs, float nElapsedTimeSeco
 
 void iberbar::Gui::CEngine::Render()
 {
+	m_pRenderer->AddCommand( m_pRenderCommand_Callback );
+
 	int nIndex = 0;
 	Renderer::CRenderGroupCommand* pGroupCommand = nullptr;
 	for ( auto& pDialog : m_Dialogs )
@@ -267,7 +286,39 @@ void iberbar::Gui::CEngine::HandleKeyboard( const UKeyboardEventData* pEvent )
 }
 
 
+void iberbar::Gui::CEngine::SetCanvasResolution( const CSize2i& Size )
+{
+	assert( m_pEffectMatrices );
+	m_CanvasResolution = Size;
 
+	DirectX::XMFLOAT4 vecEye( Size.w/2, -Size.h/2, 0.0f, 1.0f );
+	DirectX::XMFLOAT4 vecEyeDirection( 0, 0, 1.0f, 0.0f );
+	DirectX::XMFLOAT4 vecUpDirection( 0.0f, 1.0f, 0.0f, 0.0f );
+	DirectX::XMMATRIX MatView = DirectX::XMMatrixLookToLH(
+		DirectX::XMLoadFloat4( &vecEye ),
+		DirectX::XMLoadFloat4( &vecEyeDirection ),
+		DirectX::XMLoadFloat4( &vecUpDirection ) );
+	DirectX::XMFLOAT4X4 MatView_4x4;
+	DirectX::XMStoreFloat4x4( &MatView_4x4, MatView );
+
+	DirectX::XMMATRIX MatProjection = DirectX::XMMatrixOrthographicLH(
+		(float)m_CanvasResolution.w,
+		(float)m_CanvasResolution.h,
+		-100.0f,
+		100.0f );
+	DirectX::XMFLOAT4X4 MatProjection_4x4;
+	DirectX::XMStoreFloat4x4( &MatProjection_4x4, MatProjection );
+
+	m_pEffectMatrices->SetViewMatrix( MatView_4x4 );
+	m_pEffectMatrices->SetProjectionMatrix( MatProjection_4x4 );
+}
+
+
+void iberbar::Gui::CEngine::OnRenderCallbackCommand()
+{
+	assert( m_pEffectMatrices );
+	m_pEffectMatrices->Apply();
+}
 
 
 

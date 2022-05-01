@@ -3,6 +3,7 @@
 
 #include <iberbar/Gui/Headers.h>
 #include <iberbar/Utility/ViewportState.h>
+#include <iberbar/Utility/Result.h>
 #include <memory_resource>
 
 
@@ -20,6 +21,7 @@ namespace iberbar
 		class CRenderCallbackCommand;
 		class CRenderGroupCommandManager;
 		class CRenderGroupCommand;
+		class CEffectMatrices;
 	}
 
 	namespace Gui
@@ -40,6 +42,8 @@ namespace iberbar
 			Renderer::CRenderer* GetRenderer() { return m_pRenderer; }
 
 		public:
+			CResult Initial();
+
 			void AddDialog( CDialog* pDialog );
 			CDialog* GetDialog( const char* strId );
 			void RemoveDialog( CDialog* pDialog );
@@ -56,6 +60,11 @@ namespace iberbar
 			void HandleMouse( const UMouseEventData* EventData );
 			void HandleKeyboard( const UKeyboardEventData* pEventData );
 
+			void SetCanvasResolution( const CSize2i& Size );
+
+		private:
+			void OnRenderCallbackCommand();
+
 		private:
 			Renderer::CRenderer* m_pRenderer;
 			Renderer::CRenderGroupCommandManager* m_pRenderGroupCommandManager;
@@ -68,7 +77,9 @@ namespace iberbar
 			std::vector<Renderer::CRenderGroupCommand*> m_RenderGroupCommandList;
 			
 			CViewportState m_ViewportState;
-			
+
+			CSize2i m_CanvasResolution;
+			Renderer::CEffectMatrices* m_pEffectMatrices;
 			
 		public:
 			static CEngine* sGetInstance() { return sm_pInstance; }

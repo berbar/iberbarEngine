@@ -50,7 +50,7 @@ iberbar::Gui::CDialog::CDialog( CDialog* pDlgParent )
 	, m_pContainer( nullptr )
 	, m_bMouseInput( true )
 	, m_bKeyboardInput( true )
-	, m_bNeedClip( true )
+	, m_bNeedClip( false )
 	, m_bModal( false )
 {
 	if ( m_pDialogParent )

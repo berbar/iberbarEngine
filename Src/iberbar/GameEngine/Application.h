@@ -121,6 +121,7 @@ namespace iberbar
 			void Destroy();
 			void Resume();
 			void Pause();
+			CResult RhiDeviceCreate();
 			void RhiDeviceLost();
 			CResult RhiDeviceReset();
 			CResult CreateAll();

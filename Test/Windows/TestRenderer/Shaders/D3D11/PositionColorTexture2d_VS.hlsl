@@ -1,8 +1,15 @@
 
 int g_rhw;
-matrix g_matViewProjection;
-float g_viewport_w;
-float g_viewport_h;
+//matrix g_matViewProjection;
+//float g_viewport_w;
+//float g_viewport_h;
+
+cbuffer Matrices: register(b13)
+{
+    matrix g_matView;
+    matrix g_matProjection;
+    matrix g_matViewProjection;
+};
 
 
 struct VS_INPUT
@@ -26,10 +33,10 @@ VS_OUTPUT Main(VS_INPUT input)
     output.position = float4(input.position, 1.0f);
     // if ( g_rhw == 0 )
     // {
-    //     output.position = mul( output.position, g_matViewProjection );
-    //     output.position.x -= 1.0f / g_viewport_w;
-    //     output.position.y += 1.0f / g_viewport_h;
-    //     //output.position = mul( g_matViewProjection, input.position );
+         output.position = mul( g_matViewProjection, output.position );
+         //output.position.x -= 1.0f / 800;
+         //output.position.y += 1.0f / 600;
+    //output.position = mul( g_matViewProjection, input.position );
     // }
     // else
     // {

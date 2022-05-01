@@ -654,6 +654,13 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 	m_pCommandContext = new CCommandContext( this );
 
+	if ( m_CallbackCreated )
+	{
+		CResult ret = m_CallbackCreated( this );
+		if ( ret.IsOK() == false )
+			return ret;
+	}
+
 	return CResult();
 }
 

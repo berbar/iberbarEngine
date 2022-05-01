@@ -296,6 +296,12 @@ void iberbar::Game::CApplication::Pause()
 }
 
 
+iberbar::CResult iberbar::Game::CApplication::RhiDeviceCreate()
+{
+	return CResult();
+}
+
+
 void iberbar::Game::CApplication::RhiDeviceLost()
 {
 	if ( m_pRenderer )
@@ -462,7 +468,10 @@ iberbar::CResult iberbar::Game::CApplication::CreateAll()
 
 	// 创建Gui引擎
 	m_pGuiEngine = new Gui::CEngine( m_pRenderer, m_pCommandQueue, m_pMemoryRes );
-
+	ret = m_pGuiEngine->Initial();
+	if ( ret.IsOK() == false )
+		return ret;
+	m_pGuiEngine->SetCanvasResolution( m_pRHIDevice->GetContextSize() );
 
 	// 创建Gui的XML解释器
 	//m_pGuiXmlParser = new Gui::CXmlParser();
@@ -602,6 +611,10 @@ iberbar::CResult iberbar::Game::CApplication::CreateRHI()
 	if ( m_pRHIDevice == nullptr )
 		return MakeResult( ResultCode::Bad, "Failed to create dynamic rhi device" );
 
+	m_pRHIDevice->SetCallbackOnCreated( std::bind( &CApplication::RhiDeviceCreate, this ) );
+	m_pRHIDevice->SetCallbackOnLost( std::bind( &CApplication::RhiDeviceLost, this ) );
+	m_pRHIDevice->SetCallbackOnReset( std::bind( &CApplication::RhiDeviceReset, this ) );
+
 #ifdef _WINDOWS
 	Ret = m_pRHIDevice->CreateDevice(
 		m_hWnd,
@@ -612,8 +625,7 @@ iberbar::CResult iberbar::Game::CApplication::CreateRHI()
 	if ( Ret.IsOK() == false )
 		return Ret;
 
-	m_pRHIDevice->SetCallbackOnLost( std::bind( &CApplication::RhiDeviceLost, this ) );
-	m_pRHIDevice->SetCallbackOnReset( std::bind( &CApplication::RhiDeviceReset, this ) );
+
 
 	m_pRHIDevice->SetClearColor( CColor4B( 255, 255, 0, 0 ) );
 
