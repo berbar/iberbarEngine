@@ -106,14 +106,16 @@ void TestD3D11()
 
     HRESULT hResult;
 
-    hResult = D3DReadFileToBlob( L"D3D\\PixelShader.hlsl", &pD3DBlobFile );
+    //hResult = D3DReadFileToBlob( L"D3D\\PixelShader.hlsl", &pD3DBlobFile );
+    hResult = D3DReadFileToBlob( L"D3D\\VertexShader.hlsl", &pD3DBlobFile );
     if ( FAILED( hResult ) )
     {
         printf_s( DXGetErr( hResult ).c_str() );
         return;
     }
 
-    hResult = D3DCompile( pD3DBlobFile->GetBufferPointer(), pD3DBlobFile->GetBufferSize(), "", NULL, NULL, "Main", "ps_5_0", 0, 0, &pD3DBlob, &pD3DBlobError);
+    //hResult = D3DCompile( pD3DBlobFile->GetBufferPointer(), pD3DBlobFile->GetBufferSize(), "", NULL, NULL, "Main", "ps_5_0", 0, 0, &pD3DBlob, &pD3DBlobError);
+    hResult = D3DCompile( pD3DBlobFile->GetBufferPointer(), pD3DBlobFile->GetBufferSize(), "", NULL, NULL, "Main", "vs_5_0", 0, 0, &pD3DBlob, &pD3DBlobError );
     if ( FAILED( hResult ) )
     {
         return;
@@ -181,7 +183,15 @@ void TestD3D11()
             printf_s( InputBinDesc.Name );
         }
     }
-   
+    
+
+    for ( int i = 0; i < D3DDesc.InputParameters; i++ )
+    {
+        D3D11_SIGNATURE_PARAMETER_DESC ParamDesc;
+        pD3DShaderReflection->GetInputParameterDesc( i, &ParamDesc );
+
+        printf_s( "SemanticName=%s, SemanticIndex=%d\n", ParamDesc.SemanticName, ParamDesc.SemanticIndex );
+    }
 }
 
 

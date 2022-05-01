@@ -2,106 +2,130 @@
 
 #include <iberbar/GameEngine/ShaderManager.h>
 #include <iberbar/GameEngine/BaseResourceManager.h>
+#include <iberbar/RHI/ShaderState.h>
 #include <iberbar/RHI/Device.h>
+#include <iberbar/Utility/FileHelper.h>
 
 
 
-iberbar::Game::CShaderManager::CShaderManager( RHI::IDevice* pRHIDevice )
+
+
+iberbar::Game::CShaderLoader::CShaderLoader( RHI::IDevice* pRHIDevice )
 	: m_pRHIDevice( pRHIDevice )
-	, m_nApiType( pRHIDevice->GetApiType() )
-	, m_strRootDir( "" )
-	, m_ShaderNodeList()
+	, m_nApiType( m_pRHIDevice->GetApiType() )
+	, m_strRootDir()
 {
-	m_pRHIDevice->AddRef();
+}
+
+
+iberbar::CResult iberbar::Game::CShaderLoader::LoadShaderProgram( const char* pstrName, RHI::IShaderProgram** ppOutShaderProgram )
+{
+	CResult cResult;
+	std::string strShaderPath;
+	TSmartRefPtr<RHI::IShader> pVS = nullptr;
+	TSmartRefPtr<RHI::IShader> pPS = nullptr;
+	TSmartRefPtr<RHI::IShader> pGS = nullptr;
+	TSmartRefPtr<RHI::IShader> pHS = nullptr;
+	TSmartRefPtr<RHI::IShader> pDS = nullptr;
+	
+	strShaderPath = CombineShaderFilePath( RHI::EShaderType::VertexShader, pstrName );
+	if ( FileApi::IsExistFileA( strShaderPath.c_str() ) == true )
+	{
+		m_pRHIDevice->CreateVertexShader( &pVS );
+		cResult = pVS->LoadFromFile( strShaderPath.c_str() );
+		if ( cResult.IsOK() == false )
+			return cResult;
+	}
+
+	strShaderPath = CombineShaderFilePath( RHI::EShaderType::PixelShader, pstrName );
+	if ( FileApi::IsExistFileA( strShaderPath.c_str() ) == true )
+	{
+		m_pRHIDevice->CreatePixelShader( &pPS );
+		cResult = pPS->LoadFromFile( strShaderPath.c_str() );
+		if ( cResult.IsOK() == false )
+			return cResult;
+	}
+
+	strShaderPath = CombineShaderFilePath( RHI::EShaderType::HullShader, pstrName );
+	if ( FileApi::IsExistFileA( strShaderPath.c_str() ) == true )
+	{
+		m_pRHIDevice->CreateHullShader( &pHS );
+		cResult = pHS->LoadFromFile( strShaderPath.c_str() );
+		if ( cResult.IsOK() == false )
+			return cResult;
+	}
+
+	strShaderPath = CombineShaderFilePath( RHI::EShaderType::GeometryShader, pstrName );
+	if ( FileApi::IsExistFileA( strShaderPath.c_str() ) == true )
+	{
+		m_pRHIDevice->CreateGeometryShader( &pGS );
+		cResult = pGS->LoadFromFile( strShaderPath.c_str() );
+		if ( cResult.IsOK() == false )
+			return cResult;
+	}
+
+	strShaderPath = CombineShaderFilePath( RHI::EShaderType::DomainShader, pstrName );
+	if ( FileApi::IsExistFileA( strShaderPath.c_str() ) == true )
+	{
+		m_pRHIDevice->CreateDomainShader( &pDS );
+		cResult = pDS->LoadFromFile( strShaderPath.c_str() );
+		if ( cResult.IsOK() == false )
+			return cResult;
+	}
+
+	return m_pRHIDevice->CreateShaderProgram( ppOutShaderProgram, pVS, pPS, pHS, pGS, pDS );
+}
+
+
+
+
+
+iberbar::Game::CShaderManager::CShaderManager()
+	: m_ShaderProgramNodeList()
+{
 }
 
 
 iberbar::Game::CShaderManager::~CShaderManager()
 {
-	for ( int i = 0; i < m_ShaderNodeList.size(); i++ )
+	for ( int i = 0; i < m_ShaderProgramNodeList.size(); i++ )
 	{
-		UNKNOWN_SAFE_RELEASE_NULL( m_ShaderNodeList[ i ].pShader );
+		UNKNOWN_SAFE_RELEASE_NULL( m_ShaderProgramNodeList[ i ].pShaderProgram );
 	}
-	m_ShaderNodeList.clear();
-	UNKNOWN_SAFE_RELEASE_NULL( m_pRHIDevice );
+	m_ShaderProgramNodeList.clear();
 }
 
 
-iberbar::CResult iberbar::Game::CShaderManager::GetOrCreateShader( RHI::EShaderType eShaderType, const char* strName, RHI::IShader** ppOutShader )
+void iberbar::Game::CShaderManager::AddShaderProgram( const char* pstrName, RHI::IShaderProgram* pShaderProgram )
 {
-	
+	assert( pstrName );
+	assert( pShaderProgram );
 
-	TSmartRefPtr<RHI::IShader> pShader;
+	if ( GetShaderProgram( pstrName, nullptr ) == true )
+		return;
 
-	if ( FindShader( eShaderType, strName, &pShader ) == false )
-	{
-		CResult ret;
-
-		std::string strVS = CombineShaderFilePath( eShaderType, strName );
-		switch ( eShaderType )
-		{
-			case RHI::EShaderType::VertexShader:
-				ret = m_pRHIDevice->CreateVertexShader( &pShader );
-				break;
-			case RHI::EShaderType::PixelShader:
-				ret = m_pRHIDevice->CreatePixelShader( &pShader );
-				break;
-			case RHI::EShaderType::HullShader:
-				ret = m_pRHIDevice->CreateHullShader( &pShader );
-				break;
-			case RHI::EShaderType::GeometryShader:
-				ret = m_pRHIDevice->CreateGeometryShader( &pShader );
-				break;
-			case RHI::EShaderType::DomainShader:
-				ret = m_pRHIDevice->CreateDomainShader( &pShader );
-				break;
-			case RHI::EShaderType::ComputeShader:
-				ret = m_pRHIDevice->CreateComputeShader( &pShader );
-				break;
-			default:
-				return MakeResult( ResultCode::Bad, "unknown shader type" );
-				break;
-		}
-		
-		if ( ret.IsOK() == false )
-			return ret;
-
-		ret = pShader->LoadFromFile( strVS.c_str() );
-		if ( ret.IsOK() == false )
-			return ret;
-
-		_ShaderNode node;
-		node.eShaderType = eShaderType;
-		node.strName = strName;
-		node.pShader = pShader;
-		node.pShader->AddRef();
-		m_ShaderNodeList.push_back( node );
-	}
-
-	if ( ppOutShader != nullptr )
-	{
-		UNKNOWN_SAFE_RELEASE_NULL( *ppOutShader );
-		(*ppOutShader) = pShader;
-		(*ppOutShader)->AddRef();
-	}
-
-	return CResult();
+	_Node Node;
+	Node.pShaderProgram = pShaderProgram;
+	Node.pShaderProgram->AddRef();
+	Node.strName = pstrName;
+	m_ShaderProgramNodeList.push_back( Node );
 }
 
 
-bool iberbar::Game::CShaderManager::FindShader( RHI::EShaderType eShaderType, const char* strName, RHI::IShader** ppOutShader )
+bool iberbar::Game::CShaderManager::GetShaderProgram( const char* pstrName, RHI::IShaderProgram** ppOutShaderProgram )
 {
-	for ( int i = 0, s = (int)m_ShaderNodeList.size(); i < s; i++ )
+	assert( pstrName );
+
+	for ( int i = 0, s = m_ShaderProgramNodeList.size(); i < s; i++ )
 	{
-		if ( m_ShaderNodeList[ i ].eShaderType == eShaderType && strcmp( strName, m_ShaderNodeList[ i ].strName.c_str() ) == 0 )
+		if ( strcmp( m_ShaderProgramNodeList[ i ].strName.c_str(), pstrName ) == 0 )
 		{
-			if ( ppOutShader != nullptr )
+			if ( ppOutShaderProgram != nullptr )
 			{
-				UNKNOWN_SAFE_RELEASE_NULL( *ppOutShader );
-				(*ppOutShader) = m_ShaderNodeList[ i ].pShader;
-				(*ppOutShader)->AddRef();
+				UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderProgram );
+				(*ppOutShaderProgram) = m_ShaderProgramNodeList[ i ].pShaderProgram;
+				(*ppOutShaderProgram)->AddRef();
 			}
-
 			return true;
 		}
 	}
@@ -110,7 +134,7 @@ bool iberbar::Game::CShaderManager::FindShader( RHI::EShaderType eShaderType, co
 }
 
 
-std::string iberbar::Game::CShaderManager::CombineShaderFilePath( RHI::EShaderType eShaderType, const char* strName )
+std::string iberbar::Game::CShaderLoader::CombineShaderFilePath( RHI::EShaderType eShaderType, const char* strName )
 {
 	std::string strFilePath = m_strRootDir + "/" + strName;
 

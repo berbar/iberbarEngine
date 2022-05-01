@@ -11,13 +11,11 @@ iberbar::Game::CFontManager::CFontManager( RHI::IDevice* pRHIDevice )
 	, m_FontFaceList()
 	, m_FontList()
 {
-	m_pRHIDevice->AddRef();
 }
 
 
 iberbar::Game::CFontManager::~CFontManager()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pRHIDevice );
 	for ( size_t i = 0, s = m_FontFaceList.size(); i < s; i++ )
 	{
 		UNKNOWN_SAFE_RELEASE_NULL( m_FontFaceList[ i ].pFace );

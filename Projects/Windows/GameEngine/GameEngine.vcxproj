@@ -184,8 +184,14 @@
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\FontManager.h" />
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\LoadingThread.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\MaterialManager.h" />
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\OutputDeviceFileAsync.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.h" />
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.h" />
     <ClInclude Include="..\..\..\Src\iberbar\GameEngine\TextureManager.h" />
@@ -197,8 +203,18 @@
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Json.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\MsgPack.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.h" />
-    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d_Names.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d_Names.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility.h" />
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.h" />
@@ -212,7 +228,13 @@
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application_Windows.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\FontManager.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\LoadingThread.cpp" />
-    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\MaterialManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Paper2dLoader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\TextureManager.cpp" />
@@ -221,7 +243,12 @@
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Gui.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Json.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\MsgPack.cpp" />
-    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp" />
@@ -240,17 +267,11 @@
     <ProjectReference Include="..\Network\Network.vcxproj">
       <Project>{46b138c1-1e14-412f-8200-9a0686b915b5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Paper2d\Paper2d.vcxproj">
-      <Project>{d190599f-e831-45e6-8062-0dc24e4f0960}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Renderer\Renderer.vcxproj">
       <Project>{72a811b7-083c-43b3-9dac-e161fc97d8c8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RHI.D3D11\RHI.D3D11.vcxproj">
       <Project>{ab50ab76-d14e-44a8-9b8e-94a0c30102c5}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\RHI.D3D9\RHI.D3D9.vcxproj">
-      <Project>{2ae06cbb-7b0a-4f70-9017-7bc9f19b6f6a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RHI\RHI.vcxproj">
       <Project>{46598424-3772-4387-ba03-3e3ed3aeca79}</Project>

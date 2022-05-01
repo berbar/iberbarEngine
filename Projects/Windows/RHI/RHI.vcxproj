@@ -184,10 +184,12 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\RenderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Resource.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Shader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderBindings.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderReflection.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderState.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderVariables.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\StateBlock.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\TestDraw.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Texture.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Trace.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Types.h" />
@@ -206,6 +208,7 @@
     <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderState.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderVariables.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\StateBlock.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\TestDraw.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Texture.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Trace.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Types.cpp" />

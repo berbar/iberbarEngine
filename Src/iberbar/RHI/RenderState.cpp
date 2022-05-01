@@ -13,6 +13,16 @@ iberbar::RHI::IBlendState::IBlendState( const UBlendDesc& Desc )
 
 
 
+iberbar::RHI::IDepthStencilState::IDepthStencilState(const UDepthStencilDesc& Desc)
+	: IResource(UResourceType::DepthStencilState)
+	, m_Desc()
+{
+	memcpy_s(&m_Desc, sizeof(UDepthStencilDesc), &Desc, sizeof(UDepthStencilDesc));
+}
+
+
+
+
 
 iberbar::RHI::ISamplerState::ISamplerState( const UTextureSamplerState& SamplerStateDesc )
 	: IResource( UResourceType::SamplerState )

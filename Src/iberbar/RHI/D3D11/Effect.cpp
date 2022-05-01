@@ -1,67 +1,122 @@
 
 #include <iberbar/RHI/D3D11/Effect.h>
+#include <iberbar/RHI/D3D11/ShaderState.h>
+#include <iberbar/RHI/D3D11/ShaderReflection.h>
+#include <iberbar/RHI/D3D11/ShaderVariables.h>
 #include <iberbar/RHI/D3D11/Shader.h>
+#include <iberbar/RHI/D3D11/Buffer.h>
 #include <iberbar/RHI/D3D11/Device.h>
 
 
 
-namespace iberbar
+
+
+iberbar::RHI::D3D11::CEffect::CEffect( IShaderState* pShaderState )
+	: IEffect()
+	, m_pShaderState( nullptr )
+	, m_UniformMemorys()
+	, m_UniformBuffers()
+	//, m_UniformBuffersDirty()
 {
-	namespace RHI
+	memset( m_UniformMemorys, 0, sizeof( m_UniformMemorys ) );
+	memset( m_UniformBuffers, 0, sizeof( m_UniformBuffers ) );
+	//memset( m_UniformBuffersDirty, 0, sizeof( m_UniformBuffersDirty ) );
+
+	CShader* pShader = nullptr;
+	CShaderReflection* pReflection = nullptr;
+	const CShaderReflectionBuffer* pReflectionBuffer = nullptr;
+	int nBufferSizeTotalForShader;
+	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
 	{
-		namespace D3D11
+		pShader = m_pShaderState->GetShaderInternal( (EShaderType)i );
+		if ( pShader == nullptr )
+			continue;
+
+		pReflection = pShader->GetReflectionInternal();
+		if ( pShader == nullptr )
+			continue;
+
+		nBufferSizeTotalForShader = pReflection->GetBufferSizeTotal();
+		if ( nBufferSizeTotalForShader > 0 )
 		{
-			template < typename TD3DShader >
-			CResult GenerateD3DShaderDesc( EShaderType eShaderType );
+			m_UniformMemorys[ i ] = new uint8[ nBufferSizeTotalForShader ];
+			memset( m_UniformMemorys[ i ], 0, nBufferSizeTotalForShader );
+		}
+		
+		for ( int nBufferIndex = 0, nBufferCount = pReflection->GetBufferCountInternal(); nBufferIndex < nBufferCount; nBufferIndex++ )
+		{
+			pReflectionBuffer = pReflection->GetBufferByIndexInternal( nBufferIndex );
+			if ( pReflectionBuffer == nullptr )
+				continue;
+
+			m_UniformBuffers[ i ][ pReflectionBuffer->GetBindPoint() ] = new CUniformBuffer( m_pShaderState->GetDevice(), pReflectionBuffer->GetSize() );
 		}
 	}
 }
 
 
-
-iberbar::RHI::D3D11::CEffect::CEffect()
-	: m_pDevice( nullptr )
-	, m_pShaderSlots()
-{
-	memset( m_pShaderSlots, 0, ARRAYSIZE( m_pShaderSlots ) );
-}
-
-
 iberbar::RHI::D3D11::CEffect::~CEffect()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderState );
 	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
 	{
-		UNKNOWN_SAFE_RELEASE_NULL( m_pShaderSlots[i] );
+		SAFE_DELETE_ARRAY( m_UniformMemorys[ i ] );
+		for ( int j = 0; j < D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; j++ )
+		{
+			UNKNOWN_SAFE_RELEASE_NULL( m_UniformBuffers[ i ][ j ] );
+		}
 	}
+	
 }
 
 
-void iberbar::RHI::D3D11::CEffect::SetShader( EShaderType eShaderType, IShader* pShader )
+void iberbar::RHI::D3D11::CEffect::SetShaderVariables( EShaderType nShaderType, IShaderVariableTable* pShaderVariables )
 {
-	if ( m_pShaderSlots[ (int)eShaderType ] == pShader )
+	if ( m_UniformMemorys[ (int)nShaderType ] == nullptr )
 		return;
 
-	if ( pShader )
+	CShaderVariableTable* pShaderVariablesInternal = (CShaderVariableTable*)pShaderVariables;
+	assert( pShaderVariablesInternal->GetShaderInternal() == m_pShaderState->GetShaderInternal( nShaderType ) );
+	assert( pShaderVariablesInternal->GetMemory() );
+	
+
+	CShader* pShader = m_pShaderState->GetShaderInternal( nShaderType );
+	assert( pShader != nullptr );
+
+	CShaderReflection* pShaderReflection = pShader->GetReflectionInternal();
+	assert( pShaderReflection != nullptr );
+
+	int nBufferCount = pShaderReflection->GetBufferCountInternal();
+	assert( nBufferCount > 0 );
+
+	int nBufferSizeTotal = pShaderReflection->GetBufferSizeTotal();
+	assert( nBufferSizeTotal == pShaderVariablesInternal->GetMemorySize() );
+
+	const uint8* pShaderVariablesMemory = pShaderVariablesInternal->GetMemory();
+	if ( memcmp( m_UniformMemorys[ (int)nShaderType ], pShaderVariablesMemory, 0 ) == 0 )
+		return;
+
+	CUniformBuffer** pSlots = m_UniformBuffers[ (int)nShaderType ];
+	CUniformBuffer* pSlotTemp;
+	int nSlotIndex;
+	const CShaderReflectionBuffer* pShaderReflectionBuffer = nullptr;
+	int nBufferMemoryOffset = 0;
+	int nBufferMemorySize = 0;
+	for ( int i = 0, s = nBufferCount; i < s; i++ )
 	{
-		assert( pShader->GetShaderType() == eShaderType );
+		pShaderReflectionBuffer = pShaderReflection->GetBufferByIndexInternal( i );
+		nBufferMemoryOffset = pShaderReflectionBuffer->GetOffset();
+		nBufferMemorySize = pShaderReflectionBuffer->GetSize();
+		if ( memcmp( m_UniformMemorys[ (int)nShaderType ] + nBufferMemoryOffset, pShaderVariablesMemory + nBufferMemoryOffset, nBufferMemorySize ) == 0 )
+			continue;
+
+		nSlotIndex = pShaderReflectionBuffer->GetBindPoint();
+		pSlotTemp = pSlots[ nSlotIndex ];
+		if ( pSlotTemp == nullptr )
+			continue;
+
+		pSlotTemp->UpdateContents( pShaderVariablesMemory + nBufferMemoryOffset, nBufferMemorySize );
+		//m_UniformBuffersDirty[ (int)nShaderType ][ nSlotIndex ] = 1;
 	}
-
-	UNKNOWN_SAFE_RELEASE_NULL( m_pShaderSlots[(int)eShaderType] );
-	m_pShaderSlots[(int)eShaderType] = (CShader*)pShader;
-	UNKNOWN_SAFE_ADDREF( m_pShaderSlots[(int)eShaderType] );
-}
-
-
-iberbar::CResult iberbar::RHI::D3D11::CEffect::Generate()
-{
-
-}
-
-
-iberbar::CResult iberbar::RHI::D3D11::CEffect::GenerateShaderDesc( EShaderType eShaderType )
-{
-	
-	
 }
 

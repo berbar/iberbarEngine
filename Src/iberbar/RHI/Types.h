@@ -46,6 +46,7 @@ namespace iberbar
 
         enum class UPrimitiveType
         {
+            Undefined,
             Point,
             Line,
             LineStrip,
@@ -92,7 +93,6 @@ namespace iberbar
             Color,
             Normal,
             TexCoord,
-            Sample
         };
 
 
@@ -237,6 +237,57 @@ namespace iberbar
             bool AlphaToCoverageEnable;
             bool IndependentBlendEnable;
             URenderTargetBlendDesc RenderTargets[ 8 ];
+        };
+
+        enum class UDepthWriteMask
+        {
+            Zero,
+            All
+        };
+
+        enum class UComparisonFunc
+        {
+            Never = 1,
+            Less = 2,
+            Equal = 3,
+            LessEqual = 4,
+            Greater = 5,
+            NotEqual = 6,
+            GreaterEqual = 7,
+            Always = 8
+        };
+
+        struct UDepthStencilDesc
+        {
+            bool DepthEnable;
+            UDepthWriteMask DepthWriteMask;
+            UComparisonFunc DepthFunc;
+            bool StencilEnable;
+            uint8 StencilReadMask;
+            uint8 StencilWriteMask;
+        };
+
+        enum
+        {
+            MaxVertexElementCount = 16
+        };
+
+        struct UVertexElement
+        {
+            uint32 nSlot;
+            UVertexDeclareUsage nSemantic;
+            uint32 nSemanticIndex;
+            UVertexFormat nFormat;
+            uint32 nOffset;
+            uint32 nStride;
+        };
+
+        struct UVertexDeclarationDesc
+        {
+            uint32 nVertexElementsCount;
+            uint32 nSlotCount;
+            uint32 Strides[ MaxVertexElementCount ];
+            UVertexElement VertexElements[ MaxVertexElementCount ];
         };
     }
 }

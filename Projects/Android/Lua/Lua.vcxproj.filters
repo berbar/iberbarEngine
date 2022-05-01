@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaBase.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCFunctionArguments.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCppBuilder.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCppCommon.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCppFunctionParameters.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCppInstantiate.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCppInstantiateDef.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaDevice.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaError.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaJson.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaTable.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Lua\LuaCallback.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCppBuilder.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCppCommon.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCppInstantiate.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaDevice.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaJson.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Lua\LuaCallback.cpp" />
+  </ItemGroup>
+</Project>

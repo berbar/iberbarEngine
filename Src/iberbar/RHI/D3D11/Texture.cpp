@@ -15,14 +15,12 @@ iberbar::RHI::D3D11::CTexture::CTexture( CDevice* pDevice )
 	, m_bDynamic( false )
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 }
 
 
 iberbar::RHI::D3D11::CTexture::~CTexture()
 {
 	D3D_SAFE_RELEASE( m_pD3DShaderResourceView );
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 }
 
 
@@ -44,7 +42,7 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateEmpty( int w, int h )
 	TexDesc.SampleDesc.Count = 1;
 	TexDesc.Usage = D3D11_USAGE::D3D11_USAGE_DYNAMIC; // ¶¯Ì¬Ð´Èë
 	TexDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_SHADER_RESOURCE;
-	TexDesc.CPUAccessFlags = 0;
+	TexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	TexDesc.MiscFlags = 0;
 	hResult = m_pDevice->GetD3DDevice()->CreateTexture2D( &TexDesc, nullptr, &pD3DTexture );
 	if ( FAILED( hResult ) )
@@ -52,7 +50,7 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateEmpty( int w, int h )
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
-	hResult = m_pDevice->GetD3DDevice()->CreateShaderResourceView( m_pD3DTexture, NULL, &pD3DShaderResourceView );
+	hResult = m_pDevice->GetD3DDevice()->CreateShaderResourceView( pD3DTexture.Get(), NULL, &pD3DShaderResourceView );
 	if ( FAILED( hResult ) )
 	{
 		return MakeResult( ResultCode::Bad, "" );
@@ -82,6 +80,11 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateFromFileInMemory( const vo
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
+	D3D11_TEXTURE2D_DESC Desc;
+	memset( &Desc, 0, sizeof( Desc ) );
+	m_pD3DTexture->GetDesc( &Desc );
+	m_Size = CSize2i( Desc.Width, Desc.Height );
+
 	return CResult();
 }
 
@@ -97,6 +100,11 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateFromFileA( const char* str
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
+	D3D11_TEXTURE2D_DESC Desc;
+	memset( &Desc, 0, sizeof( Desc ) );
+	m_pD3DTexture->GetDesc( &Desc );
+	m_Size = CSize2i( Desc.Width, Desc.Height );
+
 	return CResult();
 }
 
@@ -109,6 +117,11 @@ iberbar::CResult iberbar::RHI::D3D11::CTexture::CreateFromFileW( const wchar_t* 
 	{
 		return MakeResult( ResultCode::Bad, "" );
 	}
+
+	D3D11_TEXTURE2D_DESC Desc;
+	memset( &Desc, 0, sizeof( Desc ) );
+	m_pD3DTexture->GetDesc( &Desc );
+	m_Size = CSize2i( Desc.Width, Desc.Height );
 
 	return CResult();
 }

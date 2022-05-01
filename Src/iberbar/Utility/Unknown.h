@@ -247,12 +247,16 @@ namespace iberbar
 		uint32 Refcount() const { return m_nRef; }
 		virtual std::string ToString() const;
 
+		void SetName( const std::string& strName ) { m_strName = strName; }
+		const std::string& GetName() const { return m_strName; }
+
 	private:
 		CRef& operator=( const CRef& SrcObject ) = delete;
 
 
 	private:
 		uint32 m_nRef;
+		std::string m_strName;
 	};
 
 

@@ -1,20 +1,16 @@
 #pragma once
 
 #include <iberbar/Gui/Object.h>
-#include <iberbar/RHI/ShaderVariables.h>
 
 namespace iberbar
 {
-	namespace RHI
-	{
-		class IShaderState;
-	}
 
 	namespace Gui
 	{
 		class CRenderElement;
 
 		IBERBAR_UNKNOWN_PTR_DECLARE( CRenderElement );
+
 
 		class __iberbarGuiApi__ CRenderElement
 			: public CObject
@@ -31,7 +27,7 @@ namespace iberbar
 
 
 		public:
-			void SetZOrder( int nZOrder ) { m_nZOrder = nZOrder; }
+			
 			int  AddChildElement( CRenderElement* pElement );
 			int  AddChildElement( int index, CRenderElement* pElement );
 			bool FindElement( const char* strName, CRenderElement** ppOutElement );
@@ -47,7 +43,8 @@ namespace iberbar
 			void SetState( int nState );
 
 		public:
-			virtual void Init();
+			virtual void Init() {}
+			virtual void SetZOrder( int nZOrder ) { m_nZOrder = nZOrder; }
 			virtual void UpdateRect();
 			virtual void Update( float nElapsedTime ) override;
 			virtual void Refresh() override;
@@ -56,8 +53,12 @@ namespace iberbar
 
 		protected:
 			int m_nZOrder;
-			RHI::IShaderState* m_pShaderState;
-			RHI::CShaderVariableTableUnion m_pShaderVariableTables;
+			//Renderer::UVertex_V3F_C4B_T2F m_MeshVertices[ 4 ];
+			//uint16 m_MeshIndices[ 6 ];
+			//Renderer::CMaterial* m_pMaterial;
+			//Renderer::CTrianglesCommand m_RenderCommand;
+			//RHI::IShaderState* m_pShaderState;
+			//RHI::CShaderVariableTableUnion m_pShaderVariableTables;
 			std::vector< PTR_CRenderElement >  m_ChildElements;
 			int m_nState;
 

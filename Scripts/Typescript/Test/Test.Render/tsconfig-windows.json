@@ -1,0 +1,6 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../../../Test/Windows/TestRenderer/Scripts/Game2"
+    }
+}

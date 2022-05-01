@@ -16,10 +16,10 @@
 #include <iberbar/Gui/Widgets/CheckBox.h>
 #include <iberbar/Gui/Widgets/RadioBox.h>
 #include <iberbar/Gui/Widgets/ListBox.h>
-#include <iberbar/Gui/Widgets/EditBox.h>
+//#include <iberbar/Gui/Widgets/EditBox.h>
 #include <iberbar/Gui/Widgets/ProgressBar.h>
-#include <iberbar/Gui/Element/ElemColorRect.h>
-#include <iberbar/Gui/Element/ElemStateLabel.h>
+//#include <iberbar/Gui/Element/ElemColorRect.h>
+//#include <iberbar/Gui/Element/ElemStateLabel.h>
 #include <iberbar/Gui/Element/ElemStateTexture.h>
 #include <iberbar/Gui/Xml/XmlState.h>
 
@@ -135,8 +135,8 @@ namespace iberbar
 		void LuaCppCallbackExecute_WidgetListBox_ItemElementUpdate( Lua::PTR_CLuaCallbackHandler pLuaCallback, CRenderElement* pElement, const CVariantDictionary* pData, int nIndex, int nUpdateEvent );
 		bool LuaCppCallbackExecute_WidgetListBox_FindItem( Lua::PTR_CLuaCallbackHandler pLuaCallback, const CVariantDictionary* pData );
 
-		int LuaCppFunction_WidgetEditBox_SetValueText( lua_State* pLuaState );
-		int LuaCppFunction_WidgetEditBox_GetValueText( lua_State* pLuaState );
+		//int LuaCppFunction_WidgetEditBox_SetValueText( lua_State* pLuaState );
+		//int LuaCppFunction_WidgetEditBox_GetValueText( lua_State* pLuaState );
 
 		int LuaCppFunction_WidgetProgressBar_SetProgressValueMax( lua_State* pLuaState );
 		int LuaCppFunction_WidgetProgressBar_SetProgressValue( lua_State* pLuaState );
@@ -149,15 +149,15 @@ namespace iberbar
 		int LuaCppFunction_Element_FindElement( lua_State* pLuaState );
 		int LuaCppFunction_Element_AddElement( lua_State* pLuaState );
 
-		int LuaCppFunction_ElementColorRect_SetColor( lua_State* pLuaState );
+		//int LuaCppFunction_ElementColorRect_SetColor( lua_State* pLuaState );
 
-		int LuaCppFunction_ElementStateLabel_SetFont( lua_State* pLuaState );
-		int LuaCppFunction_ElementStateLabel_SetText( lua_State* pLuaState );
-		int LuaCppFunction_ElementStateLabel_SetColor( lua_State* pLuaState );
-		int LuaCppFunction_ElementStateLabel_SetTextAlignHorizental( lua_State* pLuaState );
-		int LuaCppFunction_ElementStateLabel_SetTextAlignVertical( lua_State* pLuaState );
+		//int LuaCppFunction_ElementStateLabel_SetFont( lua_State* pLuaState );
+		//int LuaCppFunction_ElementStateLabel_SetText( lua_State* pLuaState );
+		//int LuaCppFunction_ElementStateLabel_SetColor( lua_State* pLuaState );
+		//int LuaCppFunction_ElementStateLabel_SetTextAlignHorizental( lua_State* pLuaState );
+		//int LuaCppFunction_ElementStateLabel_SetTextAlignVertical( lua_State* pLuaState );
 
-		int LuaCppFunction_ElementStateTexture_SetTexture( lua_State* pLuaState );
+		int LuaCppFunction_ElementStateTexture_SetMaterial( lua_State* pLuaState );
 		int LuaCppFunction_ElementStateTexture_SetColor( lua_State* pLuaState );
 		int LuaCppFunction_ElementStateTexture_SetUV( lua_State* pLuaState );
 
@@ -165,9 +165,9 @@ namespace iberbar
 		int LuaCppFunction_Engine_GetDialog( lua_State* L );
 		int LuaCppFunction_Engine_DestroyDialog( lua_State* L );
 
-		int LuaCppFunction_XmlParser_ReadFile( lua_State* pLuaState );
-		int LuaCppFunction_XmlParser_SetCallbackGetTexture( lua_State* pLuaState );
-		int LuaCppFunction_XmlParser_SetCallbackGetFont( lua_State* pLuaState );
+		//int LuaCppFunction_XmlParser_ReadFile( lua_State* pLuaState );
+		//int LuaCppFunction_XmlParser_SetCallbackGetTexture( lua_State* pLuaState );
+		//int LuaCppFunction_XmlParser_SetCallbackGetFont( lua_State* pLuaState );
 
 		void LuaCppCallbackExecute_WidetEvent( Lua::PTR_CLuaCallbackHandler pLuaCallback, CWidget* pWidget, uint64 nEvent, uint64 nValueUint );
 		CResult LuaCppCallbackExecute_XmlParser_CallbackGetTexture( Lua::PTR_CLuaCallbackHandler pLuaCallback, const char* strText, RHI::ITexture** ppOutTexture );
@@ -234,6 +234,7 @@ void iberbar::Gui::RegisterLuaCpp( lua_State* L )
 					pClass->AddMemberMethod( "Clone", &LuaCppFunction_Widget_Clone );
 					pClass->AddMemberMethod( "RequestFocus", &LuaCppFunction_Widget_RequestFocus );
 					pClass->AddMemberMethod( "SetNeedClip", &LuaCppFunction_Widget_SetNeedClip );
+					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CWidget> );
 					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CWidget> );
 				}, LuaCppNames::s_ClassName_Object_FullName );
 
@@ -297,15 +298,15 @@ void iberbar::Gui::RegisterLuaCpp( lua_State* L )
 					pClass->AddMemberMethod( "IsItemEnable", &LuaCppFunction_WidgetListBox_IsItemEnable );
 				}, LuaCppNames::s_ClassName_Widget_FullName );
 
-			scope->AddClass( LuaCppNames::s_ClassName_WidgetEditBox,
-				[]( const char*, Lua::CClassBuilder* pClass )
-				{
-					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CEditBox> );
-					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CEditBox> );
-					pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CEditBox> );
-					pClass->AddMemberMethod( "SetValueText", &LuaCppFunction_WidgetEditBox_SetValueText );
-					pClass->AddMemberMethod( "GetValueText", &LuaCppFunction_WidgetEditBox_GetValueText );
-				}, LuaCppNames::s_ClassName_Widget_FullName );
+			//scope->AddClass( LuaCppNames::s_ClassName_WidgetEditBox,
+			//	[]( const char*, Lua::CClassBuilder* pClass )
+			//	{
+			//		pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CEditBox> );
+			//		pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CEditBox> );
+			//		pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CEditBox> );
+			//		pClass->AddMemberMethod( "SetValueText", &LuaCppFunction_WidgetEditBox_SetValueText );
+			//		pClass->AddMemberMethod( "GetValueText", &LuaCppFunction_WidgetEditBox_GetValueText );
+			//	}, LuaCppNames::s_ClassName_Widget_FullName );
 
 			scope->AddClass( LuaCppNames::s_ClassName_WidgetProgressBar,
 				[]( const char*, Lua::CClassBuilder* pClass )
@@ -342,27 +343,27 @@ void iberbar::Gui::RegisterLuaCpp( lua_State* L )
 					pClass->AddMemberMethod( "AddElement", &LuaCppFunction_Element_AddElement );
 				}, LuaCppNames::s_ClassName_Object_FullName );
 
-			scope->AddClass( LuaCppNames::s_ClassName_ElementColorRect,
-				[]( const char*, Lua::CClassBuilder* pClass )
-				{
-					pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CElementColorRect> );
-					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CElementColorRect> );
-					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CElementColorRect> );
-					pClass->AddMemberMethod( "SetColor", &LuaCppFunction_ElementColorRect_SetColor );
-				}, LuaCppNames::s_ClassName_Element_FullName );
+			//scope->AddClass( LuaCppNames::s_ClassName_ElementColorRect,
+			//	[]( const char*, Lua::CClassBuilder* pClass )
+			//	{
+			//		pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CElementColorRect> );
+			//		pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CElementColorRect> );
+			//		pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CElementColorRect> );
+			//		pClass->AddMemberMethod( "SetColor", &LuaCppFunction_ElementColorRect_SetColor );
+			//	}, LuaCppNames::s_ClassName_Element_FullName );
 
-			scope->AddClass( LuaCppNames::s_ClassName_ElementStateLabel,
-				[]( const char*, Lua::CClassBuilder* pClass )
-				{
-					pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CElementStateLabel> );
-					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CElementStateLabel> );
-					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CElementStateLabel> );
-					pClass->AddMemberMethod( "SetFont", &LuaCppFunction_ElementStateLabel_SetFont );
-					pClass->AddMemberMethod( "SetColor", &LuaCppFunction_ElementStateLabel_SetColor );
-					pClass->AddMemberMethod( "SetText", &LuaCppFunction_ElementStateLabel_SetText );
-					pClass->AddMemberMethod( "SetTextAlignHorizental", &LuaCppFunction_ElementStateLabel_SetTextAlignHorizental );
-					pClass->AddMemberMethod( "SetTextAlignVertical", &LuaCppFunction_ElementStateLabel_SetTextAlignVertical );
-				}, LuaCppNames::s_ClassName_Element_FullName );
+			//scope->AddClass( LuaCppNames::s_ClassName_ElementStateLabel,
+			//	[]( const char*, Lua::CClassBuilder* pClass )
+			//	{
+			//		pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CElementStateLabel> );
+			//		pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CElementStateLabel> );
+			//		pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CElementStateLabel> );
+			//		pClass->AddMemberMethod( "SetFont", &LuaCppFunction_ElementStateLabel_SetFont );
+			//		pClass->AddMemberMethod( "SetColor", &LuaCppFunction_ElementStateLabel_SetColor );
+			//		pClass->AddMemberMethod( "SetText", &LuaCppFunction_ElementStateLabel_SetText );
+			//		pClass->AddMemberMethod( "SetTextAlignHorizental", &LuaCppFunction_ElementStateLabel_SetTextAlignHorizental );
+			//		pClass->AddMemberMethod( "SetTextAlignVertical", &LuaCppFunction_ElementStateLabel_SetTextAlignVertical );
+			//	}, LuaCppNames::s_ClassName_Element_FullName );
 
 			scope->AddClass( LuaCppNames::s_ClassName_ElementStateTexture,
 				[]( const char*, Lua::CClassBuilder* pClass )
@@ -370,18 +371,18 @@ void iberbar::Gui::RegisterLuaCpp( lua_State* L )
 					pClass->AddStaticMethod( "dynamic_cast", &Lua::Class_Unknown_Dynamic_Cast<CElementStateTexture> );
 					pClass->AddConstructor( &Lua::Class_Unknown_Constructor_New<CElementStateTexture> );
 					pClass->AddDistructor( &Lua::Class_Unknown_Distructor_Release<CElementStateTexture> );
-					pClass->AddMemberMethod( "SetTexture", &LuaCppFunction_ElementStateTexture_SetTexture );
+					pClass->AddMemberMethod( "SetMaterial", &LuaCppFunction_ElementStateTexture_SetMaterial );
 					pClass->AddMemberMethod( "SetColor", &LuaCppFunction_ElementStateTexture_SetColor );
 					pClass->AddMemberMethod( "SetUV", &LuaCppFunction_ElementStateTexture_SetUV );
 				}, LuaCppNames::s_ClassName_Element_FullName );
 
-			scope->AddClass( LuaCppName_XmlParser,
-				[]( const char*, Lua::CClassBuilder* pClass )
-				{
-					pClass->AddMemberMethod( "ReadFile", &LuaCppFunction_XmlParser_ReadFile );
-					pClass->AddMemberMethod( "SetCallbackGetTexture", &LuaCppFunction_XmlParser_SetCallbackGetTexture );
-					pClass->AddMemberMethod( "SetCallbackGetFont", &LuaCppFunction_XmlParser_SetCallbackGetFont );
-				} );
+			//scope->AddClass( LuaCppName_XmlParser,
+			//	[]( const char*, Lua::CClassBuilder* pClass )
+			//	{
+			//		pClass->AddMemberMethod( "ReadFile", &LuaCppFunction_XmlParser_ReadFile );
+			//		pClass->AddMemberMethod( "SetCallbackGetTexture", &LuaCppFunction_XmlParser_SetCallbackGetTexture );
+			//		pClass->AddMemberMethod( "SetCallbackGetFont", &LuaCppFunction_XmlParser_SetCallbackGetFont );
+			//	} );
 
 			scope->AddEnum( "UEvents",
 				[]( Lua::CEnumBuilder* pEnum )
@@ -2098,56 +2099,56 @@ bool iberbar::Gui::LuaCppCallbackExecute_WidgetListBox_FindItem( Lua::PTR_CLuaCa
 
 
 
-
-int iberbar::Gui::LuaCppFunction_WidgetEditBox_SetValueText( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 2 );
-
-	CEditBox* pEditBox = lua_tocppobject( pLuaState, 1, CEditBox );
-	if ( pEditBox == nullptr )
-		return 0;
-
-	const char* strValueText = lua_tostring( pLuaState, 2 );
-	if ( StringIsNullOrEmpty( strValueText ) )
-	{
-		pEditBox->SetValueText( L"" );
-	}
-	else
-	{
-		std::wstring strValueTextUnicode = Utf8ToUnicode( strValueText );
-		pEditBox->SetValueText( strValueTextUnicode.c_str() );
-	}
-
-	return 0;
-}
-
-
-int iberbar::Gui::LuaCppFunction_WidgetEditBox_GetValueText( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 1 );
-
-	CEditBox* pEditBox = lua_tocppobject( pLuaState, 1, CEditBox );
-	if ( pEditBox == nullptr )
-	{
-		lua_pushstring( pLuaState, "" );
-		return 1;
-	}
-
-	const wchar_t* strValueTextUnicode = pEditBox->GetValueText();
-	if ( StringIsNullOrEmpty( strValueTextUnicode ) )
-	{
-		lua_pushstring( pLuaState, "" );
-	}
-	else
-	{
-		std::string strValueTextUtf8 = UnicodeToUtf8( strValueTextUnicode );
-		lua_pushstring( pLuaState, strValueTextUtf8.c_str() );
-	}
-
-	return 1;
-}
+//
+//int iberbar::Gui::LuaCppFunction_WidgetEditBox_SetValueText( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 2 );
+//
+//	CEditBox* pEditBox = lua_tocppobject( pLuaState, 1, CEditBox );
+//	if ( pEditBox == nullptr )
+//		return 0;
+//
+//	const char* strValueText = lua_tostring( pLuaState, 2 );
+//	if ( StringIsNullOrEmpty( strValueText ) )
+//	{
+//		pEditBox->SetValueText( L"" );
+//	}
+//	else
+//	{
+//		std::wstring strValueTextUnicode = Utf8ToUnicode( strValueText );
+//		pEditBox->SetValueText( strValueTextUnicode.c_str() );
+//	}
+//
+//	return 0;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_WidgetEditBox_GetValueText( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 1 );
+//
+//	CEditBox* pEditBox = lua_tocppobject( pLuaState, 1, CEditBox );
+//	if ( pEditBox == nullptr )
+//	{
+//		lua_pushstring( pLuaState, "" );
+//		return 1;
+//	}
+//
+//	const wchar_t* strValueTextUnicode = pEditBox->GetValueText();
+//	if ( StringIsNullOrEmpty( strValueTextUnicode ) )
+//	{
+//		lua_pushstring( pLuaState, "" );
+//	}
+//	else
+//	{
+//		std::string strValueTextUtf8 = UnicodeToUtf8( strValueTextUnicode );
+//		lua_pushstring( pLuaState, strValueTextUtf8.c_str() );
+//	}
+//
+//	return 1;
+//}
 
 
 
@@ -2335,151 +2336,150 @@ int iberbar::Gui::LuaCppFunction_Element_AddElement( lua_State* pLuaState )
 
 
 
+//
+//int iberbar::Gui::LuaCppFunction_ElementColorRect_SetColor( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 3 );
+//
+//	CElementColorRect* pElement = lua_tocppobject( pLuaState, 1, CElementColorRect );
+//
+//	if ( pElement == nullptr )
+//		return 0;
+//
+//	int nState = lua_tointeger( pLuaState, 2 );
+//	CColor4B Color;
+//	if ( lua_isinteger( pLuaState, 3 ) )
+//	{
+//		Color = CColor4B( (uint32)lua_tointeger( pLuaState, 3 ) );
+//	}
+//	else if ( lua_istable( pLuaState, 3 ) )
+//	{
+//	}
+//
+//	pElement->SetColor( nState, Color );
+//
+//	return 0;
+//}
+//
+//
+//
+//
+//
+//
+//
+//
+//int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetFont( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 2 );
+//
+//	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
+//
+//	if ( pElement == nullptr )
+//		return 0;
+//
+//	Renderer::CFont* pFont = lua_tocppobject( pLuaState, 2, Renderer::CFont );
+//	pElement->SetFont( pFont );
+//
+//	return 0;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetColor( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 3 );
+//
+//	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
+//
+//	if ( pElement == nullptr )
+//		return 0;
+//
+//	int nState = lua_tointeger( pLuaState, 2 );
+//	CColor4B Color;
+//	if ( lua_isinteger( pLuaState, 3 ) )
+//	{
+//		Color = CColor4B( (uint32)lua_tointeger( pLuaState, 3 ) );
+//	}
+//	else if ( lua_istable( pLuaState, 3 ) )
+//	{
+//	}
+//
+//	pElement->SetColor( nState, Color );
+//
+//	return 0;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetText( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 2 );
+//
+//	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
+//
+//	if ( pElement == nullptr )
+//		return 0;
+//
+//	const char* strText = lua_tostring( pLuaState, 2 );
+//	pElement->SetTextA( strText );
+//
+//	return 0;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetTextAlignHorizental( lua_State* pLuaState )
+//{
+//	int nTop = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, nTop, 2 );
+//
+//	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
+//
+//	if ( pElement == nullptr )
+//		return 0;
+//
+//	UAlignHorizental nAlign = (UAlignHorizental)lua_tointeger( pLuaState, 2 );
+//	pElement->SetTextAlignHorizental( nAlign );
+//
+//	return 0;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetTextAlignVertical( lua_State* pLuaState )
+//{
+//	int nTop = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, nTop, 2 );
+//
+//	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
+//
+//	if ( pElement == nullptr )
+//		return 0;
+//
+//	UAlignVertical nAlign = (UAlignVertical)lua_tointeger( pLuaState, 2 );
+//	pElement->SetTextAlignVertical( nAlign );
+//
+//	return 0;
+//}
 
-int iberbar::Gui::LuaCppFunction_ElementColorRect_SetColor( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 3 );
-
-	CElementColorRect* pElement = lua_tocppobject( pLuaState, 1, CElementColorRect );
-
-	if ( pElement == nullptr )
-		return 0;
-
-	int nState = lua_tointeger( pLuaState, 2 );
-	CColor4B Color;
-	if ( lua_isinteger( pLuaState, 3 ) )
-	{
-		Color = CColor4B( (uint32)lua_tointeger( pLuaState, 3 ) );
-	}
-	else if ( lua_istable( pLuaState, 3 ) )
-	{
-	}
-
-	pElement->SetColor( nState, Color );
-
-	return 0;
-}
 
 
 
 
 
 
-
-
-int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetFont( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 2 );
-
-	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
-
-	if ( pElement == nullptr )
-		return 0;
-
-	Renderer::CFont* pFont = lua_tocppobject( pLuaState, 2, Renderer::CFont );
-	pElement->SetFont( pFont );
-
-	return 0;
-}
-
-
-int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetColor( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 3 );
-
-	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
-
-	if ( pElement == nullptr )
-		return 0;
-
-	int nState = lua_tointeger( pLuaState, 2 );
-	CColor4B Color;
-	if ( lua_isinteger( pLuaState, 3 ) )
-	{
-		Color = CColor4B( (uint32)lua_tointeger( pLuaState, 3 ) );
-	}
-	else if ( lua_istable( pLuaState, 3 ) )
-	{
-	}
-
-	pElement->SetColor( nState, Color );
-
-	return 0;
-}
-
-
-int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetText( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 2 );
-
-	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
-
-	if ( pElement == nullptr )
-		return 0;
-
-	const char* strText = lua_tostring( pLuaState, 2 );
-	pElement->SetTextA( strText );
-
-	return 0;
-}
-
-
-int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetTextAlignHorizental( lua_State* pLuaState )
+int iberbar::Gui::LuaCppFunction_ElementStateTexture_SetMaterial( lua_State* pLuaState )
 {
 	int nTop = lua_gettop( pLuaState );
 	iberbar_LuaCheckArguments( pLuaState, nTop, 2 );
-
-	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
-
-	if ( pElement == nullptr )
-		return 0;
-
-	UAlignHorizental nAlign = (UAlignHorizental)lua_tointeger( pLuaState, 2 );
-	pElement->SetTextAlignHorizental( nAlign );
-
-	return 0;
-}
-
-
-int iberbar::Gui::LuaCppFunction_ElementStateLabel_SetTextAlignVertical( lua_State* pLuaState )
-{
-	int nTop = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, nTop, 2 );
-
-	CElementStateLabel* pElement = lua_tocppobject( pLuaState, 1, CElementStateLabel );
-
-	if ( pElement == nullptr )
-		return 0;
-
-	UAlignVertical nAlign = (UAlignVertical)lua_tointeger( pLuaState, 2 );
-	pElement->SetTextAlignVertical( nAlign );
-
-	return 0;
-}
-
-
-
-
-
-
-
-int iberbar::Gui::LuaCppFunction_ElementStateTexture_SetTexture( lua_State* pLuaState )
-{
-	int nTop = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, nTop, 3 );
 
 	CElementStateTexture* pElement = lua_tocppobject( pLuaState, 1, CElementStateTexture );
 
 	if ( pElement == nullptr )
 		return 0;
 
-	int nState = (int)lua_tointeger( pLuaState, 2 );
-	RHI::ITexture* pTexture = lua_tocppobject( pLuaState, 3, RHI::ITexture );
-	pElement->SetTexture( nState, pTexture );
+	Renderer::CMaterial* pMaterial = lua_tocppobject( pLuaState, 2, Renderer::CMaterial );
+	pElement->SetMaterial( pMaterial );
 
 	return 0;
 }
@@ -2488,23 +2488,22 @@ int iberbar::Gui::LuaCppFunction_ElementStateTexture_SetTexture( lua_State* pLua
 int iberbar::Gui::LuaCppFunction_ElementStateTexture_SetColor( lua_State* pLuaState )
 {
 	int nTop = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, nTop, 3 );
+	iberbar_LuaCheckArguments( pLuaState, nTop, 2 );
 
 	CElementStateTexture* pElement = lua_tocppobject( pLuaState, 1, CElementStateTexture );
 
 	if ( pElement == nullptr )
 		return 0;
 
-	int nState = (int)lua_tointeger( pLuaState, 2 );
 	CColor4B Color;
-	if ( lua_isinteger( pLuaState, 3 ) )
+	if ( lua_isinteger( pLuaState, 2 ) )
 	{
-		Color = CColor4B( (uint32)lua_tointeger( pLuaState, 3 ) );
+		Color = CColor4B( (uint32)lua_tointeger( pLuaState, 2 ) );
 	}
-	else if ( lua_istable( pLuaState, 3 ) )
+	else if ( lua_istable( pLuaState, 2 ) )
 	{
 	}
-	pElement->SetColor( nState, Color );
+	pElement->SetColor( Color );
 
 	return 0;
 }
@@ -2513,19 +2512,18 @@ int iberbar::Gui::LuaCppFunction_ElementStateTexture_SetColor( lua_State* pLuaSt
 int iberbar::Gui::LuaCppFunction_ElementStateTexture_SetUV( lua_State* pLuaState )
 {
 	int nTop = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, nTop, 6 );
+	iberbar_LuaCheckArguments( pLuaState, nTop, 5 );
 
 	CElementStateTexture* pElement = lua_tocppobject( pLuaState, 1, CElementStateTexture );
 
 	if ( pElement == nullptr )
 		return 0;
 
-	int nState = (int)lua_tointeger( pLuaState, 2 );
-	float UV_Left = (float)lua_tonumber( pLuaState, 3 );
-	float UV_Top = (float)lua_tonumber( pLuaState, 4 );
-	float UV_Right = (float)lua_tonumber( pLuaState, 5 );
-	float UV_Bottom = (float)lua_tonumber( pLuaState, 6 );
-	pElement->SetUV( nState, CRect2f( UV_Left, UV_Top, UV_Right, UV_Bottom ) );
+	float UV_Left = (float)lua_tonumber( pLuaState, 2 );
+	float UV_Top = (float)lua_tonumber( pLuaState, 3 );
+	float UV_Right = (float)lua_tonumber( pLuaState, 4 );
+	float UV_Bottom = (float)lua_tonumber( pLuaState, 5 );
+	pElement->SetUV( CRect2f( UV_Left, UV_Top, UV_Right, UV_Bottom ) );
 
 	return 0;
 }
@@ -2607,93 +2605,93 @@ int iberbar::Gui::LuaCppFunction_Engine_DestroyDialog( lua_State* pLuaState )
 
 
 
-
-int iberbar::Gui::LuaCppFunction_XmlParser_ReadFile( lua_State* pLuaState )
-{
-	int top = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments( pLuaState, top, 3 );
-
-	CXmlParser* pXmlParser = lua_tocppobject( pLuaState, 1, CXmlParser );
-	const char* strFile = lua_tostring( pLuaState, 2 );
-	CDialog* pDlg = lua_tocppobject( pLuaState, 3, CDialog );
-
-	if ( pXmlParser == nullptr ||
-		StringIsNullOrEmpty( strFile ) ||
-		pDlg == nullptr )
-	{
-		lua_pushstring( pLuaState, "invalid arguments" );
-		return 1;
-	}
-
-	CResult ret = pXmlParser->ReadFile( strFile, pDlg );
-	if ( ret.IsOK() == false )
-	{
-		lua_pushstring( pLuaState, ret.data.c_str() );
-		return 1;
-	}
-
-	lua_pushnil( pLuaState );
-
-	return 1;
-}
-
-
-int iberbar::Gui::LuaCppFunction_XmlParser_SetCallbackGetTexture( lua_State* pLuaState )
-{
-	int nTop = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments2( pLuaState, nTop, 2, 3 );
-
-	CXmlParser* pXmlParser = lua_tocppobject( pLuaState, 1, CXmlParser );
-	if ( pXmlParser == nullptr )
-		return 0;
-
-	lua_Integer nFunc = lua_toluacallback( pLuaState, 2 );
-	lua_Integer nExt = 0;
-	if ( nTop == 3 )
-	{
-		nExt = lua_toluacallback_extparam( pLuaState, 3 );
-	}
-	if ( nFunc == 0 )
-		return 0;
-	
-	Lua::PTR_CLuaCallbackHandler pLuaCallback = Lua::PTR_CLuaCallbackHandler::_sNew( pLuaState, nFunc, nExt );
-	pXmlParser->RegisterGetTexture(
-		[pLuaCallback]( const char* strText, RHI::ITexture** ppOutTexture )
-		{
-			return LuaCppCallbackExecute_XmlParser_CallbackGetTexture( pLuaCallback, strText, ppOutTexture );
-		} );
-
-	return 0;
-}
-
-
-int iberbar::Gui::LuaCppFunction_XmlParser_SetCallbackGetFont( lua_State* pLuaState )
-{
-	int nTop = lua_gettop( pLuaState );
-	iberbar_LuaCheckArguments2( pLuaState, nTop, 2, 3 );
-
-	CXmlParser* pXmlParser = lua_tocppobject( pLuaState, 1, CXmlParser );
-	if ( pXmlParser == nullptr )
-		return 0;
-
-	lua_Integer nFunc = lua_toluacallback( pLuaState, 2 );
-	lua_Integer nExt = 0;
-	if ( nTop == 3 )
-	{
-		nExt = lua_toluacallback_extparam( pLuaState, 3 );
-	}
-	if ( nFunc == 0 )
-		return 0;
-
-	Lua::PTR_CLuaCallbackHandler pLuaCallback = Lua::PTR_CLuaCallbackHandler::_sNew( pLuaState, nFunc, nExt );
-	pXmlParser->RegisterGetFont(
-		[pLuaCallback]( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc )
-		{
-			return LuaCppCallbackExecute_XmlParser_CallbackGetFont( pLuaCallback, ppOutFont, FontDesc );
-		} );
-
-	return 0;
-}
+//
+//int iberbar::Gui::LuaCppFunction_XmlParser_ReadFile( lua_State* pLuaState )
+//{
+//	int top = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments( pLuaState, top, 3 );
+//
+//	CXmlParser* pXmlParser = lua_tocppobject( pLuaState, 1, CXmlParser );
+//	const char* strFile = lua_tostring( pLuaState, 2 );
+//	CDialog* pDlg = lua_tocppobject( pLuaState, 3, CDialog );
+//
+//	if ( pXmlParser == nullptr ||
+//		StringIsNullOrEmpty( strFile ) ||
+//		pDlg == nullptr )
+//	{
+//		lua_pushstring( pLuaState, "invalid arguments" );
+//		return 1;
+//	}
+//
+//	CResult ret = pXmlParser->ReadFile( strFile, pDlg );
+//	if ( ret.IsOK() == false )
+//	{
+//		lua_pushstring( pLuaState, ret.data.c_str() );
+//		return 1;
+//	}
+//
+//	lua_pushnil( pLuaState );
+//
+//	return 1;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_XmlParser_SetCallbackGetTexture( lua_State* pLuaState )
+//{
+//	int nTop = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments2( pLuaState, nTop, 2, 3 );
+//
+//	CXmlParser* pXmlParser = lua_tocppobject( pLuaState, 1, CXmlParser );
+//	if ( pXmlParser == nullptr )
+//		return 0;
+//
+//	lua_Integer nFunc = lua_toluacallback( pLuaState, 2 );
+//	lua_Integer nExt = 0;
+//	if ( nTop == 3 )
+//	{
+//		nExt = lua_toluacallback_extparam( pLuaState, 3 );
+//	}
+//	if ( nFunc == 0 )
+//		return 0;
+//	
+//	Lua::PTR_CLuaCallbackHandler pLuaCallback = Lua::PTR_CLuaCallbackHandler::_sNew( pLuaState, nFunc, nExt );
+//	pXmlParser->RegisterGetTexture(
+//		[pLuaCallback]( const char* strText, RHI::ITexture** ppOutTexture )
+//		{
+//			return LuaCppCallbackExecute_XmlParser_CallbackGetTexture( pLuaCallback, strText, ppOutTexture );
+//		} );
+//
+//	return 0;
+//}
+//
+//
+//int iberbar::Gui::LuaCppFunction_XmlParser_SetCallbackGetFont( lua_State* pLuaState )
+//{
+//	int nTop = lua_gettop( pLuaState );
+//	iberbar_LuaCheckArguments2( pLuaState, nTop, 2, 3 );
+//
+//	CXmlParser* pXmlParser = lua_tocppobject( pLuaState, 1, CXmlParser );
+//	if ( pXmlParser == nullptr )
+//		return 0;
+//
+//	lua_Integer nFunc = lua_toluacallback( pLuaState, 2 );
+//	lua_Integer nExt = 0;
+//	if ( nTop == 3 )
+//	{
+//		nExt = lua_toluacallback_extparam( pLuaState, 3 );
+//	}
+//	if ( nFunc == 0 )
+//		return 0;
+//
+//	Lua::PTR_CLuaCallbackHandler pLuaCallback = Lua::PTR_CLuaCallbackHandler::_sNew( pLuaState, nFunc, nExt );
+//	pXmlParser->RegisterGetFont(
+//		[pLuaCallback]( Renderer::CFont** ppOutFont, const UFontDesc& FontDesc )
+//		{
+//			return LuaCppCallbackExecute_XmlParser_CallbackGetFont( pLuaCallback, ppOutFont, FontDesc );
+//		} );
+//
+//	return 0;
+//}
 
 
 

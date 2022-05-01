@@ -117,7 +117,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarPaper2d.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -139,7 +139,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarPaper2d.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -157,7 +157,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarPaper2d.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -179,7 +179,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarPaper2d.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iberbarUtility.lib;iberbarRHI.lib;iberbarRenderer.lib;iberbarGui.lib;iberbarLua.lib;iberbarGameEngine.lib;iberbarNetwork.lib;liblua53.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -193,6 +193,32 @@
     <ProjectReference Include="..\..\..\Projects\Windows\GameEngine\GameEngine.vcxproj">
       <Project>{721c957b-1c66-47e4-b169-254f0c0e5cc1}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\D3D11\PositionColor2d_PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\D3D11\PositionColor2d_VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\D3D11\PositionColorTexture2d_PS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\D3D11\PositionColorTexture2d_VS.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

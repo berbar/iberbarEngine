@@ -69,9 +69,6 @@ inline D3DDECLUSAGE iberbar::RHI::D3D9::ConvertVertexDeclareUsage( UVertexDeclar
 		case UVertexDeclareUsage::TexCoord:
 			return D3DDECLUSAGE_TEXCOORD;
 
-		case UVertexDeclareUsage::Sample:
-			return D3DDECLUSAGE_SAMPLE;
-
 		default:
 			break;
 	}

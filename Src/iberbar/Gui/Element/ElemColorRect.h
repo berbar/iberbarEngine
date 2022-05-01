@@ -9,7 +9,7 @@ namespace iberbar
 {
 	namespace Renderer
 	{
-		class CRenderer2d;
+		class CRenderer;
 	}
 
 	namespace RHI

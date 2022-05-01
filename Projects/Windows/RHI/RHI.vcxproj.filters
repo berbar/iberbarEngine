@@ -19,6 +19,8 @@
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Trace.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\Effect.h" />
     <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderReflection.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\ShaderBindings.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\RHI\TestDraw.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\RHI\CommandContext.cpp" />
@@ -36,5 +38,6 @@
     <ClCompile Include="..\..\..\Src\iberbar\RHI\ShaderReflection.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\RenderState.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\RHI\Types.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\RHI\TestDraw.cpp" />
   </ItemGroup>
 </Project>

@@ -17,17 +17,19 @@ namespace iberbar
 				CBlendState( const UBlendDesc& Desc )
 					: IBlendState( Desc )
 				{
-					memcpy_s( &m_Desc, sizeof( UBlendDesc ), &Desc, sizeof( UBlendDesc ) );
 				}
 			};
 
 
-			//class CDepthStencilState
-			//	: public IDepthStencilState
-			//{
-			//public:
-			//	virtual bool Equal( const IDepthStencilState* Other ) override;
-			//};
+			class CDepthStencilState
+				: public IDepthStencilState
+			{
+			public:
+				CDepthStencilState( const UDepthStencilDesc& Desc )
+					: IDepthStencilState( Desc )
+				{
+				}
+			};
 
 
 			class CSamplerState

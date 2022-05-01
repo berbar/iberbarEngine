@@ -358,31 +358,37 @@ void iberbar::Gui::XmlReadProc_Element_StateTexture( const UXmlParserContext* pC
 	if ( pNodeList && pNodeList->GetNodeCount() )
 	{
 		Xml::PTR_CNodeA pNode = nullptr;
-		const char* strStateName = nullptr;
+		//const char* strStateName = nullptr;
 		const char* strColor = nullptr;
 		const char* strSrc = nullptr;
 		const char* strUV = nullptr;
-		int nState = -1;
+		//int nState = -1;
 		CColor4B color;
 		TSmartRefPtr<RHI::ITexture> pTexture = nullptr;
 		CRect2f rcUV;
 		for ( int i = 0, s = pNodeList->GetNodeCount(); i < s; i++ )
 		{
 			pNodeList->GetNodeAt( i, &pNode );
-			strStateName = pNode->GetAttribute( "State" );
+			//strStateName = pNode->GetAttribute( "State" );
 			strColor = pNode->GetAttribute( "Color" );
 			strSrc = pNode->GetAttribute( "Src" );
 			strUV = pNode->GetAttribute( "UV" );
-			if ( StringIsNullOrEmpty( strStateName ) == false && StringIsNullOrEmpty( strColor ) == false )
-			{
-				nState = XmlAttributeConvertToWidgetState( strStateName );
-				color = XmlAttributeConvertToColor4B( strColor );
-				pContext->GetTexture( strSrc, &pTexture );
-				rcUV = XmlAttributeConvertToUV( strUV );
-				pElementStateTexture->SetColor( nState, color );
-				pElementStateTexture->SetTexture( nState, pTexture );
-				pElementStateTexture->SetUV( nState, rcUV );
-			}
+			color = XmlAttributeConvertToColor4B( strColor );
+			pContext->GetTexture( strSrc, &pTexture );
+			rcUV = XmlAttributeConvertToUV( strUV );
+			pElementStateTexture->SetColor( nState, color );
+			pElementStateTexture->SetTexture( nState, pTexture );
+			pElementStateTexture->SetUV( nState, rcUV );
+			//if ( StringIsNullOrEmpty( strStateName ) == false && StringIsNullOrEmpty( strColor ) == false )
+			//{
+			//	nState = XmlAttributeConvertToWidgetState( strStateName );
+			//	color = XmlAttributeConvertToColor4B( strColor );
+			//	pContext->GetTexture( strSrc, &pTexture );
+			//	rcUV = XmlAttributeConvertToUV( strUV );
+			//	pElementStateTexture->SetColor( nState, color );
+			//	pElementStateTexture->SetTexture( nState, pTexture );
+			//	pElementStateTexture->SetUV( nState, rcUV );
+			//}
 		}
 	}
 }

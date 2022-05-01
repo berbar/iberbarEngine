@@ -3,7 +3,7 @@
 #include <iberbar/RHI/Device.h>
 #include <iberbar/RHI/Texture.h>
 #include <iberbar/Renderer/Renderer.h>
-#include <iberbar/Renderer/RendererSprite.h>
+//#include <iberbar/Renderer/RendererSprite.h>
 #include <iberbar/Font/FreeType.h>
 #include <iberbar/Font/FontDrawText.h>
 #include <iberbar/Utility/RectClip2d.h>
@@ -58,7 +58,6 @@ iberbar::Renderer::CFontTextureCache::CFontTextureCache( RHI::IDevice* pDevice, 
 	, m_pDevice( pDevice )
 	, m_pTextures()
 {
-	m_pDevice->AddRef();
 	if ( m_pDevice->GetApiType() == RHI::UApiType::D3D9 )
 	{
 		//m_nFix = 0.5f;
@@ -68,7 +67,6 @@ iberbar::Renderer::CFontTextureCache::CFontTextureCache( RHI::IDevice* pDevice, 
 
 iberbar::Renderer::CFontTextureCache::~CFontTextureCache()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
 	SafeReleaseStdVector( m_pTextures );
 }
 
@@ -183,6 +181,7 @@ iberbar::Renderer::CFont::CFont(
 
 iberbar::Renderer::CFont::~CFont()
 {
+	m_pTextureCache->SaveToFilesA( "font_cache.png" );
 	UNKNOWN_SAFE_RELEASE_NULL( m_pFace );
 	SAFE_DELETE( m_pCharMapper );
 	SAFE_DELETE( m_pTextureCache );

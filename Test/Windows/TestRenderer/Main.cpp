@@ -3,29 +3,39 @@
 #include <Windows.h>
 #include <iberbar/GameEngine/Application.h>
 
-#include <iberbar/GameEngine/Paper2dLoader.h>
+//#include <iberbar/GameEngine/Paper2dLoader.h>
 #include <iberbar/GameEngine/ResourcePreloader.h>
 #include <iberbar/GameEngine/FontManager.h>
 #include <iberbar/GameEngine/LoadingThread.h>
 
-#include <iberbar/Paper2d/Director.h>
-#include <iberbar/Paper2d/Scene.h>
-#include <iberbar/Paper2d/Camera.h>
-#include <iberbar/Paper2d/Image.h>
-#include <iberbar/Paper2d/Animation.h>
-#include <iberbar/Paper2d/Terrain.h>
+#include <iberbar/GameEngine/ShaderManager.h>
+#include <iberbar/GameEngine/TextureManager.h>
 
-#include <iberbar/Gui/Widgets/EditBox.h>
-#include <iberbar/Gui/Element/ElemColorRect.h>
+//#include <iberbar/Paper2d/Director.h>
+//#include <iberbar/Paper2d/Scene.h>
+//#include <iberbar/Paper2d/Camera.h>
+//#include <iberbar/Paper2d/Image.h>
+//#include <iberbar/Paper2d/Animation.h>
+//#include <iberbar/Paper2d/Terrain.h>
+
+//#include <iberbar/Gui/Widgets/EditBox.h>
+//#include <iberbar/Gui/Element/ElemColorRect.h>
 #include <iberbar/Gui/Dialog.h>
 #include <iberbar/Gui/Engine.h>
+#include <iberbar/Gui/Widget.h>
+#include <iberbar/Gui/Element/ElemStateTexture.h>
 
-#include <iberbar/Renderer/RendererSprite.h>
+//#include <iberbar/Renderer/RendererSprite.h>
 
 #include <iberbar/Network/IO.h>
 
 #include <iberbar/Lua/LuaDevice.h>
 #include <iberbar/Lua/FunctionHelper.h>
+
+#include <iberbar/RHI/Device.h>
+#include <iberbar/RHI/RenderState.h>
+#include <iberbar/RHI/Shader.h>
+#include <iberbar/RHI/TestDraw.h>
 
 #include <iberbar/Utility/RefStatistics.h>
 
@@ -63,11 +73,15 @@ protected:
 	virtual void OnDestroy() override;
 	virtual void OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTimeSecond ) override;
 	virtual void OnRender() override;
+
+public:
+	iberbar::RHI::ITestDraw* m_pTestDraw;
 };
 
 
 
 CTestApplication::CTestApplication()
+	: m_pTestDraw( nullptr )
 {
 }
 
@@ -76,46 +90,92 @@ iberbar::CResult CTestApplication::OnCreated()
 {
 	iberbar::CResult ret;
 
-	ret = m_ResourcePreloader->ReadFile( "Scripts/Preload.xml" );
+	//ret = m_ResourcePreloader->ReadFile( "Scripts/Preload.xml" );
 
-	iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
-	if ( m_pFontManager->GetFontDefault( &pFont ) )
-	{
-		pFont->LoadText( L"fps: 0123456798." );
-	}
+	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
+	//if ( m_pFontManager->GetFontDefault( &pFont ) )
+	//{
+	//	pFont->LoadText( L"fps: 0123456798." );
+	//}
 	m_pLuaDevice->AddLuaPath( "Scripts/Game2/?.lua" );
 	m_pLuaDevice->ExecuteFile( "Scripts/Game2/main.lua" );
 	
 	iberbar::Lua::CFunctionHelper::sExecuteGlobalFunction( m_pLuaDevice->GetLuaState(), "Main" );
 
-	auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
-	auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
-	auto pEditBoxBgElement = iberbar::TSmartRefPtr<iberbar::Gui::CElementColorRect>::_sNew();
+	iberbar::TSmartRefPtr<iberbar::Gui::CDialog> dlg = nullptr;
+	iberbar::Gui::CDialog::sCreateDialog( &dlg );
+	dlg->SetId( "MainMenu" );
+	dlg->SetPosition( 0, 0 );
+	dlg->SetSize( 800, 600 );
 
-	pEditBox->SetRenderElement( pEditBoxBgElement );
-	pEditBox->SetTextElementRef( pEditBoxTextElement );
-	pEditBox->SetSize( iberbar::CSize2i( 200, 100 ) );
-	pEditBox->SetPosition( 100, 100 );
+	iberbar::TSmartRefPtr<iberbar::Gui::CWidget> bg = iberbar::TSmartRefPtr<iberbar::Gui::CWidget>::_sNew();
+	bg->SetSize( 800, 600 );
 
-	pEditBoxBgElement->Init();
-	pEditBoxBgElement->SetColor( -1, iberbar::CColor4B( 0xffffffff ) );
-	pEditBoxBgElement->SetSize( iberbar::CSize2i( 200, 100 ) );
-	pEditBoxBgElement->SetZOrder( 99997 );
-	pEditBoxBgElement->AddChildElement( pEditBoxTextElement );
+	iberbar::TSmartRefPtr<iberbar::RHI::IShaderProgram> pShaderProgram;
+	m_pShaderManager->GetShaderProgram( "PositionColorTexture2d", &pShaderProgram );
 
-	pEditBoxTextElement->SetFont( pFont );
-	pEditBoxTextElement->SetTextColor( iberbar::CColor4B( 0xff000000 ) );
-	pEditBoxTextElement->SetSelTextColor( iberbar::CColor4B( 0xffffffff ) );
-	pEditBoxTextElement->SetSelBgColor( iberbar::CColor4B( 0xff3390ff ) );
-	pEditBoxTextElement->SetCaretColor( iberbar::CColor4B( 0xff000000 ) );
-	pEditBoxTextElement->SetZOrder( 99999 );
-	pEditBoxTextElement->SetBgZOrder( 99998 );
-	pEditBoxTextElement->SetSize( iberbar::CSize2i( 200, 100 ) );
-	pEditBoxTextElement->SetTextAlignHorizental( iberbar::UAlignHorizental::Left );
+	iberbar::TSmartRefPtr<iberbar::RHI::ITexture> pTexture;
+	m_pTextureManager->GetOrCreateTextureA( "Images/Background.png", &pTexture );
 
-	auto pDialog = iberbar::Gui::CEngine::sGetInstance()->GetDialog( "MainMenu" );
+	iberbar::TSmartRefPtr<iberbar::RHI::ISamplerState> pSamplerState;
+	iberbar::RHI::UTextureSamplerState SamplerStateDesc;
+	m_pRHIDevice->CreateSamplerState( &pSamplerState, SamplerStateDesc );
 
-	pDialog->GetWidgetRoot()->AddWidget( pEditBox );
+	float Viewport[ 2 ] = { 800, 600 };
+	iberbar::TSmartRefPtr<iberbar::Renderer::CMaterial> mat = iberbar::TSmartRefPtr<iberbar::Renderer::CMaterial>::_sNew();
+	mat->Initial( pShaderProgram );
+	mat->SetTexture( "g_texture", pTexture );
+	mat->SetSamplerState( "g_textureSampler", pSamplerState );
+	mat->SetInt( "g_rhw", 1 );
+	mat->SetFloat( "g_viewport_w", Viewport[0] );
+	mat->SetFloat( "g_viewport_h", Viewport[1] );
+
+	iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture> element_texture = iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture>::_sNew();
+	bg->SetRenderElement( element_texture );
+	element_texture->SetPosition( 0, 0 );
+	element_texture->SetSize( 800, 600 );
+	element_texture->SetAlignHorizental( iberbar::UAlignHorizental::Left );
+	element_texture->SetAlignVertical( iberbar::UAlignVertical::Top );
+	//element_texture->SetSize( 100, 100 );
+	//element_texture->SetPercentW( true );
+	//element_texture->SetPercentH( true );
+	element_texture->SetUV( iberbar::CRect2f( 0.0, 0.0, 1.0, 1.0 ) );
+	element_texture->SetMaterial( mat );
+
+	dlg->GetWidgetRoot()->AddWidget( bg );
+
+	//m_pTestDraw = m_pRHIDevice->CreateTestDraw();
+	//m_pTestDraw->SetShaderProgram( pShaderProgram );
+	//m_pTestDraw->SetTexture( pTexture );
+
+	//auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
+	//auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
+	//auto pEditBoxBgElement = iberbar::TSmartRefPtr<iberbar::Gui::CElementColorRect>::_sNew();
+
+	//pEditBox->SetRenderElement( pEditBoxBgElement );
+	//pEditBox->SetTextElementRef( pEditBoxTextElement );
+	//pEditBox->SetSize( iberbar::CSize2i( 200, 100 ) );
+	//pEditBox->SetPosition( 100, 100 );
+
+	//pEditBoxBgElement->Init();
+	//pEditBoxBgElement->SetColor( -1, iberbar::CColor4B( 0xffffffff ) );
+	//pEditBoxBgElement->SetSize( iberbar::CSize2i( 200, 100 ) );
+	//pEditBoxBgElement->SetZOrder( 99997 );
+	//pEditBoxBgElement->AddChildElement( pEditBoxTextElement );
+
+	//pEditBoxTextElement->SetFont( pFont );
+	//pEditBoxTextElement->SetTextColor( iberbar::CColor4B( 0xff000000 ) );
+	//pEditBoxTextElement->SetSelTextColor( iberbar::CColor4B( 0xffffffff ) );
+	//pEditBoxTextElement->SetSelBgColor( iberbar::CColor4B( 0xff3390ff ) );
+	//pEditBoxTextElement->SetCaretColor( iberbar::CColor4B( 0xff000000 ) );
+	//pEditBoxTextElement->SetZOrder( 99999 );
+	//pEditBoxTextElement->SetBgZOrder( 99998 );
+	//pEditBoxTextElement->SetSize( iberbar::CSize2i( 200, 100 ) );
+	//pEditBoxTextElement->SetTextAlignHorizental( iberbar::UAlignHorizental::Left );
+
+	//auto pDialog = iberbar::Gui::CEngine::sGetInstance()->GetDialog( "MainMenu" );
+
+	//pDialog->GetWidgetRoot()->AddWidget( pEditBox );
 
 #ifdef _DEBUG
 	FILE* f = nullptr;
@@ -145,6 +205,7 @@ iberbar::CResult CTestApplication::OnCreated()
 
 void CTestApplication::OnDestroy()
 {
+	//SAFE_DELETE( m_pTestDraw );
 }
 
 
@@ -155,14 +216,16 @@ void CTestApplication::OnUpdate( int64 nElapsedTimeMilliSecond, float nElapsedTi
 
 void CTestApplication::OnRender()
 {
-	iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
-	if ( m_pFontManager->GetFontDefault( &pFont ) )
-	{
-		iberbar::CRect2i rect( 0, 100, 200, 150 );
-		wchar_t strText[ 256 ];
-		swprintf_s( strText, L"fps: %4.4f", GetFPS() );
-		m_pRendererSprite->DrawText( INT_MAX, pFont, nullptr, strText, -1, &rect, iberbar::CColor4B( 0xffffffff ), iberbar::UFontDrawTextOptions() );
-	}
+	//if ( m_pTestDraw )
+		//m_pTestDraw->Draw();
+	//iberbar::TSmartRefPtr<iberbar::Renderer::CFont> pFont = nullptr;
+	//if ( m_pFontManager->GetFontDefault( &pFont ) )
+	//{
+	//	iberbar::CRect2i rect( 0, 100, 200, 150 );
+	//	wchar_t strText[ 256 ];
+	//	swprintf_s( strText, L"fps: %4.4f", GetFPS() );
+	//	m_pRendererSprite->DrawText( INT_MAX, pFont, nullptr, strText, -1, &rect, iberbar::CColor4B( 0xffffffff ), iberbar::UFontDrawTextOptions() );
+	//}
 }
 
 
@@ -191,7 +254,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLin
 	appInitData.nWndWidth = 800;
 	appInitData.nWndHeight = 600;
 	appInitData.bFullScreen = false;
-	appInitData.nRHIApi = iberbar::RHI::UApiType::D3D9;
+	appInitData.nRHIApi = iberbar::RHI::UApiType::D3D11;
 	appInitData.bUseLoadingThread = true;
 	CTestApplication app;
 	app.SetConfiguration( appInitData );

@@ -13,7 +13,8 @@ namespace iberbar
 		namespace D3D11
 		{
 			class CDevice;
-			class CConstantBuffer;
+			//class CConstantBuffer;
+			class CUniformBuffer;
 
 			class CShader abstract
 				: public IShader
@@ -29,14 +30,19 @@ namespace iberbar
 
 				CResult CreateReflection( const void* pCodes, uint32 nCodeLen );
 				FORCEINLINE CShaderReflection* GetReflectionInternal() { return m_pReflection; }
-				FORCEINLINE const std::vector<CConstantBuffer*>& GetConstantBuffers() { return m_ConstantBuffers; }
-				FORCEINLINE const uint8* GetConstantBuffersMemory() const { return &(m_ConstBuffersData.front()); }
+				//FORCEINLINE const std::vector<CConstantBuffer*>& GetConstantBuffers() { return m_ConstantBuffers; }
+				//FORCEINLINE const uint8* GetConstantBuffersMemory() const
+				//{
+				//	if (m_ConstBuffersData.empty())
+				//		return nullptr;
+				//	return &(m_ConstBuffersData.front());
+				//}
 
 			protected:
 				CDevice* m_pDevice;
 				CShaderReflection* m_pReflection;
-				std::vector<CConstantBuffer*> m_ConstantBuffers;
-				std::vector<uint8> m_ConstBuffersData;
+				//std::vector<CConstantBuffer*> m_ConstantBuffers;
+				//std::vector<uint8> m_ConstBuffersData;
 			};
 
 
@@ -112,6 +118,31 @@ namespace iberbar
 				FORCEINLINE ID3D11ComputeShader* GetD3DShader() { return m_pD3DShader.Get(); }
 			protected:
 				ComPtr<ID3D11ComputeShader> m_pD3DShader;
+			};
+
+
+			class CShaderProgram
+				: public IShaderProgram
+			{
+			public:
+				CShaderProgram(
+					CDevice* pDevice,
+					IShader* pVS,
+					IShader* pPS,
+					IShader* pHS,
+					IShader* pGS,
+					IShader* pDS );
+				virtual ~CShaderProgram();
+				inline CVertexShader* GetVertexShader() { return (CVertexShader*)m_pShaders[ (int)EShaderType::VertexShader ]; }
+				inline CPixelShader* GetPixelShader() { return (CPixelShader*)m_pShaders[ (int)EShaderType::PixelShader ]; }
+				inline CGeometryShader* GetGeometryShader() { return (CGeometryShader*)m_pShaders[ (int)EShaderType::GeometryShader ]; }
+				inline CHullShader* GetHullShader() { return (CHullShader*)m_pShaders[ (int)EShaderType::HullShader ]; }
+				inline CDomainShader* GetDomainShader() { return (CDomainShader*)m_pShaders[ (int)EShaderType::DomainShader ]; }
+
+				void Initial();
+
+			protected:
+				CDevice* m_pDevice;
 			};
 		}
 	}

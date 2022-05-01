@@ -55,6 +55,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Xml.h">
       <Filter>LuaApis</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\MaterialManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Xml.cpp">
       <Filter>LuaApis</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\MaterialManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="LuaApis">
