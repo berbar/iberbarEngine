@@ -56,6 +56,11 @@ void iberbar::RHI::D3D11::CDevice::Shutdown()
 		UNKNOWN_SAFE_RELEASE_NULL( m_SamplerStatesCache[ i ] );
 	}
 	m_SamplerStatesCache.clear();
+	for ( int i = 0, s = (int)m_ShaderStatesCache.size(); i < s; i++ )
+	{
+		UNKNOWN_SAFE_RELEASE_NULL( m_ShaderStatesCache[ i ] );
+	}
+	m_ShaderStatesCache.clear();
 
 	m_pD3DDepthStencil = nullptr;
 	m_pD3DDepthStencilState = nullptr;
@@ -278,8 +283,13 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateShaderState( IShaderState**
 	CResult cRet = pShaderState->Initial();
 	if ( cRet.IsOK() == false )
 		return cRet;
+
+	m_ShaderStatesCache.push_back( pShaderState );
+	(*(m_ShaderStatesCache.rbegin()))->AddRef();
+
 	( *ppOutShaderState ) = pShaderState;
 	( *ppOutShaderState )->AddRef();
+
 	return CResult();
 }
 

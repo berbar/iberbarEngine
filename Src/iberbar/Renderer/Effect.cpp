@@ -23,3 +23,8 @@ iberbar::CResult iberbar::Renderer::CEffectBase::InitialRhiUniformBuffer( uint32
 	RHI::IDevice* pRhiDevice = CRenderer::sGetInstance()->GetRHIDevice();
 	return pRhiDevice->CreateUniformBuffer( &m_pRhiUniformBuffer, nSize );
 }
+
+void iberbar::Renderer::CEffectBase::SetUniformBufferName( const std::string& strName )
+{
+	m_pRhiUniformBuffer->SetName( strName );
+}

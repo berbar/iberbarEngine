@@ -13,7 +13,6 @@ namespace iberbar
 	{
 		class IShaderProgram;
 		class IShaderState;
-		class IUniformBuffer;
 	}
 
 	namespace Renderer

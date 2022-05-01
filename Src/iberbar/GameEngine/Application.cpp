@@ -254,6 +254,7 @@ void iberbar::Game::CApplication::Destroy()
 	// 先打印僵尸对象
 #ifdef _DEBUG
 	FILE* f = nullptr;
+	
 	fopen_s( &f, "RefZombies.txt", "wt" );
 	if ( f != nullptr )
 	{
@@ -263,7 +264,7 @@ void iberbar::Game::CApplication::Destroy()
 #ifdef _WINDOWS
 				auto n = typeid(*pRefZombie).name();
 				auto r = pRefZombie->Refcount();
-				std::string strText = StdFormat( "0x%016llx: TypeName=<%s> Ref=%d\n", (uint64)pRefZombie, n, r );
+				std::string strText = StdFormat( "0x%016llx: TypeName=<%s> Ref=%d Name=%s\n", (uint64)pRefZombie, n, r, pRefZombie->GetName().c_str() );
 #else
 				std::string strText = StdFormat( "0x%016llx: Ref=%d\n", (uint64)pRefZombie, pRefZombie->Refcount() );
 #endif

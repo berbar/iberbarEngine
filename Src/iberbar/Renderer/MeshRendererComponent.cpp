@@ -10,7 +10,6 @@
 iberbar::Renderer::CMeshRendererComponent::CMeshRendererComponent()
 	: m_pMesh( nullptr )
 	, m_Materials(1)
-	, m_BoundShaderStates(1)
 	, m_RenderCommand()
 {
 }
@@ -20,10 +19,6 @@ iberbar::Renderer::CMeshRendererComponent::~CMeshRendererComponent()
 {
 	UNKNOWN_SAFE_RELEASE_NULL( m_pMesh );
 	for ( auto iter = m_Materials.begin(), end = m_Materials.end(); iter != end; iter ++ )
-	{
-		UNKNOWN_SAFE_RELEASE_NULL( *iter );
-	}
-	for ( auto iter = m_BoundShaderStates.begin(), end = m_BoundShaderStates.end(); iter != end; iter++ )
 	{
 		UNKNOWN_SAFE_RELEASE_NULL( *iter );
 	}
@@ -42,8 +37,6 @@ void iberbar::Renderer::CMeshRendererComponent::SetMesh( CMesh* pMesh )
 		m_pMesh->AddRef();
 
 	m_RenderCommand.SetMesh( m_pMesh );
-
-	//UpdateBoundShaderStates( -1 );
 }
 
 
@@ -67,31 +60,31 @@ void iberbar::Renderer::CMeshRendererComponent::SetMaterial( CMaterial* pMateria
 
 void iberbar::Renderer::CMeshRendererComponent::SetMaterialCount( int nCount )
 {
-	if ( nCount <= 0 )
-		return;
+	//if ( nCount <= 0 )
+	//	return;
 
-	int nCountOld = (int)m_Materials.size();
-	if ( nCountOld == nCount )
-		return;
+	//int nCountOld = (int)m_Materials.size();
+	//if ( nCountOld == nCount )
+	//	return;
 
-	if ( nCount < nCountOld )
-	{
-		for ( int i = nCount; i < nCountOld; i++ )
-		{
-			UNKNOWN_SAFE_RELEASE_NULL( m_Materials[ i ] );
-			UNKNOWN_SAFE_RELEASE_NULL( m_BoundShaderStates[ i ] );
-		}
-	}
-	else
-	{
-		m_Materials.resize( nCount );
-		m_BoundShaderStates.resize( nCount );
-		for ( int i = nCountOld; i < nCount; i++ )
-		{
-			m_Materials[ i ] = nullptr;
-			m_BoundShaderStates[ i ] = nullptr;
-		}
-	}
+	//if ( nCount < nCountOld )
+	//{
+	//	for ( int i = nCount; i < nCountOld; i++ )
+	//	{
+	//		UNKNOWN_SAFE_RELEASE_NULL( m_Materials[ i ] );
+	//		UNKNOWN_SAFE_RELEASE_NULL( m_BoundShaderStates[ i ] );
+	//	}
+	//}
+	//else
+	//{
+	//	m_Materials.resize( nCount );
+	//	m_BoundShaderStates.resize( nCount );
+	//	for ( int i = nCountOld; i < nCount; i++ )
+	//	{
+	//		m_Materials[ i ] = nullptr;
+	//		m_BoundShaderStates[ i ] = nullptr;
+	//	}
+	//}
 }
 
 
@@ -114,8 +107,6 @@ void iberbar::Renderer::CMeshRendererComponent::SetMaterial( int nIndex, CMateri
 
 	if ( pMaterial != nullptr )
 		pMaterial->AddRef();
-
-	//UpdateBoundShaderStates( nIndex );
 
 
 	if ( nIndex == 0 )
@@ -140,28 +131,3 @@ void iberbar::Renderer::CMeshRendererComponent::Render()
 	CRenderer::sGetInstance()->AddCommand( &m_RenderCommand );
 }
 
-
-//void iberbar::Renderer::CMeshRendererComponent::UpdateBoundShaderStates( int nIndex )
-//{
-//
-//	if ( nIndex < 0 )
-//	{
-//		for ( int i = 0, s = (int)m_Materials.size(); i < s; i++ )
-//		{
-//			UNKNOWN_SAFE_RELEASE_NULL( m_BoundShaderStates[ i ] );
-//			if ( m_pMesh != nullptr )
-//			{
-//				CRenderer2d::sGetInstance()->GetRHIDevice()->CreateShaderState( , nullptr, m_Materials[i]->GetShaderProgram() );
-//			}
-//			
-//		}
-//
-//		m_RenderCommand.SetShaderState( m_BoundShaderStates[ 0 ] );
-//	}
-//	else
-//	{
-//		m_RenderCommand.SetShaderState( m_BoundShaderStates[ 0 ] );
-//	}
-//
-//	
-//}

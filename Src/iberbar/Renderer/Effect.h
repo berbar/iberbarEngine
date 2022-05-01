@@ -23,6 +23,9 @@ namespace iberbar
 		protected:
 			CResult InitialRhiUniformBuffer( uint32 nSize );
 
+		public:
+			void SetUniformBufferName( const std::string& strName );
+
 		protected:
 			RHI::IUniformBuffer* m_pRhiUniformBuffer;
 		};

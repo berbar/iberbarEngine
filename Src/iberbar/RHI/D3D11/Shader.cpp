@@ -300,23 +300,13 @@ iberbar::RHI::D3D11::CShaderProgram::CShaderProgram(
 	IShader* pDS )
 	: IShaderProgram( pVS, pPS, pHS, pGS, pDS )
 	, m_pDevice( pDevice )
-	, m_UniformBuffers()
 {
 	assert( m_pDevice );
-
-	memset( m_UniformBuffers, 0, sizeof( m_UniformBuffers ) );
 }
 
 
 iberbar::RHI::D3D11::CShaderProgram::~CShaderProgram()
 {
-	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
-	{
-		for ( int j = 0; j < D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT; j++ )
-		{
-			SAFE_DELETE( m_UniformBuffers[ i ][ j ] );
-		}
-	}
 }
 
 
@@ -340,8 +330,6 @@ void iberbar::RHI::D3D11::CShaderProgram::Initial()
 			pReflectionBuffer = pReflection->GetBufferByIndexInternal( nBufferIndex );
 			if ( pReflectionBuffer == nullptr || pReflectionBuffer->GetSize() == 0 )
 				continue;
-
-			m_UniformBuffers[ i ][ pReflectionBuffer->GetBindPoint() ] = new CUniformBuffer( m_pDevice, pReflectionBuffer->GetSize(), true );
 		}
 	}
 }

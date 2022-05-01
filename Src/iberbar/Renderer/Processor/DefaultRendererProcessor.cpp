@@ -11,6 +11,7 @@
 #include <iberbar/RHI/VertexDeclaration.h>
 #include <iberbar/RHI/ShaderReflection.h>
 #include <iberbar/RHI/Device.h>
+#include <iberbar/Utility/String.h>
 
 
 
@@ -444,6 +445,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::_State::Initial()
 		for ( int j = 0; j < 10; j++ )
 		{
 			pRhiDevice->CreateUniformBuffer( &m_UniformBuffers[ i ][ j ], 4096 );
+			m_UniformBuffers[ i ][ j ]->SetName( StdFormat( "Renderer::CDefaultRendererProcessor::UniformBuffer_%d_%d", i, j ) );
 		}
 	}
 }

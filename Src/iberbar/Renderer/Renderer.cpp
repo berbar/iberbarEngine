@@ -42,6 +42,7 @@ iberbar::Renderer::CRenderer::~CRenderer()
 {
 	m_RenderQueue.clear();
 	SAFE_DELETE( m_pRenderGroupCommandManager );
+	SAFE_DELETE( m_pDefaultRendererProcessor );
 
 	sm_pInstance = nullptr;
 }

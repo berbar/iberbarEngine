@@ -144,9 +144,9 @@ iberbar::CResult CTestApplication::OnCreated()
 
 	dlg->GetWidgetRoot()->AddWidget( bg );
 
-	m_pTestDraw = m_pRHIDevice->CreateTestDraw();
-	m_pTestDraw->SetShaderProgram( pShaderProgram );
-	m_pTestDraw->SetTexture( pTexture );
+	//m_pTestDraw = m_pRHIDevice->CreateTestDraw();
+	//m_pTestDraw->SetShaderProgram( pShaderProgram );
+	//m_pTestDraw->SetTexture( pTexture );
 
 	//auto pEditBox = iberbar::TSmartRefPtr<iberbar::Gui::CEditBox>::_sNew();
 	//auto pEditBoxTextElement = iberbar::TSmartRefPtr<iberbar::Gui::CEditBoxTextElement>::_sNew();
@@ -205,7 +205,7 @@ iberbar::CResult CTestApplication::OnCreated()
 
 void CTestApplication::OnDestroy()
 {
-	SAFE_DELETE( m_pTestDraw );
+	//SAFE_DELETE( m_pTestDraw );
 }
 
 

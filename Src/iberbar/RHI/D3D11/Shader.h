@@ -143,7 +143,6 @@ namespace iberbar
 
 			protected:
 				CDevice* m_pDevice;
-				CUniformBuffer* m_UniformBuffers[ (int)EShaderType::__Count ][ D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT ];
 			};
 		}
 	}

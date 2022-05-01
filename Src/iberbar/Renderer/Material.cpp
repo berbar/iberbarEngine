@@ -174,7 +174,6 @@ void iberbar::Renderer::CMaterial::InitialVariableTables()
 {
 	if ( m_pShaderState )
 	{
-		m_pShaderState->AddRef();
 		RHI::IShader* pShader;
 		for ( int i = 0, s = (int)RHI::EShaderType::__Count; i < s; i++ )
 		{

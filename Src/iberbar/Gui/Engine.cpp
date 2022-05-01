@@ -94,6 +94,7 @@ iberbar::Gui::CEngine::~CEngine()
 iberbar::CResult iberbar::Gui::CEngine::Initial()
 {
 	m_pEffectMatrices->Initial();
+	m_pEffectMatrices->SetUniformBufferName( "Gui::CEngine::EffectMatrices" );
 
 	return CResult();
 }

@@ -6,11 +6,6 @@
 
 namespace iberbar
 {
-	namespace RHI
-	{
-		class IShaderState;
-	}
-
 	namespace Renderer
 	{
 		class CMesh;
@@ -32,14 +27,9 @@ namespace iberbar
 			virtual void Render();
 
 		protected:
-			//void UpdateBoundShaderStates( int nIndex );
-
-		protected:
 			CMesh* m_pMesh;
 			std::vector<CMaterial*> m_Materials;
-			std::vector<RHI::IShaderState*> m_BoundShaderStates;
 			Renderer::CMeshDrawCommand m_RenderCommand;
-			//bool m_DirtyBoundShaderStates;
 		};
 	}
 }

@@ -88,6 +88,7 @@ uint32 iberbar::CUnknownDebug::query( CUnknownDebug::PUNQuery process )
 //---------------------------------------------------------------------------------------------------------------------------------
 iberbar::CRef::CRef( void )
 	: m_nRef( 1 )
+	, m_strName( "" )
 {
 	CRefStatistics::sGetShared()->Add( this );
 }
@@ -136,7 +137,7 @@ std::string iberbar::CRef::ToString() const
 
 	const char* strTypeName = typeid( *this ).name();
 #ifdef _WIN64
-	std::string strText = StdFormat( "<%s, At 0x%016llx, Ref=%d>", strTypeName, (uint64)this, m_nRef );
+	std::string strText = StdFormat( "<%s, At 0x%016llx, Ref=%d, Name=%s>", strTypeName, (uint64)this, m_nRef, m_strName.c_str() );
 #else
 	std::string strText = StdFormat( "<%s, At 0x%08lx, Ref=%d>", strTypeName, (uint32)this, m_nRef );
 #endif
