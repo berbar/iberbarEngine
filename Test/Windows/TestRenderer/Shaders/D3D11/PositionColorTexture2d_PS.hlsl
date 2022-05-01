@@ -15,8 +15,8 @@ float4 Main(VS_OUTPUT input) : SV_TARGET
 {
     //if (g_useTexture == true)
     //{
-        //return g_texture.Sample(g_textureSampler, input.texcoord) * input.color;
+        return g_texture.Sample(g_textureSampler, input.texcoord) * input.color;
     //}
 		
-    return input.color;
+    //return input.color;
 }

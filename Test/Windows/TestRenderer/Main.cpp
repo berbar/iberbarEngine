@@ -132,8 +132,8 @@ iberbar::CResult CTestApplication::OnCreated()
 
 	iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture> element_texture = iberbar::TSmartRefPtr<iberbar::Gui::CElementStateTexture>::_sNew();
 	bg->SetRenderElement( element_texture );
-	element_texture->SetPosition( -300, 0 );
-	element_texture->SetSize( 400, 300 );
+	element_texture->SetPosition( 0, 0 );
+	element_texture->SetSize( 800, 600 );
 	element_texture->SetAlignHorizental( iberbar::UAlignHorizental::Left );
 	element_texture->SetAlignVertical( iberbar::UAlignVertical::Top );
 	//element_texture->SetSize( 100, 100 );

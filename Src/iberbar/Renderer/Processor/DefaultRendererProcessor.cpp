@@ -330,7 +330,7 @@ void iberbar::Renderer::CDefaultRendererProcessor::DrawBatchTriangles()
 	//m_pIndexBuffer->Unlock();
 
 	m_pCommandContext->SetShaderState( m_pState->GetUsingShaderState() );
-	//m_pState->SetShaderBindings();
+	m_pState->SetShaderBindings();
 	
 	for ( uint32 nStreamIndex : StreamsUsed )
 	{
@@ -544,10 +544,10 @@ void iberbar::Renderer::CDefaultRendererProcessor::_State::SetShaderBindings()
 			{
 				pShaderReflectionBuffer = pShaderReflection->GetBufferByIndex( nBufferIndex );
 				// 检查用户定义的BindPoint
-				//if ( pShaderReflectionBuffer->GetBindPoint() <= g_nRhiUniformBindPoint_UserMax )
-				//{
-				//	continue;
-				//}
+				if ( pShaderReflectionBuffer->GetBindPoint() > g_nRhiUniformBindPoint_UserMax )
+				{
+					continue;
+				}
 
 				pUniformBuffer = UniformBuffers[ nBufferIndex ];
 				pUniformBuffer->UpdateContents( pVariablesMemory + pShaderReflectionBuffer->GetOffset(), pShaderReflectionBuffer->GetSize() );
