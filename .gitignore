@@ -6,3 +6,5 @@ Bin/**
 **/.vs/**
 **.log
 **/RefZombies.txt
+Test/Windows/TestRenderer/Fonts
+Test/Windows/TestRenderer/Images

@@ -15,12 +15,12 @@ namespace iberbar
 			CDrawContext( Renderer::CRendererSprite* pRendererSprite, const DirectX::XMFLOAT4X4& matViewProjection );
 
 		public:
-			Renderer::CRenderer2d* GetRenderer();
+			Renderer::CRenderer* GetRenderer();
 			Renderer::CRendererSprite* GetRendererSprite();
 			const DirectX::XMFLOAT4X4& GetMatViewProjection() const;
 
 		private:
-			Renderer::CRenderer2d* m_pRenderer;
+			Renderer::CRenderer* m_pRenderer;
 			Renderer::CRendererSprite* m_pRendererSprite;
 			DirectX::XMFLOAT4X4 m_matViewProjection;
 		};
@@ -28,7 +28,7 @@ namespace iberbar
 }
 
 
-FORCEINLINE iberbar::Renderer::CRenderer2d* iberbar::Paper2d::CDrawContext::GetRenderer()
+FORCEINLINE iberbar::Renderer::CRenderer* iberbar::Paper2d::CDrawContext::GetRenderer()
 {
 	return m_pRenderer;
 }

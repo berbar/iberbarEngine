@@ -1,5 +1,6 @@
 
 #include "FileHelper.h"
+#include <iberbar/Utility/String.h>
 
 
 #ifdef _WIN32
@@ -26,16 +27,15 @@ std::string iberbar::CFileHelper::ReadAsText()
 
 
 
-bool iberbar::CFileUtilBase::CreateDirectory( const std::tstring& strPath, bool recurse ) const
+bool iberbar::FileApi::CreateDirectoryA( const char* strPath, bool recurse )
 {
-    //const tchar* strPathTemp = strPath.c_str();
-	if ( IsExistDirectory( strPath ) == true )
+	if ( IsExistDirectoryA( strPath ) == true )
 		return true;
 
     if ( recurse == false )
     {
 #ifdef _WIN32
-        BOOL ret = ::CreateDirectoryW( strPath.c_str(), nullptr );
+        BOOL ret = ::CreateDirectoryA( strPath, nullptr );
         if ( ret == FALSE )
         {
             return false;
@@ -50,14 +50,14 @@ bool iberbar::CFileUtilBase::CreateDirectory( const std::tstring& strPath, bool 
         return true;
     }
 
-    std::tstring strDir = GetDirectory( strPath );
+    std::string strDir = GetDirectoryA( strPath );
     //const tchar* strDirTemp = strDir.c_str();
     if ( strDir.empty() == false )
     {
-        CreateDirectory( Trim( strDir ), true );
+        CreateDirectoryA( strDir.c_str(), true );
     }
 
-    CreateDirectory( strPath, false );
+    CreateDirectoryA( strPath, false );
 //
 //	size_t nStart = 0;
 //	size_t nFound = strPath.find_first_of( "/\\", nStart );
@@ -118,22 +118,56 @@ bool iberbar::CFileUtilBase::CreateDirectory( const std::tstring& strPath, bool 
     return true;
 }
 
-bool iberbar::CFileUtilBase::IsExistDirectory( const std::tstring& strPath ) const
+
+bool iberbar::FileApi::CreateDirectoryW( const wchar_t* strPath, bool recurse )
+{
+    if ( IsExistDirectoryW( strPath ) == true )
+        return true;
+
+    if ( recurse == false )
+    {
+#ifdef _WIN32
+        BOOL ret = ::CreateDirectoryW( strPath, nullptr );
+        if ( ret == FALSE )
+        {
+            return false;
+        }
+#else
+        int ret = mkdir( strPath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+        if ( ret != 0 && (errno != EEXIST) )
+        {
+            return false;
+        }
+#endif
+        return true;
+    }
+
+    std::wstring strDir = GetDirectoryW( strPath );
+    if ( strDir.empty() == false )
+    {
+        CreateDirectoryW( strDir.c_str(), true );
+    }
+
+    CreateDirectoryW( strPath, false );
+}
+
+
+bool iberbar::FileApi::IsExistDirectoryA( const char* strPath )
 {
     
 #ifdef _WIN32
-    WIN32_FIND_DATA  FindFileData;
-    HANDLE hFind = FindFirstFile( strPath.c_str(), &FindFileData );
+    WIN32_FIND_DATAA  FindFileData;
+    HANDLE hFind = FindFirstFileA( strPath, &FindFileData );
     bool bExist = false;
     if ( (hFind != INVALID_HANDLE_VALUE) && (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 )
     {
         bExist = true;
     }
-    CloseHandle( hFind );
+    FindClose( hFind );
     return bExist;
 #else
     struct stat st;
-    if ( stat( strPath.c_str(), &st ) == 0 )
+    if ( stat( strPath, &st ) == 0 )
     {
         return S_ISDIR( st.st_mode );
     }
@@ -141,36 +175,82 @@ bool iberbar::CFileUtilBase::IsExistDirectory( const std::tstring& strPath ) con
 #endif
 }
 
-std::tstring iberbar::CFileUtilBase::GetDirectory( const std::tstring& strPath ) const
+
+bool iberbar::FileApi::IsExistDirectoryW( const wchar_t* strPath )
 {
-    std::tstring strDir = Trim( strPath );
-    size_t nFound = strDir.find_last_of( TEXT("/\\") );
-    if ( nFound == std::tstring::npos )
-        return TEXT( "" );
+
+#ifdef _WIN32
+    WIN32_FIND_DATAW  FindFileData;
+    HANDLE hFind = FindFirstFileW( strPath, &FindFileData );
+    bool bExist = false;
+    if ( (hFind != INVALID_HANDLE_VALUE) && (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0 )
+    {
+        bExist = true;
+    }
+    FindClose( hFind );
+    return bExist;
+
+#else
+    std::string strPathUtf8 = UnicodeToUtf8( strPath );
+    struct stat st;
+    if ( stat( strPathUtf8.c_str(), &st ) == 0 )
+    {
+        return S_ISDIR( st.st_mode );
+    }
+    return false;
+#endif
+}
+
+
+std::string iberbar::FileApi::GetDirectoryA( const char* strPath )
+{
+    std::string strPathTemp = TrimA( strPath );
+    size_t nFound = strPathTemp.find_last_of( "/\\" );
+    if ( nFound == std::string::npos )
+        return "";
     
-    const tchar* strDirTemp = strDir.c_str();
-    strDir = strPath.substr( 0, nFound );
-    strDirTemp = strDir.c_str();
-    strDir = Trim( strDir );
-    strDirTemp = strDir.c_str();
+    //const char* strDirTemp = strDir.c_str();
+    std::string strDir;
+    strDir = strPathTemp.substr( 0, nFound );
+    //strDirTemp = strDir.c_str();
+    strDir = TrimA( strDir.c_str() );
+    //strDirTemp = strDir.c_str();
     return strDir;
 }
 
-bool iberbar::CFileUtilBase::IsExistFile( const std::tstring& strPath ) const
+
+std::wstring iberbar::FileApi::GetDirectoryW( const wchar_t* strPath )
+{
+    std::wstring strPathTemp = TrimW( strPath );
+    size_t nFound = strPathTemp.find_last_of( L"/\\" );
+    if ( nFound == std::wstring::npos )
+        return L"";
+
+    //const char* strDirTemp = strDir.c_str();
+    std::wstring strDir;
+    strDir = strPathTemp.substr( 0, nFound );
+    //strDirTemp = strDir.c_str();
+    strDir = TrimW( strDir.c_str() );
+    //strDirTemp = strDir.c_str();
+    return strDir;
+}
+
+
+bool iberbar::FileApi::IsExistFileA( const char* strPath )
 {
 #ifdef _WIN32
-    WIN32_FIND_DATA  FindFileData;
-    HANDLE hFind = FindFirstFile( strPath.c_str(), &FindFileData );
+    WIN32_FIND_DATAA  FindFileData;
+    HANDLE hFind = FindFirstFileA( strPath, &FindFileData );
     bool bExist = false;
     if ( (hFind != INVALID_HANDLE_VALUE) && (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 )
     {
         bExist = true;
     }
-    CloseHandle( hFind );
+    FindClose( hFind );
     return bExist;
 #else
     struct stat st;
-    if ( stat( strPath.c_str(), &st ) == 0 )
+    if ( stat( strPath, &st ) == 0 )
     {
         return S_ISREG( st.st_mode );
     }
@@ -178,12 +258,61 @@ bool iberbar::CFileUtilBase::IsExistFile( const std::tstring& strPath ) const
 #endif
 }
 
-std::tstring iberbar::CFileUtilBase::Trim( const std::tstring& strPath ) const
+
+bool iberbar::FileApi::IsExistFileW( const wchar_t* strPath )
 {
-    size_t nFound = strPath.find_last_not_of( TEXT("/\\") );
-    if ( nFound == std::tstring::npos )
+#ifdef _WIN32
+    WIN32_FIND_DATAW  FindFileData;
+    HANDLE hFind = FindFirstFileW( strPath, &FindFileData );
+    bool bExist = false;
+    if ( (hFind != INVALID_HANDLE_VALUE) && (FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 )
+    {
+        bExist = true;
+    }
+    FindClose( hFind );
+    return bExist;
+#else
+    std::string strPathUtf8 = UnicodeToUtf8( strPath );
+    struct stat st;
+    if ( stat( strPathUtf8.c_str(), &st ) == 0 )
+    {
+        return S_ISREG( st.st_mode );
+    }
+    return false;
+#endif
+}
+
+
+std::string iberbar::FileApi::TrimA( const char* strPath )
+{
+    std::string strPathTemp = strPath;
+    size_t nFound = strPathTemp.find_last_not_of( "/\\" );
+    if ( nFound == std::string::npos )
         return strPath;
-    return strPath.substr( 0, nFound + 1 );
+    return strPathTemp.substr( 0, nFound + 1 );
+
+    //const char* ptr = strPath.c_str();
+    //int nLen = strPath.length();
+    //int nLenNew = nLen;
+    //for ( int i = nLen - 1; i >= 0; i-- )
+    //{
+    //    if ( ptr[ i ] != '/' && ptr[ i ] != '\\' )
+    //        break;
+    //    nLenNew--;
+    //}
+    //if ( nLenNew == nLen )
+    //    return strPath;
+    //return strPath.substr( 0, nLenNew );
+}
+
+
+std::wstring iberbar::FileApi::TrimW( const wchar_t* strPath )
+{
+    std::wstring strPathTemp = strPath;
+    size_t nFound = strPathTemp.find_last_not_of( L"/\\" );
+    if ( nFound == std::wstring::npos )
+        return strPath;
+    return strPathTemp.substr( 0, nFound + 1 );
 
     //const char* ptr = strPath.c_str();
     //int nLen = strPath.length();

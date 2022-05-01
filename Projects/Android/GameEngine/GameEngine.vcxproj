@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\Application.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\FontManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\GameEngine\TextureManager.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Game.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Gui.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Rect.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Application.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\BaseResourceManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\FontManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ResourcePreloader.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\ShaderManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\GameEngine\TextureManager.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Game.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Gui.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Paper2d.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Rhi.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Rect.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\LuaCppApis\Utility\Xml.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Font\Font.vcxproj">
+      <Project>{854e82f5-77d1-42dc-bcc3-5fbc021f536c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Gui\Gui.vcxproj">
+      <Project>{d5eb2c13-ae9b-471c-b8cb-9bca829512cd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Lua\Lua.vcxproj">
+      <Project>{299ac609-16ef-48df-82c3-c1fa80b95b89}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Paper2d\Paper2d.vcxproj">
+      <Project>{900742d7-148b-48f1-b363-e6ad4ab1b6db}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Renderer\Renderer.vcxproj">
+      <Project>{f76aea6f-a678-4542-91cc-8dd99fc81f76}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI.OpenGL\RHI.OpenGL.vcxproj">
+      <Project>{9e16d20a-2873-4faa-a0e9-362af2d30a77}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI\RHI.vcxproj">
+      <Project>{5b8fb16a-620c-419a-abe3-3d525e6dedb0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{0a1ee270-a68c-4754-917e-866a3f69a4ca}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Src\iberbar\LuaCppApis\readme.md" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{b63a511a-7df7-4d47-841e-d82c026b1e72}</ProjectGuid>
+    <Keyword>Android</Keyword>
+    <RootNamespace>GameEngine</RootNamespace>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <ApplicationType>Android</ApplicationType>
+    <ApplicationTypeRevision>3.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+    <AndroidAPILevel>android-21</AndroidAPILevel>
+    <UseOfStl>c++_shared</UseOfStl>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <Import Project="..\..\..\Properties\Common-Android.props" />
+    <Import Project="..\..\..\Properties\Paths.props" />
+    <Import Project="..\..\..\Properties\Sdk.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>lib_iberbar$(RootNamespace)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(__common_include)\unix;$(sdk_directxmath_include);$(sdk_lua_include);$(IncludePath)</IncludePath>
+    <IntDir>$(iberbarOutputDirRoot)\Temp\$(RootNamespace)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <CppLanguageStandard>c++1z</CppLanguageStandard>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(sdk_lua_lib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LibraryDependencies>lua;%(LibraryDependencies)</LibraryDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

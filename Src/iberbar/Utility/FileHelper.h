@@ -34,19 +34,32 @@ namespace iberbar
 #define fread_s(_DstBuf, _DstSize, _ElementSize, _Count, _File)  fread(_DstBuf, _ElementSize, _Count, _File)
 #endif
 
-
-	class __iberbarUtilityApi__ CFileUtilBase
+	namespace FileApi
 	{
-	public:
-		bool CreateDirectory( const std::tstring& strPath, bool recurse ) const;
-		bool IsExistDirectory( const std::tstring& strPath ) const;
-		std::tstring GetDirectory( const std::tstring& strPath ) const;
-		bool IsExistFile( const std::tstring& strPath ) const;
-		std::tstring Trim( const std::tstring& strPath ) const;
+		bool __iberbarUtilityApi__ CreateDirectoryA( const char* strPath, bool recurse );
+		bool __iberbarUtilityApi__ CreateDirectoryW( const wchar_t* strPath, bool recurse );
+		bool __iberbarUtilityApi__ IsExistDirectoryA( const char* strPath );
+		bool __iberbarUtilityApi__ IsExistDirectoryW( const wchar_t* strPath );
+		std::string __iberbarUtilityApi__ GetDirectoryA( const char* strPath );
+		std::wstring __iberbarUtilityApi__ GetDirectoryW( const wchar_t* strPath );
+		bool __iberbarUtilityApi__ IsExistFileA( const char* strPath );
+		bool __iberbarUtilityApi__ IsExistFileW( const wchar_t* strPath );
+		std::string __iberbarUtilityApi__ TrimA( const char* strPath );
+		std::wstring __iberbarUtilityApi__ TrimW( const wchar_t* strPath );
+	}
 
-	protected:
-		//bool CreateDirectoryInner( const std::tstring& strPath ) const;
-	};
+	//class __iberbarUtilityApi__ CFileUtilBase
+	//{
+	//public:
+	//	bool CreateDirectory( const std::tstring& strPath, bool recurse ) const;
+	//	bool IsExistDirectory( const std::tstring& strPath ) const;
+	//	std::tstring GetDirectory( const std::tstring& strPath ) const;
+	//	bool IsExistFile( const std::tstring& strPath ) const;
+	//	std::tstring Trim( const std::tstring& strPath ) const;
+
+	//protected:
+	//	//bool CreateDirectoryInner( const std::tstring& strPath ) const;
+	//};
 
 }
 

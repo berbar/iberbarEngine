@@ -72,15 +72,24 @@ class CPopo
 
 function Main(): void
 {
-    let dlg = iberbar.Gui.CreateDialog( 0 );
+    let dlg = iberbar.Gui.CreateDialog();
     dlg.SetId( "MainMenu" );
     dlg.SetPosition( 0, 0 );
     dlg.SetSize( 800, 600 );
 
+    let dlgPop = iberbar.Gui.CreateDialog();
+    dlgPop.SetId( "PopMenu" );
+    dlgPop.SetPosition( -50, -50 );
+    dlgPop.SetSize( 400, 200 );
+    dlgPop.SetAlignHorizental( iberbar.UAlignHorizontal.Center );
+    dlgPop.SetAlignVertical( iberbar.UAlignVertical.Center );
+    dlgPop.SetModal( false );
+
     let guiXmlParser = iberbar.Game.GetGuiXmlParser();
     guiXmlParser.ReadFile( "Scripts/MainMenu.xml", dlg );
+    guiXmlParser.ReadFile( "Scripts/PopMenu.xml", dlgPop );
 
-    let btn = dlg.FindWidget( "Btn-StartGame" );
+    let btn = dlg.GetWidgetRoot().FindWidget( "Btn-StartGame" );
     if ( btn != null )
     {
         btn.AddEventCallback( 0, function( widget, event, valueInt )
@@ -91,12 +100,13 @@ function Main(): void
 
 
     let listbox = iberbar.Gui.CListBox.new<UListBoxItem>();
+    listbox.SetDebugId( 15 );
     listbox.SetPosition( 0, 0 );
     listbox.SetSize( 200, 100 );
-    listbox.SetEnableDrag( true );
+    listbox.SetDragStyle( iberbar.Gui.EListBoxDragStyle.DragView );
     listbox.SetSelectType( 2 );
     listbox.SetItemSize( 200, 40 );
-    listbox.SetCallback_CreateItemElements( function( element, item, index )
+    listbox.SetCallback_ItemElementCreate( function( element, item, index )
     {
         let elementLabel = iberbar.Gui.CElementStateLabel.new();
         elementLabel.SetId( "" + item.id );
@@ -107,6 +117,7 @@ function Main(): void
         elementLabel.SetColor( 1, 0xff0000ff );
         elementLabel.SetColor( 2, 0xffff0000 );
         elementLabel.SetColor( 3, 0xff00ff00 );
+        elementLabel.SetColor( iberbar.Gui.UWidgetState.Disabled, 0xff808080 );
         element.AddElement( elementLabel );
     });
     listbox.AddItem( { id: 1, text : "gogo" } );
@@ -114,6 +125,7 @@ function Main(): void
     listbox.AddItem( { id: 22, text : "gaga" } );
     listbox.AddItem( { id: 22, text : "我" } );
     listbox.AddItem( { id: 22, text : "好可爱哟" } );
+    listbox.SetItemEnable( 2, false );
     listbox.AddEventCallback( iberbar.Gui.UEvents.ValueChanged, function( widget, event, valueInt )
     {
         let listboxTemp = iberbar.Gui.CListBox.dynamic_cast( widget );
@@ -133,7 +145,7 @@ function Main(): void
             iberbar.Game.LogDebug( "Lua","[]" );
         }
     } );
-    dlg.AddWidget( listbox );
+    dlg.GetWidgetRoot().AddWidget( listbox );
 
     let find = listbox.FindItemOne( function( item )
     {

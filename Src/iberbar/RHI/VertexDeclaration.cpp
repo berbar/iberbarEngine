@@ -3,37 +3,34 @@
 
 
 
-iberbar::RHI::IVertexDeclaration::IVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride )
+iberbar::RHI::IVertexDeclaration::IVertexDeclaration( const UVertexElement* pVertexElements, uint32 nVertexElementsCount )
 	: IResource( UResourceType::VertexDeclaration )
-	, m_nStride( nStride )
-	, m_pVertexElements( nullptr )
 	, m_nVertexElementsCount( 0 )
+	, m_Strides()
+	, m_VertexElements()
 {
-	m_pVertexElements = new UVertexElement[ nVertexElementsCount ];
-	uint32 nCopySize = sizeof( UVertexElement ) * nVertexElementsCount;
-	memcpy_s( m_pVertexElements, nCopySize, pVertexElements, nCopySize );
+	assert( nVertexElementsCount <= MaxVertexElementCount );
+
+	uint16 UsedStreamsMask = 0;
+	memset( m_Strides, 0, sizeof( m_Strides ) );
+	memset( m_VertexElements, 0, sizeof( m_VertexElements ) );
+
+	for ( uint32 nElementIndex = 0; nElementIndex < nVertexElementsCount; nElementIndex++ )
+	{
+		const UVertexElement& Element = pVertexElements[ nElementIndex ];
+		m_VertexElements[ nElementIndex ] = Element;
+
+		if ( ( UsedStreamsMask & 1 << Element.nSlot ) != 0 )
+		{
+			assert( m_Strides[ Element.nSlot ] == Element.nStride );
+		}
+		else
+		{
+			UsedStreamsMask = UsedStreamsMask | (1 << Element.nSlot);
+			m_Strides[ Element.nSlot ] = Element.nStride;
+		}
+	}
+	
 	m_nVertexElementsCount = nVertexElementsCount;
 }
 
-
-iberbar::RHI::IVertexDeclaration::~IVertexDeclaration()
-{
-	SAFE_DELETE_ARRAY( m_pVertexElements );
-}
-
-//
-//iberbar::RHI::CVertexDeclaration::CVertexDeclaration()
-//	: m_Attributes()
-//	, m_nStride( 0 )
-//{
-//}
-//
-//void iberbar::RHI::CVertexDeclaration::SetAttribute( const std::string& strName, uint32 nIndex, UVertexFormat nFormat, uint32 nOffset, bool bNormallized )
-//{
-//	m_Attributes[ strName ] = UAttribute( strName, nIndex, nFormat, nOffset, bNormallized );
-//}
-//
-//void iberbar::RHI::CVertexDeclaration::SetStride( uint32 nStride )
-//{
-//	m_nStride = nStride;
-//}

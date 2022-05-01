@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\iberbar\Poster\Font.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\LuaApis.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Paints.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Sprite.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\TextureScale9.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\ElementBase.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\ElementImage.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\ElementLabel.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\XmlEngine.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\Poster\ResourcesManager.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp">
+      <Filter>LuaApis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\LuaCppApis\Utility\Rect.cpp">
+      <Filter>LuaApis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\XmlProc.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\XmlCommon.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Font.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\LuaApis.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\MathTypes.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Paints.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Sprite.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Surface.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\TextureScale9.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementBase.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementImage.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementImageScale9.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementLabel.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\XmlEngine.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\ResourcesManager.h" />
+    <ClInclude Include="..\..\Src\iberbar\LuaCppApis\Utility\Xml.h">
+      <Filter>LuaApis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\LuaCppApis\Utility\Rect.h">
+      <Filter>LuaApis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\XmlProc.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\XmlCommon.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="LuaApis">
+      <UniqueIdentifier>{ece552fa-866a-4fc6-826b-614ea24a0075}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Elements">
+      <UniqueIdentifier>{65410a1f-9fa8-46c1-b88e-c63285d5bc7e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

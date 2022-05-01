@@ -2,7 +2,7 @@
 #include <iberbar/LuaCppApis/Game.h>
 #include <iberbar/LuaCppApis/Game_Names.h>
 #include <iberbar/GameEngine/Application.h>
-#include <iberbar/GameEngine/Paper2dLoader.h>
+//#include <iberbar/GameEngine/Paper2dLoader.h>
 #include <iberbar/GameEngine/BaseResourceManager.h>
 #include <iberbar/GameEngine/TextureManager.h>
 #include <iberbar/GameEngine/FontManager.h>
@@ -25,14 +25,14 @@ namespace iberbar
 	namespace Game
 	{
 		//int LuaCFunction_GetGuiEngine( lua_State* pLuaState );
-		int LuaCFunction_GetGuiXmlParser( lua_State* pLuaState );
+		//int LuaCFunction_GetGuiXmlParser( lua_State* pLuaState );
 		int LuaCFunction_GetOrCreateTexture( lua_State* pLuaState );
 		int LuaCFunction_GetTexture( lua_State* pLuaState );
 		int LuaCFunction_GetOrCreateFont( lua_State* pLuaState );
 		int LuaCFunction_GetFont( lua_State* pLuaState );
 		int LuaCFunction_GetResourcePath( lua_State* pLuaState );
-		int LuaCFunction_Paper2dLoadAnimations( lua_State* pLuaState );
-		int LuaCFunction_Paper2dLoadGridTerrain( lua_State* pLuaState );
+		//int LuaCFunction_Paper2dLoadAnimations( lua_State* pLuaState );
+		//int LuaCFunction_Paper2dLoadGridTerrain( lua_State* pLuaState );
 
 
 		int LuaCFunction_CreateTimer( lua_State* pLuaState );
@@ -107,15 +107,15 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 	builder.ResolveScope( []( Lua::CScopeBuilder* scope )
 		{
 			//scope->AddFunctionOne( "GetGuiEngine", &LuaCFunction_GetGuiEngine );
-			scope->AddFunctionOne( "GetGuiXmlParser", &LuaCFunction_GetGuiXmlParser );
+			//scope->AddFunctionOne( "GetGuiXmlParser", &LuaCFunction_GetGuiXmlParser );
 			scope->AddFunctionOne( "GetOrCreateTexture", &LuaCFunction_GetOrCreateTexture );
 			scope->AddFunctionOne( "GetTexture", &LuaCFunction_GetTexture );
 			scope->AddFunctionOne( "GetOrCreateFont", &LuaCFunction_GetOrCreateFont );
 			scope->AddFunctionOne( "GetFont", &LuaCFunction_GetFont );
 			scope->AddFunctionOne( "GetResourcePath", LuaCFunction_GetResourcePath );
 
-			scope->AddFunctionOne( "Paper2dLoadAnimations", &LuaCFunction_Paper2dLoadAnimations );
-			scope->AddFunctionOne( "Paper2dLoadGridTerrain", &LuaCFunction_Paper2dLoadGridTerrain );
+			//scope->AddFunctionOne( "Paper2dLoadAnimations", &LuaCFunction_Paper2dLoadAnimations );
+			//scope->AddFunctionOne( "Paper2dLoadGridTerrain", &LuaCFunction_Paper2dLoadGridTerrain );
 
 			scope->AddFunctionOne( "AddLoadingTask", &LuaCFunction_AddLoadingTask );
 			scope->AddFunctionOne( "WakeupLoadingThread", &LuaCFunction_WakeupLoadingThread );
@@ -190,12 +190,12 @@ void iberbar::Game::RegisterLuaCpp( lua_State* pLuaState )
 //}
 
 
-int iberbar::Game::LuaCFunction_GetGuiXmlParser( lua_State* pLuaState )
-{
-	auto pEngine = CApplication::sGetApp()->GetGuiXmlParser();
-	lua_pushcppobject( pLuaState, "iberbar.Gui.CXmlParser", pEngine );
-	return 1;
-}
+//int iberbar::Game::LuaCFunction_GetGuiXmlParser( lua_State* pLuaState )
+//{
+//	auto pEngine = CApplication::sGetApp()->GetGuiXmlParser();
+//	lua_pushcppobject( pLuaState, "iberbar.Gui.CXmlParser", pEngine );
+//	return 1;
+//}
 
 
 int iberbar::Game::LuaCFunction_GetOrCreateTexture( lua_State* pLuaState )
@@ -336,65 +336,65 @@ int iberbar::Game::LuaCFunction_GetResourcePath( lua_State* pLuaState )
 	return 1;
 }
 
-
-int iberbar::Game::LuaCFunction_Paper2dLoadAnimations( lua_State* pLuaState )
-{
-	int t = lua_gettop( pLuaState );
-	if ( t != 1 )
-		return iberbar_LuaError_ArgumentsCountIsNotMatch( pLuaState, 1 );
-
-	const char* strFile = lua_tostring( pLuaState, 1 );
-	if ( StringIsNullOrEmpty( strFile ) == true )
-	{
-		lua_pushnil( pLuaState );
-		return 1;
-	}
-
-	std::vector<Paper2d::CAnimationController*> AnimList;
-	CResult ret = CPaper2dLoader::GetShared()->LoadAnimations( strFile, AnimList );
-	if ( ret.IsOK() == false )
-	{
-		lua_pushnil( pLuaState );
-		return 1;
-	}
-
-	lua_newtable( pLuaState );
-	int nLuaTable = lua_gettop( pLuaState );
-	for ( size_t i = 0, s = AnimList.size(); i < s; i++ )
-	{
-		lua_pushcppref( pLuaState, "iberbar.Paper2d.CAnimationController", AnimList[ i ] );
-		lua_rawseti( pLuaState, -2, (lua_Integer)i + 1 );
-		UNKNOWN_SAFE_RELEASE_NULL( AnimList[ i ] );
-	}
-	AnimList.clear();
-
-	return 1;
-}
-
-
-int iberbar::Game::LuaCFunction_Paper2dLoadGridTerrain( lua_State* pLuaState )
-{
-	int t = lua_gettop( pLuaState );
-	if ( t != 2 )
-		return iberbar_LuaError_ArgumentsCountIsNotMatch( pLuaState, 2 );
-
-	const char* strFile = lua_tostring( pLuaState, 1 );
-	if ( StringIsNullOrEmpty( strFile ) == true )
-		return 0;
-
-	Paper2d::CGridTerrain* pTerrain = lua_tocppobject( pLuaState, 2, Paper2d::CGridTerrain );
-	if ( pTerrain == nullptr )
-		return 0;
-
-	CResult ret = CPaper2dLoader::GetShared()->LoadGridTerrain( strFile, pTerrain );
-	if ( ret.IsOK() == false )
-	{
-		//lua_pushnil( pLuaState );
-		return 0;
-	}
-
-	return 0;
-}
+//
+//int iberbar::Game::LuaCFunction_Paper2dLoadAnimations( lua_State* pLuaState )
+//{
+//	int t = lua_gettop( pLuaState );
+//	if ( t != 1 )
+//		return iberbar_LuaError_ArgumentsCountIsNotMatch( pLuaState, 1 );
+//
+//	const char* strFile = lua_tostring( pLuaState, 1 );
+//	if ( StringIsNullOrEmpty( strFile ) == true )
+//	{
+//		lua_pushnil( pLuaState );
+//		return 1;
+//	}
+//
+//	std::vector<Paper2d::CAnimationController*> AnimList;
+//	CResult ret = CPaper2dLoader::GetShared()->LoadAnimations( strFile, AnimList );
+//	if ( ret.IsOK() == false )
+//	{
+//		lua_pushnil( pLuaState );
+//		return 1;
+//	}
+//
+//	lua_newtable( pLuaState );
+//	int nLuaTable = lua_gettop( pLuaState );
+//	for ( size_t i = 0, s = AnimList.size(); i < s; i++ )
+//	{
+//		lua_pushcppref( pLuaState, "iberbar.Paper2d.CAnimationController", AnimList[ i ] );
+//		lua_rawseti( pLuaState, -2, (lua_Integer)i + 1 );
+//		UNKNOWN_SAFE_RELEASE_NULL( AnimList[ i ] );
+//	}
+//	AnimList.clear();
+//
+//	return 1;
+//}
+//
+//
+//int iberbar::Game::LuaCFunction_Paper2dLoadGridTerrain( lua_State* pLuaState )
+//{
+//	int t = lua_gettop( pLuaState );
+//	if ( t != 2 )
+//		return iberbar_LuaError_ArgumentsCountIsNotMatch( pLuaState, 2 );
+//
+//	const char* strFile = lua_tostring( pLuaState, 1 );
+//	if ( StringIsNullOrEmpty( strFile ) == true )
+//		return 0;
+//
+//	Paper2d::CGridTerrain* pTerrain = lua_tocppobject( pLuaState, 2, Paper2d::CGridTerrain );
+//	if ( pTerrain == nullptr )
+//		return 0;
+//
+//	CResult ret = CPaper2dLoader::GetShared()->LoadGridTerrain( strFile, pTerrain );
+//	if ( ret.IsOK() == false )
+//	{
+//		//lua_pushnil( pLuaState );
+//		return 0;
+//	}
+//
+//	return 0;
+//}
 
 
 

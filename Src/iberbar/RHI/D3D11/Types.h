@@ -17,6 +17,9 @@ namespace iberbar
 			D3D11_TEXTURE_ADDRESS_MODE ConvertTextureAddressMode( UTextureAddress nAddress );
 			D3D11_FILTER_TYPE ConvertTextureFilter( UTextureFilterType nFilter );
 			D3D11_FILTER EncodeTextureFilter( UTextureFilterType nMin, UTextureFilterType nMag, UTextureFilterType nMip );
+			D3D11_DEPTH_WRITE_MASK ConvertDepthWriteMask( UDepthWriteMask nWriteMask );
+			D3D11_COMPARISON_FUNC ConvertComparisonFunc( UComparisonFunc nComparisonFunc );
+			uint32 GetVertexCountForPrimitiveCount( uint32 nNumPrimitives, UPrimitiveType nPrimitiveType );
 			static const int MAX_VERTEX_BUFFERS_COUNT = 16;
 		}
 	}
@@ -46,7 +49,7 @@ inline D3D11_PRIMITIVE_TOPOLOGY iberbar::RHI::D3D11::ConvertPrimitiveType( UPrim
 			break;
 	}
 
-	return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+	return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 }
 
 
@@ -233,4 +236,66 @@ inline D3D11_FILTER_TYPE iberbar::RHI::D3D11::ConvertTextureFilter( UTextureFilt
 inline D3D11_FILTER iberbar::RHI::D3D11::EncodeTextureFilter( UTextureFilterType nMin, UTextureFilterType nMag, UTextureFilterType nMip )
 {
 	return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+}
+
+
+inline D3D11_DEPTH_WRITE_MASK iberbar::RHI::D3D11::ConvertDepthWriteMask( UDepthWriteMask nWriteMask )
+{
+	switch (nWriteMask)
+	{
+	case UDepthWriteMask::Zero:
+		return D3D11_DEPTH_WRITE_MASK_ZERO;
+
+	case UDepthWriteMask::All:
+		return D3D11_DEPTH_WRITE_MASK_ALL;
+	}
+
+	return D3D11_DEPTH_WRITE_MASK_ALL;
+}
+
+
+inline D3D11_COMPARISON_FUNC iberbar::RHI::D3D11::ConvertComparisonFunc( UComparisonFunc nComparisonFunc )
+{
+	switch (nComparisonFunc)
+	{
+	case UComparisonFunc::Never:
+		return D3D11_COMPARISON_NEVER;
+
+	case UComparisonFunc::Less:
+		return D3D11_COMPARISON_LESS;
+
+	case UComparisonFunc::Equal:
+		return D3D11_COMPARISON_EQUAL;
+
+	case UComparisonFunc::LessEqual:
+		return D3D11_COMPARISON_LESS_EQUAL;
+
+	case UComparisonFunc::Greater:
+		return D3D11_COMPARISON_GREATER;
+
+	case UComparisonFunc::NotEqual:
+		return D3D11_COMPARISON_NOT_EQUAL;
+
+	case UComparisonFunc::GreaterEqual:
+		return D3D11_COMPARISON_GREATER_EQUAL;
+
+	case UComparisonFunc::Always:
+		return D3D11_COMPARISON_ALWAYS;
+	}
+	return D3D11_COMPARISON_NEVER;
+}
+
+
+inline uint32 iberbar::RHI::D3D11::GetVertexCountForPrimitiveCount( uint32 nNumPrimitives, UPrimitiveType nPrimitiveType )
+{
+	switch ( nPrimitiveType )
+	{
+	case UPrimitiveType::TriangleStrip:
+		return nNumPrimitives * 3;
+
+	case UPrimitiveType::Triangle:
+		return nNumPrimitives * 3;
+	}
+
+	return 0;
 }

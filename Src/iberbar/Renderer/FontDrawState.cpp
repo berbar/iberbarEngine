@@ -160,16 +160,16 @@ void iberbar::Renderer::CFontDrawState::AddDrawCommand(
 
 void iberbar::Renderer::CFontDrawState::AddCommandIntoRenderer()
 {
-	m_pRendererSprite->DrawRectsBatch(
-		m_nZOrder,
-		m_pDrawBuffer->GetRectCount(),
-		m_pDrawBuffer->GetRectsPointer(),
-		m_pDrawBuffer->sm_nRects_Stride,
-		m_pDrawBuffer->sm_nRects_Offset_RcDst,
-		m_pDrawBuffer->sm_nRects_Offset_Color,
-		m_pDrawBuffer->sm_nRects_Offset_RcTextureCoord,
-		m_pTextureCurrent
-	);
+	//m_pRendererSprite->DrawRectsBatch(
+	//	m_nZOrder,
+	//	m_pDrawBuffer->GetRectCount(),
+	//	m_pDrawBuffer->GetRectsPointer(),
+	//	m_pDrawBuffer->sm_nRects_Stride,
+	//	m_pDrawBuffer->sm_nRects_Offset_RcDst,
+	//	m_pDrawBuffer->sm_nRects_Offset_Color,
+	//	m_pDrawBuffer->sm_nRects_Offset_RcTextureCoord,
+	//	m_pTextureCurrent
+	//);
 	m_pDrawBuffer->Reset();
 }
 

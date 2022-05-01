@@ -3,61 +3,53 @@
 
 #include <iberbar/Gui/Element/ElemStateTexture.h>
 #include <iberbar/Gui/Engine.h>
-#include <iberbar/RHI/Texture.h>
-#include <iberbar/RHI/ShaderState.h>
-#include <iberbar/RHI/ShaderVariables.h>
-#include <iberbar/RHI/VertexBuilder.h>
-#include <iberbar/Renderer/RendererSprite.h>
+#include <iberbar/Renderer/Renderer.h>
+#include <iberbar/Renderer/Mesh.h>
+#include <iberbar/Renderer/MeshRendererComponent.h>
 #include <iberbar/Utility/RectClip2d.h>
 
 
 
 iberbar::Gui::CElementStateTexture::CElementStateTexture()
 	: CRenderElement()
-	, m_BlendColorRate()
-	, m_BlendColor()
-	, m_ppTextures()
-	, m_nRenderUV()
+	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
+	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
+	, m_bDirtyMeshPositionOrUV( true )
+	, m_bEmptyBoundingFinal( true )
+	, m_pMesh( new Renderer::CMeshForUI_1() )
+	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
+	, m_pMaterial( nullptr )
 {
-	memset( m_ppTextures, 0, sizeof( m_ppTextures ) );
-	memset( m_nRenderUV, 0, sizeof( m_nRenderUV ) );
-	m_BlendColorRate[ (int)UWidgetState::Normal ]    = BlendColorRate_Normal;
-	m_BlendColorRate[ (int)UWidgetState::MouseOver ] = BlendColorRate_Normal;
-	m_BlendColorRate[ (int)UWidgetState::Pressed ]   = BlendColorRate_Quick;
-	m_BlendColorRate[ (int)UWidgetState::Focus ]     = BlendColorRate_Normal;
-	m_BlendColorRate[ (int)UWidgetState::Hidden ]    = BlendColorRate_Normal;
-	m_BlendColorRate[ (int)UWidgetState::Disabled ]  = BlendColorRate_Normal;
+	SetColor( m_Color );
+	//SetUV( m_UV );
+
+	m_pMeshRendererComponent->SetMesh( m_pMesh );
 }
 
 
 iberbar::Gui::CElementStateTexture::CElementStateTexture(const CElementStateTexture& element )
 	: CRenderElement( element )
-	, m_BlendColorRate()
-	, m_BlendColor( element.m_BlendColor )
-	, m_ppTextures()
-	, m_nRenderUV()
+	, m_Color( 1.0f, 1.0f, 1.0f, 1.0f )
+	, m_UV( 0.0f, 0.0f, 1.0f, 1.0f )
+	, m_bDirtyMeshPositionOrUV( true )
+	, m_bEmptyBoundingFinal( true )
+	, m_pMesh( new Renderer::CMeshForUI_1() )
+	, m_pMeshRendererComponent( new Renderer::CMeshRendererComponent() )
+	, m_pMaterial( nullptr )
 {
-	for ( int i = 0; i < uWidgetStateCount; i ++ )
-	{
-		m_ppTextures[ i ] = element.m_ppTextures[ i ];
-		if ( m_ppTextures[ i ] )
-			m_ppTextures[ i ]->AddRef();
+	SetColor( element.m_Color );
+	SetUV( element.m_UV );
+	SetMaterial( element.m_pMaterial );
 
-		m_nRenderUV[ i ] = element.m_nRenderUV[ i ];
-	}
-
-	memcpy_s(
-		m_BlendColorRate, sizeof( m_BlendColorRate ),
-		element.m_BlendColorRate, sizeof( m_BlendColorRate ) );
+	m_pMeshRendererComponent->SetMesh( m_pMesh );
 }
 
 
 iberbar::Gui::CElementStateTexture::~CElementStateTexture()
 {
-	for ( int i = 0; i < uWidgetStateCount; i ++ )
-	{
-		UNKNOWN_SAFE_RELEASE_NULL( m_ppTextures[ i ] );
-	}
+	UNKNOWN_SAFE_RELEASE_NULL( m_pMesh );
+	SAFE_DELETE( m_pMeshRendererComponent );
+	UNKNOWN_SAFE_RELEASE_NULL( m_pMaterial );
 }
 
 
@@ -69,28 +61,27 @@ iberbar::Gui::CElementStateTexture* iberbar::Gui::CElementStateTexture::Clone() 
 
 void iberbar::Gui::CElementStateTexture::Init()
 {
-	CRenderElement::Init();
-
-	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetBool( Renderer::s_strShaderVarName_UseTexture, true );
+	//m_RenderCommand.SetTriangles( Renderer::CTrianglesCommand::UTriangles(
+	//	m_MeshVertices,
+	//	m_MeshIndices,
+	//	sizeof( Renderer::UVertex_V3F_C4B_T2F ), 4, 6, 2
+	//) );
 }
 
 
-void iberbar::Gui::CElementStateTexture::Refresh()
+void iberbar::Gui::CElementStateTexture::SetZOrder( int nZOrder )
 {
-	m_BlendColor.Refresh();
+	CRenderElement::SetZOrder( nZOrder );
 
-	CRenderElement::Refresh();
+	m_pMeshRendererComponent->SetZOrder( nZOrder );
 }
 
 
-void iberbar::Gui::CElementStateTexture::Update( float nElapsedTime )
+void iberbar::Gui::CElementStateTexture::UpdateRect()
 {
-	if ( GetVisible() == false )
-		return;
+	CRenderElement::UpdateRect();
 
-	m_BlendColor.Blend( m_nState, nElapsedTime, m_BlendColorRate[ (int)m_nState ] );
-
-	CRenderElement::Update( nElapsedTime );
+	m_bDirtyMeshPositionOrUV = true;
 }
 
 
@@ -98,92 +89,86 @@ void iberbar::Gui::CElementStateTexture::Render()
 {
 	if ( GetVisible() == false )
 		return;
-	if ( m_pShaderState == nullptr ||
-		m_pShaderVariableTables.GetVariableTableForVertexShader() == nullptr ||
-		m_pShaderVariableTables.GetVariableTableForPixelShader() == nullptr )
+	if ( m_pMaterial == nullptr )
 		return;
 
-	int nIndex = m_nState;
-
-	const CRect2i* pViewport = CEngine::sGetInstance()->GetViewportState()->GetClipViewport();
-	CRect2i rectDst = m_pTransform->GetBounding();
-	CRect2f rectTexCoord = m_nRenderUV[ nIndex ];
-
-	if ( pViewport != nullptr )
+	if ( m_bDirtyMeshPositionOrUV == true )
 	{
-		if ( RectTestIntersection( &rectDst, pViewport ) == false )
-			return;
-		RectClip2d( &rectTexCoord, &rectDst, pViewport );
+		m_bDirtyMeshPositionOrUV = false;
+
+		const CRect2i* pViewport = CEngine::sGetInstance()->GetViewportState()->GetClipViewport();
+		CRect2i rcBoundingFinal = m_pTransform->GetBounding();
+		CRect2f rcTexCoordFinal = m_UV;
+
+		if ( pViewport != nullptr )
+		{
+			if ( RectTestIntersection( &rcBoundingFinal, pViewport ) == false )
+				return;
+			RectClip2d( &rcTexCoordFinal, &rcBoundingFinal, pViewport );
+		}
+
+		if ( rcBoundingFinal.IsEmpty() == true )
+		{
+			m_bEmptyBoundingFinal = true;
+		}
+		else
+		{
+			m_bEmptyBoundingFinal = false;
+		}
+
+		rcBoundingFinal.t = - rcBoundingFinal.t;
+		rcBoundingFinal.b = - rcBoundingFinal.b;
+		Renderer::VerticesRectUpdatePosition( m_pMesh->GetBufferPositions(), rcBoundingFinal, 0 );
+		Renderer::VerticesRectUpdateUV( m_pMesh->GetBufferTexcoords(0), rcTexCoordFinal );
 	}
 
-	if ( rectDst.IsEmpty() == true )
+	if ( m_bEmptyBoundingFinal == true )
+	{
 		return;
+	}
 
-	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetTexture( Renderer::s_strShaderVarName_Texture, m_ppTextures[ nIndex ] );
-	m_pShaderVariableTables.GetVariableTableForPixelShader()->SetSamplerState( Renderer::s_strShaderVarName_TextureSampler, RHI::UTextureSamplerState() );
-
-	CEngine::sGetInstance()->GetRendererSprite()->DrawRectRhwEx(
-		m_nZOrder,
-		CRect2f( (float)rectDst.l, (float)rectDst.t, (float)rectDst.r, (float)rectDst.b ),
-		m_BlendColor.currentColor,
-		m_nRenderUV[ nIndex ],
-		m_pShaderState,
-		m_pShaderVariableTables.GetVariableTableForVertexShader(),
-		m_pShaderVariableTables.GetVariableTableForPixelShader()
-	);
+	m_pMeshRendererComponent->Render();
 
 	CRenderElement::Render();
 }
 
 
-void iberbar::Gui::CElementStateTexture::SetTexture( int state, RHI::ITexture* pTexture )
+void iberbar::Gui::CElementStateTexture::SetColor( const CColor4F& Color )
 {
-	if ( state == -1 )
-	{
-		for ( int i = 0; i < uWidgetStateCount; i ++ )
-		{
-			UNKNOWN_SAFE_RELEASE_NULL( m_ppTextures[ i ] );
-			m_ppTextures[ i ] = pTexture;
-			UNKNOWN_SAFE_ADDREF( m_ppTextures[ i ] );
-		}
-	}
-	else if ( state < uWidgetStateCount && state >= 0 )
-	{
-		UNKNOWN_SAFE_RELEASE_NULL( m_ppTextures[ state ] );
-		m_ppTextures[ state ] = pTexture;
-		UNKNOWN_SAFE_ADDREF( m_ppTextures[ state ] );
-	}
+	m_Color = Color;
+	CColor4F* pBuffer = m_pMesh->GetBufferColors();
+	pBuffer[ 0 ] = Color;
+	pBuffer[ 1 ] = Color;
+	pBuffer[ 2 ] = Color;
+	pBuffer[ 3 ] = Color;
 }
 
 
-void iberbar::Gui::CElementStateTexture::SetUV( int state, const CRect2f& uv )
+void iberbar::Gui::CElementStateTexture::SetUV( const CRect2f& UV )
 {
-	if ( state == -1 )
-	{
-		for ( int i = 0; i < uWidgetStateCount; i ++ )
-		{
-			m_nRenderUV[ i ] = uv;
-		}
-	}
-	else if ( state < uWidgetStateCount && state >= 0 )
-	{
-		m_nRenderUV[ state ] = uv;
-	}
+	m_UV = UV;
+	m_bDirtyMeshPositionOrUV = true;
 }
 
 
-void iberbar::Gui::CElementStateTexture::SetColorBlendRate( int state, float nRate )
+void iberbar::Gui::CElementStateTexture::SetMaterial( Renderer::CMaterial* pMaterial )
 {
-	if ( state == -1 )
+	if ( m_pMaterial == pMaterial )
+		return;
+
+	if ( m_pMaterial != nullptr )
+		m_pMaterial->Release();
+
+	m_pMaterial = pMaterial;
+
+	if ( m_pMaterial != nullptr )
 	{
-		for ( int i = 0; i < uWidgetStateCount; i ++ )
-		{
-			m_BlendColorRate[ i ] = nRate;
-		}
+		m_pMaterial->AddRef();
+		m_pMeshRendererComponent->SetMaterial( m_pMaterial );
 	}
-	else if ( state < uWidgetStateCount && state >= 0 )
+	else
 	{
-		m_BlendColorRate[ state ] = nRate;
+		m_pMeshRendererComponent->SetMaterial( nullptr );
 	}
 }
 

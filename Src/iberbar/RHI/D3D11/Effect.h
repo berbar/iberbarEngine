@@ -1,8 +1,10 @@
 #pragma once
 
 
-#include <iberbar/RHI/Effect.h>
+
 #include <iberbar/RHI/D3D11/Headers.h>
+#include <iberbar/RHI/D3D11/Types.h>
+#include <iberbar/RHI/Effect.h>
 
 
 namespace iberbar
@@ -11,39 +13,30 @@ namespace iberbar
 	{
 		namespace D3D11
 		{
-			class CShader;
-			class CDevice;
-
+			class CShaderState;
+			class CUniformBuffer;
+			class CUniformMemoryBuffer;
 
 			class CEffect
 				: public IEffect
 			{
 			public:
-				CEffect();
+				CEffect( IShaderState* pShaderState );
 				virtual ~CEffect();
 
-				virtual void SetShader( EShaderType eShaderType, IShader* pShader ) override;
-				virtual CResult Generate() override;
+				virtual void SetShaderVariables( EShaderType nShaderType, IShaderVariableTable* pShaderVariables ) override;
 
-			private:
-				CResult GenerateShaderDesc( EShaderType eShaderType );
+				//FORCEINLINE void ClearDirty()
+				//{
+				//	memset( m_UniformBuffersDirty, 0, sizeof( m_UniformBuffersDirty ) );
+				//}
 
 			protected:
-				CDevice* m_pDevice;
-				union {
-					CShader* m_pShaderSlots[ (int)EShaderType::__Count ];
-					struct
-					{
-						CShader* m_pVertexShader;
-						CShader* m_pPixelShader;
-						CShader* m_pHullShader;
-						CShader* m_pDomainShader;
-						CShader* m_pGeometryShader;
-						CShader* m_pComputeShader;
-					};
-				};
+				CShaderState* m_pShaderState;
+				uint8* m_UniformMemorys[ (int)EShaderType::__Count ];
+				CUniformBuffer* m_UniformBuffers[ (int)EShaderType::__Count ][ D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT ];
+				//uint8 m_UniformBuffersDirty[ (int)EShaderType::__Count ][ D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT ];
 				
-
 			};
 		}
 	}

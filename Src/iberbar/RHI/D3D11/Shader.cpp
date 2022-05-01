@@ -10,21 +10,23 @@
 iberbar::RHI::D3D11::CShader::CShader( CDevice* pDevice, EShaderType eShaderType )
 	: IShader( eShaderType )
 	, m_pDevice( pDevice )
+	, m_pReflection( nullptr )
+	//, m_ConstantBuffers()
+	//, m_ConstBuffersData()
 {
 	assert( m_pDevice );
-	m_pDevice->AddRef();
 }
 
 
 iberbar::RHI::D3D11::CShader::~CShader()
 {
-	UNKNOWN_SAFE_RELEASE_NULL( m_pDevice );
-	auto iter = m_ConstantBuffers.begin();
-	auto end = m_ConstantBuffers.end();
-	for ( ; iter != end; iter++ )
-	{
-		SAFE_DELETE( *iter );
-	}
+	SAFE_DELETE(m_pReflection);
+	//auto iter = m_ConstantBuffers.begin();
+	//auto end = m_ConstantBuffers.end();
+	//for ( ; iter != end; iter++ )
+	//{
+	//	SAFE_DELETE( *iter );
+	//}
 }
 
 
@@ -41,37 +43,23 @@ iberbar::CResult iberbar::RHI::D3D11::CShader::LoadFromFile( const char* pstrFil
 		return MakeResult( ResultCode::Bad, "failed to D3DReadFileToBlob, file=%s", pstrFile );
 	}
 
-	const char* pstrTarget = nullptr;
-	if ( m_eShaderType == EShaderType::VertexShader )
-	{
-		pstrTarget = "vs_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::PixelShader )
-	{
-		pstrTarget = "ps_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::HullShader )
-	{
-		pstrTarget = "hs_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::GeometryShader )
-	{
-		pstrTarget = "gs_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::DomainShader )
-	{
-		pstrTarget = "ds_5_0";
-	}
-	else if ( m_eShaderType == EShaderType::ComputeShader )
-	{
-		pstrTarget = "cs_5_0";
-	}
-	else
+	const char* pstrTarget = m_pDevice->GetShaderCompileTarget( m_eShaderType );
+	if ( pstrTarget == nullptr )
 	{
 		return MakeResult( ResultCode::Bad, "not support" );
 	}
 
-	hResult = D3DCompileFromFile( strFileUnicode, NULL, NULL, "Main", pstrTarget, 0, 0, &pD3DBlob, &pD3DBlobError );
+	DWORD nShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+#ifdef _DEBUG
+	// 设置 D3DCOMPILE_DEBUG 标志用于获取着色器调试信息。该标志可以提升调试体验，
+	// 但仍然允许着色器进行优化操作
+	nShaderFlags |= D3DCOMPILE_DEBUG;
+
+	// 在Debug环境下禁用优化以避免出现一些不合理的情况
+	nShaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
+	hResult = D3DCompileFromFile( strFileUnicode, NULL, NULL, "Main", pstrTarget, nShaderFlags, 0, &pD3DBlob, &pD3DBlobError );
 	if ( FAILED( hResult ) )
 	{
 		std::string strError;
@@ -96,7 +84,13 @@ iberbar::CResult iberbar::RHI::D3D11::CShader::LoadFromSource( const char* pstrS
 	ComPtr<ID3DBlob> pD3DBlobError = nullptr;
 	HRESULT hResult;
 
-	hResult = D3DCompile( pstrSource, strlen( pstrSource ), "", NULL, NULL, "Main", NULL, 0, 0, &pD3DBlob, &pD3DBlobError );
+	const char* pstrTarget = m_pDevice->GetShaderCompileTarget( m_eShaderType );
+	if ( pstrTarget == nullptr )
+	{
+		return MakeResult( ResultCode::Bad, "not support" );
+	}
+
+	hResult = D3DCompile( pstrSource, strlen( pstrSource ), "", NULL, NULL, "Main", pstrTarget, 0, 0, &pD3DBlob, &pD3DBlobError );
 	if ( FAILED( hResult ) )
 	{
 		std::string strError = UnicodeToUtf8( (const wchar_t*)pD3DBlobError->GetBufferPointer() );
@@ -120,21 +114,21 @@ iberbar::CResult iberbar::RHI::D3D11::CShader::CreateReflection( const void* pCo
 	if ( cResult.IsOK() == false )
 		return cResult;
 
-	int nBufferCount = m_pReflection->GetBufferCountInternal();
-	if ( nBufferCount > 0 )
-	{
-		m_ConstantBuffers.resize( nBufferCount, nullptr );
-		for ( int i = 0; i < nBufferCount; i++ )
-		{
-			const CShaderReflectionBuffer* pReflectionBuffer = m_pReflection->GetBufferByIndexInternal( i );
-			m_ConstantBuffers[ i ] = new CConstantBuffer( m_pDevice, pReflectionBuffer->GetSize(), UBufferUsageFlags::Dynamic );
-			cResult = m_ConstantBuffers[ i ]->Initial();
-			if ( cResult.IsOK() == false )
-				return cResult;
-		}
-		m_ConstBuffersData.resize( m_pReflection->GetBufferSizeTotal() );
-		memset( &(m_ConstBuffersData.front()), 0, sizeof( m_pReflection->GetBufferSizeTotal() ) );
-	}
+	//int nBufferCount = m_pReflection->GetBufferCountInternal();
+	//if ( nBufferCount > 0 )
+	//{
+	//	m_ConstantBuffers.resize( nBufferCount, nullptr );
+	//	for ( int i = 0; i < nBufferCount; i++ )
+	//	{
+	//		const CShaderReflectionBuffer* pReflectionBuffer = m_pReflection->GetBufferByIndexInternal( i );
+	//		m_ConstantBuffers[ i ] = new CConstantBuffer( m_pDevice, pReflectionBuffer->GetSize(), UBufferUsageFlags::Dynamic );
+	//		cResult = m_ConstantBuffers[ i ]->Initial();
+	//		if ( cResult.IsOK() == false )
+	//			return cResult;
+	//	}
+	//	m_ConstBuffersData.resize( m_pReflection->GetBufferSizeTotal() );
+	//	memset( &(m_ConstBuffersData.front()), 0, sizeof( m_pReflection->GetBufferSizeTotal() ) );
+	//}
 
 	return CResult();
 }
@@ -289,4 +283,53 @@ iberbar::CResult iberbar::RHI::D3D11::CComputeShader::Load( const void* pCodes, 
 	}
 
 	return CreateReflection( pCodes, nCodeLen );
+}
+
+
+
+
+
+
+
+iberbar::RHI::D3D11::CShaderProgram::CShaderProgram(
+	CDevice* pDevice,
+	IShader* pVS,
+	IShader* pPS,
+	IShader* pHS,
+	IShader* pGS,
+	IShader* pDS )
+	: IShaderProgram( pVS, pPS, pHS, pGS, pDS )
+	, m_pDevice( pDevice )
+{
+	assert( m_pDevice );
+}
+
+
+iberbar::RHI::D3D11::CShaderProgram::~CShaderProgram()
+{
+}
+
+
+void iberbar::RHI::D3D11::CShaderProgram::Initial()
+{
+	CShader* pShader = nullptr;
+	CShaderReflection* pReflection = nullptr;
+	const CShaderReflectionBuffer* pReflectionBuffer = nullptr;
+	for ( int i = 0, s = (int)EShaderType::__Count; i < s; i++ )
+	{
+		pShader = (CShader*)m_pShaders[ i ];
+		if ( pShader == nullptr )
+			continue;
+
+		pReflection = pShader->GetReflectionInternal();
+		if ( pShader == nullptr )
+			continue;
+
+		for ( int nBufferIndex = 0, nBufferCount = pReflection->GetBufferCount(); nBufferIndex < nBufferCount; nBufferIndex++ )
+		{
+			pReflectionBuffer = pReflection->GetBufferByIndexInternal( nBufferIndex );
+			if ( pReflectionBuffer == nullptr || pReflectionBuffer->GetSize() == 0 )
+				continue;
+		}
+	}
 }

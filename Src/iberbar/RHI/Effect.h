@@ -6,7 +6,8 @@ namespace iberbar
 {
 	namespace RHI
 	{
-		class IShader;
+		class IShaderState;
+		class IShaderVariableTable;
 
 		class IEffect abstract
 			: public IResource
@@ -16,10 +17,8 @@ namespace iberbar
 				: IResource( UResourceType::Effect )
 			{
 			}
-
 		public:
-			virtual void SetShader( EShaderType eShaderType, IShader* pShader ) = 0;
-			virtual CResult Generate() = 0;
+			virtual void SetShaderVariables( EShaderType nShaderType, IShaderVariableTable* pShaderVariables ) = 0;
 		};
 	}
 }

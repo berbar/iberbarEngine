@@ -62,5 +62,20 @@ namespace iberbar
 			uint32 m_nInSize;
 			uint32 m_nUsage;
 		};
+
+
+
+		class __iberbarRHIApi__ IUniformBuffer abstract
+			: public IResource
+		{
+		public:
+			IUniformBuffer()
+				: IResource( UResourceType::UniformBuffer )
+			{
+			}
+
+		public:
+			virtual void UpdateContents( const void* pContents, uint32 nContentSize ) = 0;
+		};
 	}
 }

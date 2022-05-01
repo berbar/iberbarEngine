@@ -10,6 +10,11 @@
 #include <iberbar/RHI/D3D11/RenderState.h>
 
 
+#ifdef _DEBUG
+#include <iberbar/RHI/D3D11/TestDraw.h>
+#endif
+
+
 
 
 iberbar::RHI::D3D11::CDevice::CDevice()
@@ -18,7 +23,6 @@ iberbar::RHI::D3D11::CDevice::CDevice()
 	, m_hInstance( nullptr )
 	, m_pDXGIFactory( nullptr )
 	, m_pDXGIAdapter( nullptr )
-	, m_DXGIOutputArraySize( 0 )
 	, m_pDXGISwapChain( nullptr )
 	, m_D3DFeatureLevel()
 	, m_pD3DDevice( nullptr )
@@ -28,21 +32,55 @@ iberbar::RHI::D3D11::CDevice::CDevice()
 	, m_pD3DRasterizerState( nullptr )
 	, m_bEnableMultisampleQuality( false )
 	, m_nMultisampleQualityLevels( 0 )
-	, m_pD3DVertexBuffers()
-	, m_nVertexBufferStride( 0 )
-	, m_pD3DIndexBuffer( nullptr )
-	, m_pD3DTextures()
+	, m_pCommandContext( nullptr )
 {
-	memset( m_pD3DVertexBuffers, 0, sizeof( m_pD3DVertexBuffers ) );
 }
 
 
 iberbar::RHI::D3D11::CDevice::~CDevice()
 {
-	for ( int i = 0; i < MAX_VERTEX_BUFFERS_COUNT; i++ )
+	assert( m_pD3DDevice == nullptr );
+}
+
+
+void iberbar::RHI::D3D11::CDevice::Shutdown()
+{
+	SAFE_DELETE( m_pCommandContext );
+	for ( int i = 0, s = (int)m_VertexDeclarationsCache.size(); i < s; i++ )
 	{
-		D3D_SAFE_RELEASE( m_pD3DVertexBuffers[ i ] );
+		UNKNOWN_SAFE_RELEASE_NULL( m_VertexDeclarationsCache[ i ] );
 	}
+	m_VertexDeclarationsCache.clear();
+	for ( int i = 0, s = (int)m_SamplerStatesCache.size(); i < s; i++ )
+	{
+		UNKNOWN_SAFE_RELEASE_NULL( m_SamplerStatesCache[ i ] );
+	}
+	m_SamplerStatesCache.clear();
+	for ( int i = 0, s = (int)m_ShaderStatesCache.size(); i < s; i++ )
+	{
+		UNKNOWN_SAFE_RELEASE_NULL( m_ShaderStatesCache[ i ] );
+	}
+	m_ShaderStatesCache.clear();
+
+	m_pD3DDepthStencil = nullptr;
+	m_pD3DDepthStencilState = nullptr;
+	m_pD3DDepthStencilView = nullptr;
+	m_pD3DRenderTargetView = nullptr;
+	m_pD3DRasterizerState = nullptr;
+
+	m_pDXGIFactory = nullptr;
+	m_pDXGIAdapter = nullptr;
+	m_pDXGISwapChain = nullptr;
+
+	// Perform a detailed live object report (with resource types)
+	ID3D11Debug* pD3D11Debug = nullptr;
+	m_pD3DDevice->QueryInterface( __uuidof(ID3D11Debug), (void**)(&pD3D11Debug) );
+	if ( pD3D11Debug )
+	{
+		pD3D11Debug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+	}
+
+	m_pD3DDevice = nullptr;
 }
 
 
@@ -94,6 +132,20 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateIndexBuffer( uint32 nStride
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutBuffer );
 	( *ppOutBuffer ) = pIndexBuffer;
 	( *ppOutBuffer )->AddRef();
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateUniformBuffer( IUniformBuffer** ppOutBuffer, uint32 nSize )
+{
+	assert( ppOutBuffer );
+	TSmartRefPtr<CUniformBuffer> pUniformBuffer = TSmartRefPtr<CUniformBuffer>::_sNew( this, nSize, UBufferUsageFlags::Dynamic );
+	CResult ret = pUniformBuffer->Initial();
+	if ( ret.IsOK() == false )
+		return ret;
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutBuffer );
+	(*ppOutBuffer) = pUniformBuffer;
+	(*ppOutBuffer)->AddRef();
 	return CResult();
 }
 
@@ -164,44 +216,81 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateComputeShader( IShader** pp
 }
 
 
-iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount, uint32 nStride )
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateVertexDeclaration( IVertexDeclaration** ppOutDeclaration, const UVertexElement* pVertexElements, uint32 nVertexElementsCount )
 {
 	assert( ppOutDeclaration );
-	TSmartRefPtr<CVertexDeclaration> pDeclaration = TSmartRefPtr<CVertexDeclaration>::_sNew( pVertexElements, nVertexElementsCount, nStride );
+
+	for ( int i = 0, s = (int)m_VertexDeclarationsCache.size(); i < s; i++ )
+	{
+		CVertexDeclaration* pDeclarationTemp = m_VertexDeclarationsCache[ i ];
+		if ( memcmp( pDeclarationTemp->GetVertexElements(), pVertexElements, sizeof( UVertexElement ) * MaxVertexElementCount ) == 0 )
+		{
+			UNKNOWN_SAFE_RELEASE_NULL( *ppOutDeclaration );
+			(*ppOutDeclaration) = pDeclarationTemp;
+			(*ppOutDeclaration)->AddRef();
+			return CResult();
+		}
+	}
+
+	TSmartRefPtr<CVertexDeclaration> pDeclarationNew = TSmartRefPtr<CVertexDeclaration>::_sNew( pVertexElements, nVertexElementsCount );
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutDeclaration );
-	( *ppOutDeclaration ) = pDeclaration;
+	( *ppOutDeclaration ) = pDeclarationNew;
 	( *ppOutDeclaration )->AddRef();
 	return CResult();
 }
 
 
-iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader )
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateShaderProgram( IShaderProgram** ppOutShaderProgram, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader )
 {
-	assert( ppOutShaderState );
-	TSmartRefPtr<CShaderState> pShaderState = TSmartRefPtr<CShaderState>::_sNew( this,
-		(CVertexDeclaration*)pVertexDeclaration,
+	assert( ppOutShaderProgram );
+	TSmartRefPtr<CShaderProgram> pShaderProgram = TSmartRefPtr<CShaderProgram>::_sNew( this,
 		(CVertexShader*)pVertexShader,
 		(CPixelShader*)pPixelShader,
 		(CHullShader*)pHullShader,
 		(CGeometryShader*)pGeometryShader,
 		(CDomainShader*)pDomainShader );
-	CResult cRet = pShaderState->Initial();
-	if ( cRet.IsOK() == false )
-		return cRet;
-	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderState );
-	( *ppOutShaderState ) = pShaderState;
-	( *ppOutShaderState )->AddRef();
+	pShaderProgram->Initial();
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderProgram );
+	(*ppOutShaderProgram) = pShaderProgram;
+	(*ppOutShaderProgram)->AddRef();
 	return CResult();
 }
 
 
-void iberbar::RHI::D3D11::CDevice::CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable )
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShaderProgram* pShaderProgram )
 {
-	assert( ppOutShaderVariableTable );
-	TSmartRefPtr<CShaderVariableTable> pShaderVarTable = TSmartRefPtr<CShaderVariableTable>::_sNew( this );
-	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderVariableTable );
-	( *ppOutShaderVariableTable ) = pShaderVarTable;
-	( *ppOutShaderVariableTable )->AddRef();
+	assert( ppOutShaderState );
+
+	assert( pVertexDeclaration != nullptr );
+	assert( pShaderProgram != nullptr );
+
+	UNKNOWN_SAFE_RELEASE_NULL( *ppOutShaderState );
+
+	for ( int i = 0, s = (int)m_ShaderStatesCache.size(); i < s; i++ )
+	{
+		if ( m_ShaderStatesCache[ i ]->GetShaderProgram() == pShaderProgram &&
+			m_ShaderStatesCache[ i ]->GetVertexDeclarationInternal() == pVertexDeclaration )
+		{
+			(*ppOutShaderState) = m_ShaderStatesCache[ i ];
+			(*ppOutShaderState)->AddRef();
+			return CResult();
+		}
+	}
+
+	TSmartRefPtr<CShaderState> pShaderState = TSmartRefPtr<CShaderState>::_sNew( this,
+		(CVertexDeclaration*)pVertexDeclaration,
+		(CShaderProgram*)pShaderProgram );
+	CResult cRet = pShaderState->Initial();
+	if ( cRet.IsOK() == false )
+		return cRet;
+
+	m_ShaderStatesCache.push_back( pShaderState );
+	(*(m_ShaderStatesCache.rbegin()))->AddRef();
+
+	( *ppOutShaderState ) = pShaderState;
+	( *ppOutShaderState )->AddRef();
+
+	return CResult();
 }
 
 
@@ -215,6 +304,20 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateBlendState( IBlendState** p
 	UNKNOWN_SAFE_RELEASE_NULL( *ppOutBlendState );
 	( *ppOutBlendState ) = pBlendState;
 	( *ppOutBlendState )->AddRef();
+	return CResult();
+}
+
+
+iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDepthStencilState( IDepthStencilState** ppOutDepthStencilState, const UDepthStencilDesc& DepthStencilDesc )
+{
+	assert(ppOutDepthStencilState);
+	TSmartRefPtr<CDepthStencilState> pDepthStencilState = TSmartRefPtr<CDepthStencilState>::_sNew(DepthStencilDesc);
+	CResult cRet = pDepthStencilState->Create(this);
+	if (cRet.IsOK() == false)
+		return cRet;
+	UNKNOWN_SAFE_RELEASE_NULL(*ppOutDepthStencilState );
+	(*ppOutDepthStencilState) = pDepthStencilState;
+	(*ppOutDepthStencilState)->AddRef();
 	return CResult();
 }
 
@@ -251,29 +354,23 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateSamplerState( ISamplerState
 }
 
 
-void iberbar::RHI::D3D11::CDevice::CreateCommandContext( ICommandContext** ppOutContext )
+iberbar::RHI::ICommandContext* iberbar::RHI::D3D11::CDevice::GetDefaultContext()
 {
-	assert( ppOutContext );
-	TSmartRefPtr<CCommandContext> pNewContext = TSmartRefPtr<CCommandContext>::_sNew( this );
-	UNKNOWN_SAFE_RELEASE_NULL( *ppOutContext );
-	( *ppOutContext ) = pNewContext;
-	( *ppOutContext )->AddRef();
+	return m_pCommandContext;
 }
 
 
 iberbar::CResult iberbar::RHI::D3D11::CDevice::Begin()
 {
-	//m_pD3DDeviceContext->Begin( nullptr );
 	m_pD3DDeviceContext->ClearRenderTargetView( m_pD3DRenderTargetView.Get(), m_D3DClearColorRGBA );
-	m_pD3DDeviceContext->ClearDepthStencilView( m_pD3DDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0 );
+	m_pD3DDeviceContext->ClearDepthStencilView( m_pD3DDepthStencilView.Get(), D3D11_CLEAR_DEPTH| D3D11_CLEAR_STENCIL, 1.0f, 0 );
 	return CResult();
 }
 
 
 void iberbar::RHI::D3D11::CDevice::End()
 {
-	//m_pD3DDeviceContext->End( nullptr );
-	if ( true )
+	if ( false )
 	{
 		m_pDXGISwapChain->Present( 1, 0 );
 	}
@@ -295,6 +392,16 @@ void iberbar::RHI::D3D11::CDevice::SetClearColor( const CColor4B& color )
 }
 
 
+#ifdef _DEBUG
+iberbar::RHI::ITestDraw* iberbar::RHI::D3D11::CDevice::CreateTestDraw()
+{
+	CTestDraw* TestDraw = new CTestDraw();
+	TestDraw->Initial( this );
+	return TestDraw;
+}
+#endif
+
+
 iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWindowed, int nSuitedWidth, int nSuitedHeight )
 {
 	assert( hWnd );
@@ -313,8 +420,8 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 	ComPtr<IDXGIDevice> pDXGIDevice = nullptr;
 	ComPtr<IDXGIAdapter> pDXGIAdapter = nullptr;
-	ComPtr<IDXGIFactory1> pDXGIFactory1 = nullptr;	// D3D11.0(°üº¬DXGI1.1)µÄ½Ó¿ÚÀà
-	ComPtr<IDXGIFactory2> pDXGIFactory2 = nullptr;	// D3D11.1(°üº¬DXGI1.2)ÌØÓÐµÄ½Ó¿ÚÀà
+	ComPtr<IDXGIFactory1> pDXGIFactory1 = nullptr;
+	ComPtr<IDXGIFactory2> pDXGIFactory2 = nullptr;
 	ComPtr<ID3D11Device> pD3DDevice = nullptr;
 	ComPtr<ID3D11DeviceContext> pD3DDeviceContext = nullptr;
 	ComPtr<ID3D11Device1> pD3DDevice1 = nullptr;
@@ -323,12 +430,11 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	ComPtr<IDXGISwapChain1> pDXGISwapChain1 = nullptr;
 
 
-	// ´´½¨D3DÉè±¸ ºÍ D3DÉè±¸ÉÏÏÂÎÄ
 	UINT createDeviceFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)  
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-	// Çý¶¯ÀàÐÍÊý×é
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	D3D_DRIVER_TYPE driverTypes[] =
 	{
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -337,7 +443,7 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	};
 	UINT numDriverTypes = ARRAYSIZE( driverTypes );
 
-	// ÌØÐÔµÈ¼¶Êý×é
+	// ï¿½ï¿½ï¿½ÔµÈ¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	D3D_FEATURE_LEVEL featureLevels[] =
 	{
 		D3D_FEATURE_LEVEL_11_1,
@@ -364,7 +470,6 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 		if ( hResult == E_INVALIDARG )
 		{
-			// Direct3D 11.0 µÄAPI²»³ÐÈÏD3D_FEATURE_LEVEL_11_1£¬ËùÒÔÎÒÃÇÐèÒª³¢ÊÔÌØÐÔµÈ¼¶11.0ÒÔ¼°ÒÔÏÂµÄ°æ±¾
 			hResult = D3D11CreateDevice(
 				nullptr,
 				d3dDriverType,
@@ -387,37 +492,33 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 		return MakeResult( ResultCode::Bad, "" );
 	}
 
-	// ¼ì²âÊÇ·ñÖ§³ÖÌØÐÔµÈ¼¶11.0»ò11.1
 	if ( featureLevel != D3D_FEATURE_LEVEL_11_0 && featureLevel != D3D_FEATURE_LEVEL_11_1 )
 		return MakeResult( ResultCode::Bad, "Direct3D Feature Level 11 unsupported." );
 
-	// ¼ì²â MSAAÖ§³ÖµÄÖÊÁ¿µÈ¼¶
 	pD3DDevice->CheckMultisampleQualityLevels( DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m_nMultisampleQualityLevels );
 	assert( m_nMultisampleQualityLevels > 0 );
 
 
-	// ÎªÁËÕýÈ·´´½¨ DXGI½»»»Á´£¬Ê×ÏÈÎÒÃÇÐèÒª»ñÈ¡´´½¨ D3DÉè±¸ µÄ DXGI¹¤³§£¬·ñÔò»áÒý·¢±¨´í£º
-	// "IDXGIFactory::CreateSwapChain: This function is being called with a device from a different IDXGIFactory."
 	HR( pD3DDevice.As( &pDXGIDevice ), "" );
 	HR( pDXGIDevice->GetAdapter( &pDXGIAdapter ), "" );
 	HR( pDXGIAdapter->GetParent( __uuidof( IDXGIFactory1 ), reinterpret_cast<void**>( pDXGIFactory1.GetAddressOf() ) ), "" );
 
-	// ²é¿´¸Ã¶ÔÏóÊÇ·ñ°üº¬IDXGIFactory2½Ó¿Ú
+	// ï¿½é¿´ï¿½Ã¶ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½IDXGIFactory2ï¿½Ó¿ï¿½
 	HR( pDXGIFactory1.As( &pDXGIFactory2 ), "" );
 
-	// Èç¹û°üº¬£¬ÔòËµÃ÷Ö§³ÖD3D11.1
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ö§ï¿½ï¿½D3D11.1
 	if ( pDXGIFactory2 != nullptr )
 	{
 		HR( pD3DDevice.As( &pD3DDevice1 ), "" );
 		HR( pD3DDeviceContext.As( &pD3DDeviceContext1 ), "" );
 
-		// Ìî³ä¸÷ÖÖ½á¹¹ÌåÓÃÒÔÃèÊö½»»»Á´
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ö½á¹¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		DXGI_SWAP_CHAIN_DESC1 sd;
 		ZeroMemory( &sd, sizeof( sd ) );
 		sd.Width = nSuitedWidth;
 		sd.Height = nSuitedHeight;
 		sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		// ÊÇ·ñ¿ªÆô4±¶¶àÖØ²ÉÑù£¿
+		// ï¿½Ç·ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½ï¿½ï¿½
 		if ( m_bEnableMultisampleQuality )
 		{
 			sd.SampleDesc.Count = 4;
@@ -439,13 +540,13 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 		fd.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 		fd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		fd.Windowed = TRUE;
-		// Îªµ±Ç°´°¿Ú´´½¨½»»»Á´
+		// Îªï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		HR( pDXGIFactory2->CreateSwapChainForHwnd( pD3DDevice.Get(), m_hWnd, &sd, &fd, nullptr, &pDXGISwapChain1 ), "" );
 		HR( pDXGISwapChain1.As( &pDXGISwapChain ), "" );
 	}
 	else
 	{
-		// Ìî³äDXGI_SWAP_CHAIN_DESCÓÃÒÔÃèÊö½»»»Á´
+		// ï¿½ï¿½ï¿½DXGI_SWAP_CHAIN_DESCï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory( &sd, sizeof( sd ) );
 		sd.BufferDesc.Width = nSuitedWidth;
@@ -455,7 +556,7 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		// ÊÇ·ñ¿ªÆô4±¶¶àÖØ²ÉÑù£¿
+		// ï¿½Ç·ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½ï¿½ï¿½
 		if ( m_bEnableMultisampleQuality )
 		{
 			sd.SampleDesc.Count = 4;
@@ -504,7 +605,7 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 
 	D3D11_DEPTH_STENCIL_DESC DepthStencilDesc;
 	memset( &DepthStencilDesc, 0, sizeof( DepthStencilDesc ) );
-	DepthStencilDesc.DepthEnable = true;
+	DepthStencilDesc.DepthEnable = false;
 	DepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	DepthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	DepthStencilDesc.StencilEnable = true;
@@ -529,21 +630,24 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	DepthStencilViewDesc.Texture2D.MipSlice = 0;
 	HR( m_pD3DDevice->CreateDepthStencilView( m_pD3DDepthStencil.Get(), &DepthStencilViewDesc, &m_pD3DDepthStencilView ), "");
 
-	D3D11_RASTERIZER_DESC RasterizerDesc;
-	memset( &RasterizerDesc, 0, sizeof( RasterizerDesc ) );
-	RasterizerDesc.AntialiasedLineEnable = false;
-	RasterizerDesc.CullMode = D3D11_CULL_BACK;
-	RasterizerDesc.DepthBias = 0;
-	RasterizerDesc.DepthBiasClamp = 0.0f;
-	RasterizerDesc.DepthClipEnable = true;
-	RasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	RasterizerDesc.FrontCounterClockwise = false;
-	RasterizerDesc.MultisampleEnable = false;
-	RasterizerDesc.ScissorEnable = false;
-	RasterizerDesc.SlopeScaledDepthBias = 0.0f;
-	HR( m_pD3DDevice->CreateRasterizerState( &RasterizerDesc, &m_pD3DRasterizerState ), "" );
-	
-	m_pD3DDeviceContext->RSSetState( m_pD3DRasterizerState.Get() );
+	//D3D11_RASTERIZER_DESC RasterizerDesc;
+	//memset( &RasterizerDesc, 0, sizeof( RasterizerDesc ) );
+	//RasterizerDesc.AntialiasedLineEnable = false;
+	//RasterizerDesc.CullMode = D3D11_CULL_BACK;
+	//RasterizerDesc.DepthBias = 0;
+	//RasterizerDesc.DepthBiasClamp = 0.0f;
+	//RasterizerDesc.DepthClipEnable = true;
+	//RasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	//RasterizerDesc.FrontCounterClockwise = false;
+	//RasterizerDesc.MultisampleEnable = false;
+	//RasterizerDesc.ScissorEnable = false;
+	//RasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	//HR( m_pD3DDevice->CreateRasterizerState( &RasterizerDesc, &m_pD3DRasterizerState ), "" );
+	//
+	//m_pD3DDeviceContext->RSSetState( m_pD3DRasterizerState.Get() );
+
+		// ï¿½ï¿½ï¿½ï¿½È¾Ä¿ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½/Ä£ï¿½å»ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½
+	m_pD3DDeviceContext->OMSetRenderTargets(1, m_pD3DRenderTargetView.GetAddressOf(), m_pD3DDepthStencilView.Get());
 
 	D3D11_VIEWPORT Viewport;
 	memset( &Viewport, 0, sizeof( Viewport ) );
@@ -555,101 +659,56 @@ iberbar::CResult iberbar::RHI::D3D11::CDevice::CreateDevice( HWND hWnd, bool bWi
 	Viewport.TopLeftY = 0.0f;
 	m_pD3DDeviceContext->RSSetViewports( 1, &Viewport );
 
-	// ¿ÉÒÔ½ûÖ¹alt+enterÈ«ÆÁ
+	// ï¿½ï¿½ï¿½Ô½ï¿½Ö¹alt+enterÈ«ï¿½ï¿½
 	pDXGIFactory1->MakeWindowAssociation( hWnd, DXGI_MWA_NO_ALT_ENTER | DXGI_MWA_NO_WINDOW_CHANGES );
 
+	m_pCommandContext = new CCommandContext( this );
+
+	if ( m_CallbackCreated )
+	{
+		CResult ret = m_CallbackCreated( this );
+		if ( ret.IsOK() == false )
+			return ret;
+	}
 
 	return CResult();
 }
 
 
-void iberbar::RHI::D3D11::CDevice::BindVertexBuffer( ID3D11Buffer* pD3DVertexBuffer, uint32 stride )
+const char* iberbar::RHI::D3D11::CDevice::GetShaderCompileTarget( EShaderType eShaderType )
 {
-	if ( m_pD3DVertexBuffers[0] == pD3DVertexBuffer && stride == m_nVertexBufferStride )
-		return;
-
-	UNKNOWN_SAFE_RELEASE_NULL( m_pD3DVertexBuffers[ 0 ] );
-	m_pD3DVertexBuffers[ 0 ] = pD3DVertexBuffer;
-	UNKNOWN_SAFE_ADDREF( m_pD3DVertexBuffers[ 0 ] );
-	m_nVertexBufferStride = stride;
-	if ( m_pD3DVertexBuffers[ 0 ] == nullptr )
+	const char* pstrTarget = nullptr;
+	if ( eShaderType == EShaderType::VertexShader )
 	{
-		m_pD3DDeviceContext->IASetVertexBuffers( 0, 0, nullptr, nullptr, nullptr );
+		pstrTarget = "vs_5_0";
+	}
+	else if ( eShaderType == EShaderType::PixelShader )
+	{
+		pstrTarget = "ps_5_0";
+	}
+	else if ( eShaderType == EShaderType::HullShader )
+	{
+		pstrTarget = "hs_5_0";
+	}
+	else if ( eShaderType == EShaderType::GeometryShader )
+	{
+		pstrTarget = "gs_5_0";
+	}
+	else if ( eShaderType == EShaderType::DomainShader )
+	{
+		pstrTarget = "ds_5_0";
+	}
+	else if ( eShaderType == EShaderType::ComputeShader )
+	{
+		pstrTarget = "cs_5_0";
 	}
 	else
 	{
-		UINT offsets = 0;
-		m_pD3DDeviceContext->IASetVertexBuffers( 0, 1, m_pD3DVertexBuffers, &m_nVertexBufferStride, &offsets );
+		return nullptr;
 	}
+
+	return pstrTarget;
 }
 
 
-void iberbar::RHI::D3D11::CDevice::BindIndexBuffer( ID3D11Buffer* pD3DIndexBuffer )
-{
-	if ( m_pD3DIndexBuffer.Get() == pD3DIndexBuffer )
-		return;
-
-	m_pD3DIndexBuffer = pD3DIndexBuffer;
-	m_pD3DDeviceContext->IASetIndexBuffer( m_pD3DIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetVertexShader( ID3D11VertexShader* pD3DShader )
-{
-	m_pD3DDeviceContext->VSSetShader( pD3DShader, nullptr, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetPixelShader( ID3D11PixelShader* pD3DShader )
-{
-	m_pD3DDeviceContext->PSSetShader( pD3DShader, nullptr, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetHullShader( ID3D11HullShader* pD3DShader )
-{
-	m_pD3DDeviceContext->HSSetShader( pD3DShader, nullptr, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetGeometryShader( ID3D11GeometryShader* pD3DShader )
-{
-	m_pD3DDeviceContext->GSSetShader( pD3DShader, nullptr, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetDomainShader( ID3D11DomainShader* pD3DShader )
-{
-	m_pD3DDeviceContext->DSSetShader( pD3DShader, nullptr, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetComputeShader( ID3D11ComputeShader* pD3DShader )
-{
-	m_pD3DDeviceContext->CSSetShader( pD3DShader, nullptr, 0 );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetTexture( uint32 nStage, ID3D11ShaderResourceView* pD3DShaderResourceView )
-{
-	assert( nStage < 8 );
-
-	if ( m_pD3DTextures[ nStage ].Get() == pD3DShaderResourceView )
-		return;
-
-	m_pD3DTextures[ nStage ] = pD3DShaderResourceView;
-	m_pD3DDeviceContext->PSSetShaderResources( nStage, 1, m_pD3DTextures[nStage].GetAddressOf() );
-}
-
-
-void iberbar::RHI::D3D11::CDevice::SetSamplerState( uint32 nStage, ID3D11SamplerState* pD3DSamplerState )
-{
-	assert( nStage < 8 );
-
-	if ( m_pD3DSamplerStates[ nStage ].Get() == pD3DSamplerState )
-		return;
-
-	m_pD3DSamplerStates[ nStage ] = pD3DSamplerState;
-	m_pD3DDeviceContext->PSSetSamplers( nStage, 1, m_pD3DSamplerStates[nStage].GetAddressOf() );
-}
 

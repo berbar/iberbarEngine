@@ -7,9 +7,8 @@
 
 
 
-iberbar::Renderer::CRenderGroupCommandManager::CRenderGroupCommandManager( CRenderer2d* pRenderer )
-	: m_pRenderer( pRenderer )
-	, m_QueueIdMapping()
+iberbar::Renderer::CRenderGroupCommandManager::CRenderGroupCommandManager()
+	: m_QueueIdMapping()
 	, m_UnusedQueueId()
 {
 }
@@ -26,7 +25,7 @@ int iberbar::Renderer::CRenderGroupCommandManager::AllocQueueId()
 
 	if ( m_UnusedQueueId.empty() )
 	{
-		nQueueId = m_pRenderer->CreateRenderQueue();
+		nQueueId = CRenderer::sGetInstance()->CreateRenderQueue();
 		m_QueueIdMapping[ nQueueId ] = true;
 	}
 	else
@@ -57,6 +56,7 @@ iberbar::Renderer::CRenderGroupCommand::CRenderGroupCommand( CRenderGroupCommand
 	: CRenderCommand( URenderCommandType::Group )
 	, m_pGroupCommandManager( pManager )
 	, m_nQueueId( 0 )
+	, m_pRendererProcessor( nullptr )
 {
 	assert( m_pGroupCommandManager );
 	m_nQueueId = m_pGroupCommandManager->AllocQueueId();

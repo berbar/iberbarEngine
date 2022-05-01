@@ -9,6 +9,8 @@ namespace iberbar
 	{
 		namespace D3D9
 		{
+
+
 			class __iberbarD3DApi__ CDevice
 				: public IDevice
 			{
@@ -33,6 +35,7 @@ namespace iberbar
 				virtual CResult CreateShaderState( IShaderState** ppOutShaderState, IVertexDeclaration* pVertexDeclaration, IShader* pVertexShader, IShader* pPixelShader, IShader* pHullShader, IShader* pGeometryShader, IShader* pDomainShader ) override;
 				virtual void CreateShaderVariableTable( IShaderVariableTable** ppOutShaderVariableTable ) override;
 				virtual CResult CreateBlendState( IBlendState** ppOutBlendState, const UBlendDesc& BlendDesc ) override;
+				virtual CResult CreateDepthStencilState( IDepthStencilState** ppOutDepthStencilState, const UDepthStencilDesc& DepthStencilDesc ) override;
 				virtual CResult CreateSamplerState( ISamplerState** ppOutSamplerState, const UTextureSamplerState& SamplerDesc ) override;
 				virtual void CreateCommandContext( ICommandContext** ppOutContext ) override;
 				virtual CResult Begin() override;
@@ -48,7 +51,8 @@ namespace iberbar
 				void SetTexture( uint32 nStage, IDirect3DTexture9* pD3DTexture );
 
 			public:
-				void SetSamplerState( uint32 nStage, const UTextureSamplerState& SamplerState );
+				virtual void SetSamplerState( uint32 nStage, ISamplerState* pSamplerState ) override;
+				virtual void SetBlendState( IBlendState* pBlendState ) override;
 
 			public:
 				IDirect3DDevice9* GetD3DDevice() { return m_pD3DDevice; }

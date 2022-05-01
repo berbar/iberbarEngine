@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "tstl 构建 TestRender Windows",
+            "type": "shell",
+            "command": "./node_modules/.bin/tstl --project ./Test/Test.Render/tsconfig-windows.json --watch"
+
+        }
+    ]
+}

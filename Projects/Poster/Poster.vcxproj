@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{B842A98E-5213-4B7F-97F9-9AA228878DB8}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Poster</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Properties\Sdk.props" />
+    <Import Project="..\..\Properties\Paths.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Properties\Sdk.props" />
+    <Import Project="..\..\Properties\Paths.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Properties\Sdk.props" />
+    <Import Project="..\..\Properties\Paths.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\Properties\Sdk.props" />
+    <Import Project="..\..\Properties\Paths.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(iberbarBinDir)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opencv_include);$(sdk_lua_include);$(sdk_freetype2_include);$(sdk_curl_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opencv_lib);$(sdk_lua_lib);$(sdk_curl_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(iberbarBinDir)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opencv_include);$(sdk_lua_include);$(sdk_freetype2_include);$(sdk_curl_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opencv_lib);$(sdk_lua_lib);$(sdk_curl_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(iberbarBinDir)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opencv_include);$(sdk_lua_include);$(sdk_freetype2_include);$(sdk_curl_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opencv_lib);$(sdk_lua_lib);$(sdk_curl_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(iberbarBinDir)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
+    <IncludePath>$(iberbarSrcDir);$(sdk_opencv_include);$(sdk_lua_include);$(sdk_freetype2_include);$(sdk_curl_include);$(IncludePath)</IncludePath>
+    <LibraryPath>$(iberbarBinDir);$(sdk_opencv_lib);$(sdk_lua_lib);$(sdk_curl_lib);$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>IBERBAR_API_EXPORTS;WIN32;_DEBUG;POSTER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>opencv_imgcodecs412d.lib;opencv_imgproc412d.lib;opencv_core412d.lib;liblua53.a;iberbarUtility.lib;iberbarFont.lib;iberbarLua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>IBERBAR_API_EXPORTS;_DEBUG;POSTER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>opencv_imgcodecs412d.lib;opencv_imgproc412d.lib;opencv_core412d.lib;liblua53.a;iberbarUtility.lib;iberbarFont.lib;iberbarLua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>IBERBAR_API_EXPORTS;WIN32;NDEBUG;POSTER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>opencv_imgcodecs412d.lib;opencv_imgproc412d.lib;opencv_core412d.lib;liblua53.a;iberbarUtility.lib;iberbarFont.lib;iberbarLua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>IBERBAR_API_EXPORTS;NDEBUG;POSTER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>opencv_imgcodecs412d.lib;opencv_imgproc412d.lib;opencv_core412d.lib;liblua53.a;iberbarUtility.lib;iberbarFont.lib;iberbarLua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\iberbar\LuaCppApis\Utility\Rect.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\LuaCppApis\Utility\Xml.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\ElementBase.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\ElementImage.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\ElementLabel.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\XmlCommon.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\XmlEngine.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Elements\XmlProc.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Font.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\LuaApis.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Paints.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\ResourcesManager.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\Sprite.cpp" />
+    <ClCompile Include="..\..\Src\iberbar\Poster\TextureScale9.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\iberbar\LuaCppApis\Utility\Rect.h" />
+    <ClInclude Include="..\..\Src\iberbar\LuaCppApis\Utility\Xml.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementBase.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementImage.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementImageScale9.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\ElementLabel.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\XmlCommon.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\XmlEngine.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Elements\XmlProc.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Font.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\LuaApis.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\MathTypes.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Paints.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\ResourcesManager.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Sprite.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\Surface.h" />
+    <ClInclude Include="..\..\Src\iberbar\Poster\TextureScale9.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Font\Font.vcxproj">
+      <Project>{49d3fa7d-bc14-4987-af1d-92af0a2c7ff3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Lua\Lua.vcxproj">
+      <Project>{19354e10-e280-4145-896a-7eab42b9cec2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{295545fc-44b3-43cd-b1a5-6871e9be9217}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
