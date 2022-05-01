@@ -7,7 +7,7 @@ namespace iberbar
 {
 	namespace Renderer
 	{
-		class CEffectMatrices
+		class __iberbarRendererApi__ CEffectMatrices
 			: public CEffectBase
 		{
 		protected:
@@ -15,9 +15,11 @@ namespace iberbar
 			{
 				DirectX::XMFLOAT4X4 ViewMatrix;
 				DirectX::XMFLOAT4X4 ProjectionMatrix;
+				DirectX::XMFLOAT4X4 ViewProjectionMatrix;
 			};
 
 		public:
+			CResult Initial();
 			void SetViewMatrix( const DirectX::XMFLOAT4X4& Matrix );
 			void SetProjectionMatrix( const DirectX::XMFLOAT4X4& Matrix );
 			void Apply();

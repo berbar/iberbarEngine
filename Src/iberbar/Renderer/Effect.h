@@ -13,7 +13,7 @@ namespace iberbar
 	namespace Renderer
 	{
 
-		class CEffectBase
+		class __iberbarRendererApi__ CEffectBase
 			: public CRef
 		{
 		public:

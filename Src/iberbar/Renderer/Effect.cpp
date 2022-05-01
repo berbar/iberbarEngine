@@ -21,5 +21,5 @@ iberbar::Renderer::CEffectBase::~CEffectBase()
 iberbar::CResult iberbar::Renderer::CEffectBase::InitialRhiUniformBuffer( uint32 nSize )
 {
 	RHI::IDevice* pRhiDevice = CRenderer::sGetInstance()->GetRHIDevice();
-	return pRhiDevice->CreateUniformBuffer( &m_pRhiUniformBuffer, 0 );
+	return pRhiDevice->CreateUniformBuffer( &m_pRhiUniformBuffer, nSize );
 }
