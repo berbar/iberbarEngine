@@ -58,6 +58,9 @@
     <sdk_directxtk>$(CppSdkEnv)\DirectXTK\jan2021\$(PlatformTarget)</sdk_directxtk>
     <sdk_directxtk_include>$(sdk_directxtk)\Inc</sdk_directxtk_include>
     <sdk_directxtk_lib>$(sdk_directxtk)\Lib</sdk_directxtk_lib>
+    <sdk_v8>$(CppSdkEnv)\v8\8.4.371.19</sdk_v8>
+    <sdk_v8_include>$(sdk_v8)\Inc</sdk_v8_include>
+    <sdk_v8_lib>$(sdk_v8)\Lib\Win64DLL</sdk_v8_lib>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
@@ -229,6 +232,15 @@
     </BuildMacro>
     <BuildMacro Include="sdk_directxtk_lib">
       <Value>$(sdk_directxtk_lib)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_v8">
+      <Value>$(sdk_v8)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_v8_include">
+      <Value>$(sdk_v8_include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="sdk_v8_lib">
+      <Value>$(sdk_v8_lib)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
