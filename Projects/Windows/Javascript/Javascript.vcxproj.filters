@@ -6,6 +6,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Translator\FunctionTranslator.h">
       <Filter>Translator</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Javascript\V8Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Javascript\Device.cpp" />

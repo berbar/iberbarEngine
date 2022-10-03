@@ -9,7 +9,7 @@ namespace iberbar
 	namespace iJavascript
 	{
 
-		class CDevice
+		class __iberbarJavascriptApi__ CDevice
 		{
 		public:
 			CDevice();
@@ -20,11 +20,15 @@ namespace iberbar
 			void Shutdown();
 
 			void ExecuteFile( const char* pstrFilePath );
+			CResult ExecuteScript( const char* pstrScript );
 
 			v8::Isolate* GetMainIsolate() { return m_MainIsolate; }
 
+		private:
+			void DumpStatisticsLog( const v8::FunctionCallbackInfo<v8::Value>& Info );
+
 		public:
-			static CDevice* sGetInstance() {}
+			static CDevice* sGetInstance() { return sm_pInstance; }
 		private:
 			static CDevice* sm_pInstance;
 

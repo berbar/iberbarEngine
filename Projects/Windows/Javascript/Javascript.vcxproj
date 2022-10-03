@@ -85,18 +85,30 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(sdk_v8_include);$(iberbarSrcDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_v8_lib);$(LibraryPath)</LibraryPath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(sdk_v8_include);$(iberbarSrcDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_v8_lib);$(LibraryPath)</LibraryPath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(sdk_v8_include);$(iberbarSrcDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_v8_lib);$(LibraryPath)</LibraryPath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(sdk_v8_include);$(iberbarSrcDir);$(IncludePath)</IncludePath>
+    <LibraryPath>$(sdk_v8_lib);$(LibraryPath)</LibraryPath>
+    <OutDir>$(iberbarOutputDirRoot)</OutDir>
+    <TargetName>iberbar$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -104,11 +116,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__iberbarJavascriptApiExport__;WIN32;_DEBUG;JAVASCRIPT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>v8.dll.lib;v8_libplatform.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,6 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__iberbarJavascriptApiExport__;WIN32;NDEBUG;JAVASCRIPT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -126,6 +141,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>v8.dll.lib;v8_libplatform.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,11 +150,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__iberbarJavascriptApiExport__;_DEBUG;JAVASCRIPT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>v8.dll.lib;v8_libplatform.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,6 +167,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>__iberbarJavascriptApiExport__;NDEBUG;JAVASCRIPT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,15 +175,22 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>v8.dll.lib;v8_libplatform.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Device.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Headers.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Translator\FunctionTranslator.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Javascript\V8Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Javascript\Device.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utility\Utility.vcxproj">
+      <Project>{295545fc-44b3-43cd-b1a5-6871e9be9217}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
