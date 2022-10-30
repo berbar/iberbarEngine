@@ -8,6 +8,13 @@ namespace iberbar
 {
 	namespace iJavascript
 	{
+
+        FORCEINLINE static std::string ToStringA( v8::Isolate* Isolate, v8::Local<v8::Value> Value )
+        {
+            return std::string(*(v8::String::Utf8Value( Isolate, Value )));
+
+        }
+
 		FORCEINLINE v8::Local<v8::String> ToV8StringA( v8::Isolate* Isolate, const char* pText )
 		{
 			return v8::String::NewFromUtf8( Isolate, pText, v8::NewStringType::kNormal ).ToLocalChecked();

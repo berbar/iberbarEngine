@@ -7,9 +7,12 @@
       <Filter>Translator</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\V8Utils.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Javascript\JsLogger.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Javascript\JsModuleLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Javascript\Device.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Javascript\JsLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Translator">

@@ -1,6 +1,9 @@
 
 #include <iberbar/Javascript/Device.h>
+#include <iberbar/Javascript/JsModuleLoader.h>
+#include <iberbar/Javascript/JsLogger.h>
 #include <iberbar/Javascript/V8Utils.h>
+#include <iberbar/Utility/FileHelper.h>
 
 
 iberbar::iJavascript::CDevice* iberbar::iJavascript::CDevice::sm_pInstance = nullptr;
@@ -158,4 +161,71 @@ void iberbar::iJavascript::CDevice::DumpStatisticsLog( const v8::FunctionCallbac
     printf_s( StatisticsLog.c_str() );
     //Logger->Info( StatisticsLog );
 #endif // !WITH_QUICKJS
+}
+
+
+void iberbar::iJavascript::CDevice::FindModule( const v8::FunctionCallbackInfo<v8::Value>& Info )
+{
+
+}
+
+
+void iberbar::iJavascript::CDevice::LoadModule( const v8::FunctionCallbackInfo<v8::Value>& Info )
+{
+    v8::Isolate* Isolate = Info.GetIsolate();
+    v8::HandleScope HandleScope( Isolate );
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope( Context );
+
+    if ( Info.Length() == 0 ) {
+        Isolate->ThrowException(
+            v8::String::NewFromUtf8( Isolate, "bad args", v8::NewStringType::kNormal ).ToLocalChecked() );
+        return;
+    }
+    
+    std::string strFilePath = ToStringA( Isolate, Info[0] );
+    std::string strScriptText;
+    CFileHelper FileHelper;
+    if ( FileHelper.OpenFileA( strFilePath.c_str(), "r" ) )
+    {
+        strScriptText = FileHelper.ReadAsText();
+        FileHelper.CloseFile();
+    }
+
+
+
+    v8::Local<v8::Value> Result = v8::Undefined( Isolate );
+
+    v8::Local<v8::Object> global = Context->Global();
+    global->Set( Context, v8::String::NewFromUtf8( Isolate, "exports" ).ToLocalChecked(), v8::Object::New( Isolate ) );
+    v8::Local<v8::String> Source = v8::String::NewFromUtf8( Isolate, strScriptText.c_str(), v8::NewStringType::kNormal ).ToLocalChecked();
+    v8::Local<v8::Script> CompiledScript = v8::Script::Compile( Context, Source ).ToLocalChecked();
+    if ( CompiledScript.IsEmpty() ) {
+        Result = Isolate->ThrowException( v8::String::NewFromUtf8( Isolate, "module import error: Compile" ).ToLocalChecked() );
+    }
+    else {
+
+        CompiledScript->Run( Context );
+
+        Info.GetReturnValue().Set( global->Get( Context, v8::String::NewFromUtf8( Isolate, "exports" ).ToLocalChecked() ).ToLocalChecked() );
+    }
+}
+
+iberbar::CResult iberbar::iJavascript::CDevice::LoadFile(
+    const std::string& RequiringDir, const std::string& ModuleName,
+    std::string& OutPath, std::string& OutDebugPath,
+    std::string& Data )
+{
+    if ( m_pModuleLoader->Search( RequiringDir, ModuleName, OutPath, OutDebugPath ) )
+    {
+        if ( !m_pModuleLoader->Load( OutPath, Data ) )
+        {
+            return MakeResult( ResultCode::Bad, "can not load [%s]", ModuleName.c_str() );
+        }
+    }
+    else
+    {
+        return MakeResult( ResultCode::Bad, "can not find [%s]", ModuleName.c_str() );
+    }
+    return CResult();
 }

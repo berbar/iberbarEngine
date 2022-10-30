@@ -9,6 +9,9 @@ namespace iberbar
 	namespace iJavascript
 	{
 
+		class ILogger;
+		class IJsModuleLoader;
+
 		class __iberbarJavascriptApi__ CDevice
 		{
 		public:
@@ -26,6 +29,12 @@ namespace iberbar
 
 		private:
 			void DumpStatisticsLog( const v8::FunctionCallbackInfo<v8::Value>& Info );
+			void FindModule( const v8::FunctionCallbackInfo<v8::Value>& Info );
+			void LoadModule( const v8::FunctionCallbackInfo<v8::Value>& Info );
+
+			CResult LoadFile( const std::string& RequiringDir, const std::string& ModuleName,
+				std::string& OutPath, std::string& OutDebugPath,
+				std::string& Data );
 
 		public:
 			static CDevice* sGetInstance() { return sm_pInstance; }
@@ -38,6 +47,9 @@ namespace iberbar
 			v8::Isolate* m_MainIsolate = nullptr;
 			v8::Global<v8::Context> m_DefaultContext;
 			v8::Local<v8::ObjectTemplate> m_GlobalObjs;
+
+			ILogger* m_pLogger;
+			IJsModuleLoader* m_pModuleLoader;
 		};
 	}
 }

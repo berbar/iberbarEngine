@@ -181,11 +181,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Device.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Headers.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Javascript\JsLogger.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Javascript\JsModuleLoader.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\Translator\FunctionTranslator.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Javascript\V8Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Javascript\Device.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Javascript\JsLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utility\Utility.vcxproj">
