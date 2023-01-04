@@ -8,6 +8,27 @@ namespace iberbar
 {
 	namespace iJavascript
 	{
+        enum class EArgType
+        {
+            Int32,
+            Number,
+            String,
+            External,
+            Function,
+            Object
+        };
+
+        FORCEINLINE static void ThrowException( v8::Isolate* Isolate, const std::string& Message )
+        {
+            ThrowException( Isolate, Message.c_str() );
+        }
+
+        FORCEINLINE static void ThrowException( v8::Isolate* Isolate, const char* Message )
+        {
+            auto ExceptionStr = v8::String::NewFromUtf8( Isolate, Message,
+                v8::NewStringType::kNormal ).ToLocalChecked();
+            Isolate->ThrowException( v8::Exception::Error( ExceptionStr ) );
+        }
 
         FORCEINLINE static std::string ToStringA( v8::Isolate* Isolate, v8::Local<v8::Value> Value )
         {
@@ -72,5 +93,92 @@ namespace iberbar
             Result.data = TryCatchToString( Isolate, TryCatch );
             return Result;
         }
+
+        FORCEINLINE static bool CheckArgument( const v8::FunctionCallbackInfo<v8::Value>& Info, const std::vector<EArgType>& TypesExpect )
+        {
+            if ( Info.Length() < TypesExpect.size() )
+            {
+                ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters, the function expect %d, but  %d provided.", TypesExpect.size(), Info.Length() ) );
+                return false;
+            }
+
+            for ( int i = 0; i < TypesExpect.size(); ++i )
+            {
+                switch ( TypesExpect[ i ] )
+                {
+                case EArgType::Int32:
+                    if ( !Info[ i ]->IsInt32() )
+                    {
+                        ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters #%d, expect a int32.", i ) );
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                case EArgType::Number:
+                    if ( !Info[ i ]->IsNumber() )
+                    {
+                        ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters #%d, expect a int32.", i ) );
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                case EArgType::String:
+                    if ( !Info[ i ]->IsString() )
+                    {
+                        ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters #%d, expect a string.", i ) );
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                case EArgType::External:
+                    if ( !Info[ i ]->IsExternal() )
+                    {
+                        ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters #%d, expect an external.", i ) );
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                case EArgType::Function:
+                    if ( !Info[ i ]->IsFunction() )
+                    {
+                        ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters #%d, expect a function.", i ) );
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                case EArgType::Object:
+                    if ( !Info[ i ]->IsObject() )
+                    {
+                        ThrowException( Info.GetIsolate(), StdFormat( "Bad parameters #%d, expect a object.", i ) );
+                        return false;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                default:
+                    break;
+                }
+            }
+
+            return true;
+        }
 	}
+}
+
+#define CHECK_V8_ARGS(...) \
+static std::vector<EArgType> ArgExpect = { __VA_ARGS__ }; \
+if (!iberbar::iJavascript::CheckArgument(Info, ArgExpect)) \
+{ \
+    return; \
 }

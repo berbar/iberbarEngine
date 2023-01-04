@@ -2,6 +2,7 @@
 
 #include <iberbar/Javascript/Headers.h>
 #include <iberbar/Utility/Result.h>
+#include <functional>
 
 
 namespace iberbar
@@ -31,6 +32,9 @@ namespace iberbar
 			void DumpStatisticsLog( const v8::FunctionCallbackInfo<v8::Value>& Info );
 			void FindModule( const v8::FunctionCallbackInfo<v8::Value>& Info );
 			void LoadModule( const v8::FunctionCallbackInfo<v8::Value>& Info );
+			void Log( const v8::FunctionCallbackInfo<v8::Value>& Info );
+
+			void ExecuteModule( const std::string& ModuleName, std::function<std::string( const std::string&, const std::string& )> Preprocessor = nullptr );
 
 			CResult LoadFile( const std::string& RequiringDir, const std::string& ModuleName,
 				std::string& OutPath, std::string& OutDebugPath,
@@ -48,7 +52,9 @@ namespace iberbar
 			v8::Global<v8::Context> m_DefaultContext;
 			v8::Local<v8::ObjectTemplate> m_GlobalObjs;
 
+			ILogger* m_pLoggerDefault;
 			ILogger* m_pLogger;
+			IJsModuleLoader* m_pModuleLoaderDefault;
 			IJsModuleLoader* m_pModuleLoader;
 		};
 	}

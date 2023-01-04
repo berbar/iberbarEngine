@@ -79,6 +79,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\DpiHelper.h">
       <Filter>OS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Paths.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Utility\Color.cpp" />

@@ -215,6 +215,7 @@
     <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\Error.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\MultiEventWaiter.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Utility\OS\Windows\WndMessage.h" />
+    <ClInclude Include="..\..\..\Src\iberbar\Utility\Paths.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Utility\Ref.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Utility\RefStatistics.h" />
     <ClInclude Include="..\..\..\Src\iberbar\Utility\StdHelper_List.h" />

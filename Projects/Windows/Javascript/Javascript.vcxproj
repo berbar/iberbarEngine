@@ -189,6 +189,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\Src\iberbar\Javascript\Device.cpp" />
     <ClCompile Include="..\..\..\Src\iberbar\Javascript\JsLogger.cpp" />
+    <ClCompile Include="..\..\..\Src\iberbar\Javascript\JsModuleLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utility\Utility.vcxproj">
