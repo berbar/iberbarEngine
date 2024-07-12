@@ -5,7 +5,12 @@
 
 void Run( iberbar::iJavascript::CDevice* pJsDevice )
 {
-	pJsDevice->ExecuteScript( "dumpStatisticsLog();" );
+	//pJsDevice->ExecuteScript( "dumpStatisticsLog();" );
+	auto ret = pJsDevice->ExecuteScript( "console.info( 'yes, log\\n' );" );
+	if ( !ret.IsOK() )
+	{
+		printf_s( ret.data.c_str() );
+	}
 }
 
 int main()
